@@ -1,0 +1,29 @@
+{
+  "skill_name": "toefl-prep",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我12月20号考托福，去年考过一次旧版 88 分（阅读26 听力24 口语20 写作18）。申请的项目要求总分100、口语不低于22。工作日每天能学2小时左右，周末每天4小时。帮我做个备考计划。",
+      "expected_output": "按新版 1–6 分制换算：88 → band 4.5，要求 100 → band 5 但需提示 band 5 区间下沿 95 < 100、稳妥目标 5.5；说明旧单项 0–30 不能直接套总分对照表；按剩余周数给出三阶段计划、各阶段可检验目标、一周样例和检查点，重点放在口语和写作新题型；最后给出今天就能开始的第一个练习。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "给我出一组 Build a Sentence，10 道，中等难度。先别告诉我答案，我做完发给你。",
+      "expected_output": "10 道新版 Build a Sentence 题：每题有 A 的完整句和 B 的待拼句、词块列表，覆盖不同语法点（间接疑问句、被动、定语从句、完成时等），每题答案唯一；消息中不出现答案或解析，只给作答说明。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "帮我批改这篇托福学术讨论，给个分。\n\n教授：Some people believe universities should require all students to take a course in personal finance. Others think students should be free to choose their own courses. What is your opinion?\n\nAnna: I support requiring it. Many young people get into credit card debt because nobody taught them how to manage money.\n\nBen: I disagree. University is expensive, and students should spend their limited credits on courses related to their major.\n\n我的回答：\nIn my opinion, I think university should require personal finance course. Because it is very important for students. Many students don't know how to save money, they spend all money on shopping and eating outside. For example my roommate, he always have no money at the end of month and he need to borrow money from me. If he take a finance course, he will know how to make a budget. Although Ben said credits is limited, but I think one course is not a big problem. So I agree with Anna.",
+      "expected_output": "先用 text_stats.py 得到字数等客观数据；给出 0–5 估分（约 3 分）和大致 Writing band；指出亮点；按收益排序的 3 条改进（如：理由与 Anna 重复缺少新贡献、语法错误如主谓一致/Although...but/逗号连句、例子展开不足）；逐句修改表；保留原观点和室友例子的升级版；一个下一步练习。",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "来一段 Complete the Words 练练手，话题随便，难度中等",
+      "expected_output": "原创 70–100 词学术短文并用 scripts/c_test.py 生成挖空（首句完整、约 10 个空、下划线数等于缺失字母数）；只展示题目，不展示答案；说明作答方式（可以只写缺失字母或完整单词）。",
+      "files": []
+    }
+  ]
+}
