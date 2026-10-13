@@ -1,0 +1,365 @@
+<title>职场英语第 1 课</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+  /* Layout: sticky control bar (mode · filter · progress), then grouped card grids; cards stack to one column on phones. */
+  :root {
+    --bg: #f3f5f8;
+    --surface: #ffffff;
+    --ink: #17202b;
+    --muted: #5d6877;
+    --line: #dde2ea;
+    --accent: #1f4fa3;
+    --accent-soft: #e6edf9;
+    --known: #1d7a4c;
+    --known-soft: #e5f4ec;
+    --unknown: #c2352b;
+    --unknown-soft: #fcebea;
+    --cover: #c9d1dd;
+    --font-en: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --font-zh: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-num: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11161d; --surface: #19202a; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3442;
+      --accent: #7ea6f0; --accent-soft: #1d2a40; --known: #5cc690; --known-soft: #16302a;
+      --unknown: #f0786d; --unknown-soft: #3a1d1d; --cover: #3a4555; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11161d; --surface: #19202a; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3442;
+    --accent: #7ea6f0; --accent-soft: #1d2a40; --known: #5cc690; --known-soft: #16302a;
+    --unknown: #f0786d; --unknown-soft: #3a1d1d; --cover: #3a4555; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-en), var(--font-zh); font-size: 15px; line-height: 1.45; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 0 48px; }
+
+  header.top { padding-block: 20px 8px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+  header.top h1 { margin: 0; font-family: var(--font-zh); font-size: 22px; font-weight: 700; letter-spacing: 0.01em; text-wrap: balance; }
+  header.top p { margin: 0; color: var(--muted); font-size: 13px; font-family: var(--font-zh); }
+
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+  .tabs, .seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 2px; }
+  .tabs button, .seg button {
+    font: 600 13px/1 var(--font-zh); color: var(--muted); background: none; border: 0; border-radius: 6px; padding: 8px 11px; cursor: pointer; white-space: nowrap;
+  }
+  .tabs button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .label { font: 500 12px/1 var(--font-zh); color: var(--muted); letter-spacing: 0.04em; }
+  .ctl { display: inline-flex; align-items: center; gap: 6px; }
+  .stats { margin-left: auto; display: inline-flex; gap: 12px; font: 500 13px/1 var(--font-num); font-variant-numeric: tabular-nums; }
+  .stats .k { color: var(--known); } .stats .u { color: var(--unknown); } .stats .n { color: var(--muted); }
+  .meter { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; display: flex; }
+  .meter i { display: block; height: 100%; }
+  .meter .mk { background: var(--known); } .meter .mu { background: var(--unknown); }
+  .tool { font: 500 13px/1 var(--font-zh); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 11px; cursor: pointer; }
+  .tool[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  .tool.danger { color: var(--unknown); }
+  .sync { font: 12px/1 var(--font-zh); color: var(--muted); }
+  .confirm { display: inline-flex; gap: 6px; align-items: center; font: 13px/1 var(--font-zh); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font: 500 12.5px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 10px; cursor: pointer; }
+  .chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+  section.group { margin-top: 22px; }
+  section.group h2 { margin: 0 0 10px; display: flex; align-items: baseline; gap: 10px; font: 700 15px/1.2 var(--font-zh); }
+  section.group h2 small { font: 400 12px/1 var(--font-en); color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+  section.group h2 .cnt { margin-left: auto; font: 500 12px/1 var(--font-num); color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+  .grid.wide { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+  @media (max-width: 480px) { .grid, .grid.wide { grid-template-columns: 1fr; } }
+
+  .card {
+    position: relative; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--line);
+    border-radius: 6px; padding: 9px 10px 9px 11px; display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: start; min-width: 0;
+  }
+  .card.known { border-left-color: var(--known); }
+  .card.unknown { border-left-color: var(--unknown); background: var(--unknown-soft); }
+  .face { min-width: 0; cursor: pointer; display: grid; gap: 3px; border-radius: 4px; }
+  .face:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .en { font: 600 15px/1.35 var(--font-en); overflow-wrap: anywhere; }
+  .zh { font: 400 14px/1.45 var(--font-zh); color: var(--muted); overflow-wrap: anywhere; }
+  .sent .zh { color: var(--ink); font-size: 15px; }
+  .sent .en { font-weight: 400; font-size: 14.5px; color: var(--muted); }
+  .num { font: 500 11px/1 var(--font-num); color: var(--muted); margin-right: 6px; }
+  .covered { color: transparent !important; background: repeating-linear-gradient(135deg, var(--cover) 0 6px, transparent 6px 10px); border-radius: 3px; user-select: none; }
+  .covered .num { color: transparent; }
+  .marks { display: flex; gap: 4px; }
+  .mk-btn { font: 600 12px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 6px; padding: 7px 8px; cursor: pointer; min-width: 40px; }
+  .mk-btn.k[aria-pressed="true"] { background: var(--known); border-color: var(--known); color: #fff; }
+  .mk-btn.u[aria-pressed="true"] { background: var(--unknown); border-color: var(--unknown); color: #fff; }
+  .card.unknown .mk-btn { background: var(--surface); }
+  .card.unknown .mk-btn.u[aria-pressed="true"] { background: var(--unknown); }
+
+  .empty { margin-top: 28px; padding: 22px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-family: var(--font-zh); text-align: center; }
+  .hint { margin-top: 10px; color: var(--muted); font: 13px/1.5 var(--font-zh); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 640px) { .stats { margin-left: 0; } }
+  @media (prefers-reduced-motion: no-preference) { .card { transition: background .15s, border-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>职场英语 · 第 1 课</h1>
+    <p>项目协调与现场售后 · 60 个职业词组 · 88 个行业词汇 · 24 句中译英</p>
+  </header>
+
+  <div class="bar" id="bar">
+    <div class="row">
+      <div class="tabs" role="group" aria-label="内容">
+        <button id="tab-phrases" data-tab="phrases" aria-pressed="true">职业词组</button>
+        <button id="tab-industry" data-tab="industry" aria-pressed="false">行业词汇</button>
+        <button id="tab-sentences" data-tab="sentences" aria-pressed="false">中译英</button>
+      </div>
+      <div class="stats" aria-live="polite"><span class="k" id="st-k">会 0</span><span class="u" id="st-u">不会 0</span><span class="n" id="st-n">未标 0</span></div>
+    </div>
+    <div class="meter" aria-hidden="true"><i class="mk" id="m-k"></i><i class="mu" id="m-u"></i></div>
+    <div class="row">
+      <span class="ctl"><span class="label">遮盖</span>
+        <span class="seg" role="group" aria-label="遮盖">
+          <button id="cov-none" data-cover="none" aria-pressed="false">不遮</button>
+          <button id="cov-en" data-cover="en" aria-pressed="true">遮英文</button>
+          <button id="cov-zh" data-cover="zh" aria-pressed="false">遮中文</button>
+        </span>
+      </span>
+      <span class="ctl"><span class="label">显示</span>
+        <span class="seg" role="group" aria-label="显示">
+          <button id="flt-all" data-filter="all" aria-pressed="true">全部</button>
+          <button id="flt-review" data-filter="review" aria-pressed="false">待复习</button>
+          <button id="flt-unknown" data-filter="unknown" aria-pressed="false">只看不会</button>
+        </span>
+      </span>
+      <button class="tool" id="shuffle" aria-pressed="false">打乱顺序</button>
+      <span id="reset-wrap"><button class="tool danger" id="reset">清除本页标记</button></span>
+      <span class="sync" id="sync">标记保存在本浏览器</span>
+    </div>
+    <div class="chips" id="chips" hidden></div>
+  </div>
+
+  <p class="hint" id="hint">点卡片显示被遮住的部分，再点一次重新遮住。按“会 / 不会”标记；“待复习”= 不会 + 还没标的。</p>
+  <main id="list"></main>
+</div>
+
+<script>
+const DATA = {"phrases": [{"name": "项目推进", "en": "Project delivery", "items": [["kick off the project", "启动项目"], ["set clear milestones", "设定明确的里程碑"], ["meet a tight deadline", "赶上紧迫的期限"], ["fall behind schedule", "进度落后"], ["get back on track", "回到正轨"], ["allocate resources", "分配资源"], ["scope creep", "需求范围蔓延"], ["a critical-path task", "关键路径任务"], ["identify potential risks", "识别潜在风险"], ["draw up a contingency plan", "制定应急预案"], ["sign off on the design", "签字确认设计"], ["hand over the project", "移交项目"]]}, {"name": "沟通协调", "en": "Coordination", "items": [["keep stakeholders in the loop", "随时同步相关方"], ["follow up on an action item", "跟进待办事项"], ["escalate the issue", "把问题上报（给上级）"], ["align on priorities", "对齐优先级"], ["address customer concerns", "回应客户顾虑"], ["reach a compromise", "达成妥协"], ["set expectations", "事先讲清楚预期"], ["touch base with sb.", "和某人碰个头"], ["circulate the meeting minutes", "分发会议纪要"], ["give a status update", "做进度汇报"], ["bring sb. up to speed", "让某人了解最新进展"], ["put the project on hold", "暂停项目"]]}, {"name": "现场与故障", "en": "On-site & troubleshooting", "items": [["carry out a site survey", "做现场勘察"], ["troubleshoot the fault", "排查故障"], ["pinpoint the root cause", "找准根本原因"], ["an intermittent fault", "间歇性故障"], ["trip the circuit breaker", "使断路器跳闸"], ["run a diagnostic test", "运行诊断测试"], ["calibrate the sensor", "校准传感器"], ["a temporary workaround", "临时解决办法"], ["unplanned downtime", "计划外停机"], ["restore normal operation", "恢复正常运行"], ["commission the equipment", "调试设备"], ["perform preventive maintenance", "做预防性维护"]]}, {"name": "质量与交付", "en": "Quality & delivery", "items": [["meet the specifications", "符合规格"], ["fail the acceptance test", "验收测试不通过"], ["issue a non-conformance report", "开不合格报告"], ["take corrective action", "采取纠正措施"], ["conduct a quality audit", "进行质量审核"], ["tighten quality control", "加强质量控制"], ["expedite the delivery", "加急交货"], ["a lead time of six weeks", "六周的交货周期"], ["source parts locally", "本地采购零件"], ["a supply chain disruption", "供应链中断"], ["bear the extra cost", "承担额外费用"], ["stay within budget", "控制在预算内"]]}, {"name": "客户与售后", "en": "Customer & after-sales", "items": [["log a service request", "登记服务请求"], ["respond within 24 hours", "24 小时内响应"], ["dispatch an engineer", "派工程师（到现场）"], ["be covered under warranty", "在保修范围内"], ["replace sth. free of charge", "免费更换"], ["file a complaint", "提出投诉"], ["handle a complaint", "处理投诉"], ["provide remote support", "提供远程支持"], ["a service-level agreement", "服务级别协议 SLA"], ["exceed customer expectations", "超出客户预期"], ["build a long-term relationship", "建立长期合作"], ["write up a service report", "写服务报告"]]}], "industry": [{"name": "医疗", "items": [["sterilization", "灭菌"], ["ventilator", "呼吸机"], ["catheter", "导管"], ["ultrasound", "超声"], ["implant", "植入物"], ["sterile", "无菌的"], ["clinical trial", "临床试验"], ["regulatory approval", "注册审批"]]}, {"name": "信息", "items": [["server", "服务器"], ["database", "数据库"], ["firewall", "防火墙"], ["bandwidth", "带宽"], ["latency", "延迟"], ["deployment", "部署"], ["interface", "接口"], ["encryption", "加密"]]}, {"name": "电气", "items": [["voltage", "电压"], ["transformer", "变压器"], ["switchgear", "开关柜"], ["inverter", "逆变器"], ["relay", "继电器"], ["grounding", "接地"], ["insulation", "绝缘"], ["short circuit", "短路"]]}, {"name": "工程", "items": [["blueprint", "图纸"], ["tolerance", "公差"], ["welding", "焊接"], ["load-bearing", "承重的"], ["prototype", "样机"], ["simulation", "仿真"], ["durability", "耐久性"], ["retrofit", "改造升级"]]}, {"name": "制造", "items": [["assembly line", "装配线"], ["yield", "良率"], ["defect rate", "不良率"], ["fixture", "夹具"], ["mold", "模具"], ["machining", "机加工"], ["throughput", "产出量"], ["lean manufacturing", "精益生产"]]}, {"name": "汽车", "items": [["chassis", "底盘"], ["powertrain", "动力总成"], ["transmission", "变速箱"], ["OEM", "整车厂"], ["Tier 1 supplier", "一级供应商"], ["battery pack", "电池包"], ["recall", "召回"], ["homologation", "型式认证"]]}, {"name": "电子信息", "items": [["semiconductor", "半导体"], ["wafer", "晶圆"], ["PCB", "印刷电路板"], ["soldering", "焊接（电子）"], ["firmware", "固件"], ["connector", "连接器"], ["SMT", "表面贴装"], ["embedded system", "嵌入式系统"]]}, {"name": "物流", "items": [["freight", "货运"], ["warehouse", "仓库"], ["consignment", "托运货物"], ["customs clearance", "清关"], ["bill of lading", "提单"], ["container", "集装箱"], ["freight forwarder", "货代"], ["pallet", "托盘"]]}, {"name": "供应链", "items": [["inventory", "库存"], ["forecast", "需求预测"], ["bottleneck", "瓶颈"], ["safety stock", "安全库存"], ["shortage", "短缺"], ["traceability", "可追溯性"], ["just-in-time", "准时制"], ["backlog", "积压订单"]]}, {"name": "采购", "items": [["quotation", "报价"], ["RFQ", "询价单"], ["tender", "招标"], ["purchase order", "采购订单"], ["vendor", "供应商"], ["payment terms", "付款条件"], ["invoice", "发票"], ["procurement", "采购"]]}, {"name": "项目管理", "items": [["deliverable", "交付物"], ["Gantt chart", "甘特图"], ["baseline", "基线"], ["change request", "变更请求"], ["risk log", "风险清单"], ["WBS", "工作分解结构"], ["KPI", "关键绩效指标"], ["agile", "敏捷（开发）"]]}], "sentences": [["因为供应链中断，项目进度落后了两周，我们需要尽快制定一个应急预案。", "Because of a supply chain disruption, the project has fallen behind schedule by two weeks, so we need to draw up a contingency plan as soon as possible."], ["我们下周一启动项目，并在第一次会议上设定明确的里程碑。", "We'll kick off the project next Monday and set clear milestones at the first meeting."], ["在设计签字确认之前，请让所有相关方随时了解情况。", "Please keep all stakeholders in the loop before we sign off on the design."], ["如果这周还解决不了，我会把问题上报给管理层。", "If we can't solve it this week, I'll escalate the issue to management."], ["工程师花了三个小时排查故障，最后找准了根本原因：一个传感器没有校准好。", "The engineer spent three hours troubleshooting the fault and finally pinpointed the root cause: a sensor that hadn't been calibrated properly."], ["这是一个间歇性故障，所以我们先给客户一个临时解决办法。", "This is an intermittent fault, so we'll give the customer a temporary workaround first."], ["我们运行了诊断测试，现在设备已经恢复正常运行。", "We ran a diagnostic test, and the equipment has now been restored to normal operation."], ["这台设备还在保修范围内，所以我们会免费更换控制板。", "The equipment is still covered under warranty, so we'll replace the control board free of charge."], ["客户登记服务请求后，我们会在 24 小时内响应，必要时派工程师到现场。", "Once a customer logs a service request, we respond within 24 hours and dispatch an engineer to the site if necessary."], ["这批零件不符合规格，质量部门已经开了不合格报告。", "This batch of parts doesn't meet the specifications, and the quality department has already issued a non-conformance report."], ["我们已经采取了纠正措施，并会加强质量控制，避免同样的问题再次发生。", "We've taken corrective action and will tighten quality control to make sure the same problem doesn't happen again."], ["为了赶上这个紧迫的截止日期，我们需要重新分配资源。", "To meet this tight deadline, we need to reallocate resources."], ["正常交货周期是六周；如果要加急交货，客户需要承担额外费用。", "The standard lead time is six weeks. If you want us to expedite the delivery, you'll need to bear the extra cost."], ["我们正在考虑本地采购零件，这样可以缩短交货周期，也能控制在预算内。", "We're considering sourcing parts locally, which would shorten the lead time and help us stay within budget."], ["我们明天能不能碰个头，对齐一下下个月的优先级？", "Can we touch base tomorrow to align on priorities for next month?"], ["会议结束后，请分发会议纪要，并跟进每一个待办事项。", "After the meeting, please circulate the meeting minutes and follow up on every action item."], ["新同事下周加入，你能帮他了解一下项目的最新情况吗？", "A new colleague is joining next week. Could you bring them up to speed on the project?"], ["由于预算问题，客户决定暂停项目，直到明年一季度。", "Due to budget issues, the customer has decided to put the project on hold until Q1 next year."], ["安装之前，我们需要先做现场勘察，确认电源和空间都满足要求。", "Before the installation, we need to carry out a site survey to make sure the power supply and the space meet the requirements."], ["我们不仅解决了问题，还提供了远程支持，超出了客户的预期。", "We not only solved the problem but also provided remote support, which exceeded the customer's expectations."], ["这次计划外停机让客户损失了大约十个小时的产量。", "This unplanned downtime cost the customer about ten hours of production."], ["每次维修后，工程师都要写服务报告，并请客户签字确认。", "After every repair, the engineer has to write up a service report and ask the customer to sign it."], ["客户对延期提出了投诉，我们需要在今天下班前回应他们的顾虑。", "The customer has filed a complaint about the delay, and we need to address their concerns before the end of the day."], ["项目验收测试没通过，所以我们还不能把项目移交给客户。", "The project failed the acceptance test, so we can't hand it over to the customer yet."]]};
+
+// ---- items ----
+const ITEMS = { phrases: [], industry: [], sentences: [] };
+let n = 0;
+DATA.phrases.forEach((g) => g.items.forEach(([en, zh]) => { n++; ITEMS.phrases.push({ id: "p" + n, n, en, zh, group: g.name, groupEn: g.en }); }));
+DATA.industry.forEach((g, gi) => g.items.forEach(([en, zh], i) => ITEMS.industry.push({ id: "i" + gi + "-" + i, n: i + 1, en, zh, group: g.name })));
+DATA.sentences.forEach(([zh, en], i) => ITEMS.sentences.push({ id: "s" + (i + 1), n: i + 1, en, zh, group: "中译英" }));
+const INDUSTRIES = DATA.industry.map((g) => g.name);
+
+// ---- state ----
+const prefsKey = "lesson1-prefs", marksKey = "lesson1-marks";
+const state = { tab: "phrases", cover: "en", filter: "all", shuffle: false, industries: [], marks: {}, revealed: new Set() };
+function readLocal(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
+function writeLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+Object.assign(state, readLocal(prefsKey) || {});
+state.revealed = new Set();
+state.marks = readLocal(marksKey) || {};
+let order = {};
+
+function savePrefs() { const { tab, cover, filter, shuffle, industries } = state; writeLocal(prefsKey, { tab, cover, filter, shuffle, industries }); }
+
+// ---- rendering ----
+const $ = (id) => document.getElementById(id);
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+function visible(item) {
+  const m = state.marks[item.id];
+  if (state.filter === "review") return m !== "k";
+  if (state.filter === "unknown") return m === "u";
+  return true;
+}
+function shuffled(list, key) {
+  if (!state.shuffle) return list;
+  if (!order[key]) { order[key] = list.map((x) => x.id).sort(() => Math.random() - 0.5); }
+  const pos = new Map(order[key].map((id, i) => [id, i]));
+  return [...list].sort((a, b) => pos.get(a.id) - pos.get(b.id));
+}
+
+function card(item, sentence) {
+  const m = state.marks[item.id];
+  const c = el("div", "card" + (sentence ? " sent" : "") + (m === "k" ? " known" : m === "u" ? " unknown" : ""));
+  const face = el("div", "face");
+  face.tabIndex = 0;
+  face.setAttribute("role", "button");
+  const shown = state.revealed.has(item.id);
+  const first = sentence ? ["zh", item.zh] : ["en", item.en];
+  const second = sentence ? ["en", item.en] : ["zh", item.zh];
+  for (const [kind, text] of [first, second]) {
+    const line = el("div", kind);
+    if (kind === first[0]) { line.append(el("span", "num", String(item.n))); }
+    line.append(document.createTextNode(text));
+    if (state.cover === kind && !shown) line.classList.add("covered");
+    face.append(line);
+  }
+  face.setAttribute("aria-label", state.cover === "none" ? "卡片" : (shown ? "点击重新遮住" : "点击显示"));
+  const toggle = () => { if (state.cover === "none") return; shown ? state.revealed.delete(item.id) : state.revealed.add(item.id); render(); };
+  face.addEventListener("click", toggle);
+  face.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+  const marks = el("div", "marks");
+  for (const [v, label] of [["k", "会"], ["u", "不会"]]) {
+    const b = el("button", "mk-btn " + v, label);
+    b.setAttribute("aria-pressed", String(m === v));
+    b.addEventListener("click", () => setMark(item.id, m === v ? null : v));
+    marks.append(b);
+  }
+  c.append(face, marks);
+  return c;
+}
+
+function render() {
+  const tab = state.tab;
+  for (const b of document.querySelectorAll("[data-tab]")) b.setAttribute("aria-pressed", String(b.dataset.tab === tab));
+  for (const b of document.querySelectorAll("[data-cover]")) b.setAttribute("aria-pressed", String(b.dataset.cover === state.cover));
+  for (const b of document.querySelectorAll("[data-filter]")) b.setAttribute("aria-pressed", String(b.dataset.filter === state.filter));
+  $("shuffle").setAttribute("aria-pressed", String(state.shuffle));
+
+  // industry chips
+  const chips = $("chips");
+  chips.hidden = tab !== "industry";
+  if (tab === "industry") {
+    chips.replaceChildren();
+    const all = el("button", "chip", "全部行业");
+    all.setAttribute("aria-pressed", String(state.industries.length === 0));
+    all.addEventListener("click", () => { state.industries = []; savePrefs(); render(); });
+    chips.append(all);
+    for (const name of INDUSTRIES) {
+      const b = el("button", "chip", name);
+      const on = state.industries.includes(name);
+      b.setAttribute("aria-pressed", String(on));
+      b.addEventListener("click", () => {
+        state.industries = on ? state.industries.filter((x) => x !== name) : [...state.industries, name];
+        savePrefs(); render();
+      });
+      chips.append(b);
+    }
+  }
+
+  let pool = ITEMS[tab];
+  if (tab === "industry" && state.industries.length) pool = pool.filter((i) => state.industries.includes(i.group));
+
+  // stats for the current pool (before the display filter)
+  const k = pool.filter((i) => state.marks[i.id] === "k").length;
+  const u = pool.filter((i) => state.marks[i.id] === "u").length;
+  $("st-k").textContent = "会 " + k; $("st-u").textContent = "不会 " + u; $("st-n").textContent = "未标 " + (pool.length - k - u);
+  $("m-k").style.width = (pool.length ? (k / pool.length) * 100 : 0) + "%";
+  $("m-u").style.width = (pool.length ? (u / pool.length) * 100 : 0) + "%";
+
+  const list = $("list");
+  list.replaceChildren();
+  const shown = pool.filter(visible);
+  if (!shown.length) {
+    const msg = state.filter === "unknown" ? "这一页没有标成“不会”的条目。" : "这一页的条目都已经标成“会”了。切到“全部”可以重新看。";
+    list.append(el("div", "empty", msg));
+    return;
+  }
+  if (state.shuffle) {
+    const sec = el("section", "group");
+    const h = el("h2", null, "打乱顺序"); h.append(el("span", "cnt", shown.length + " 条"));
+    const grid = el("div", "grid" + (tab === "sentences" ? " wide" : ""));
+    shuffled(shown, tab + state.industries.join()).forEach((i) => grid.append(card(i, tab === "sentences")));
+    sec.append(h, grid); list.append(sec);
+    return;
+  }
+  const groups = [...new Set(shown.map((i) => i.group))];
+  for (const g of groups) {
+    const items = shown.filter((i) => i.group === g);
+    const sec = el("section", "group");
+    const h = el("h2", null, g);
+    if (items[0].groupEn) h.append(el("small", null, items[0].groupEn));
+    h.append(el("span", "cnt", items.length + " 条"));
+    const grid = el("div", "grid" + (tab === "sentences" ? " wide" : ""));
+    items.forEach((i) => grid.append(card(i, tab === "sentences")));
+    sec.append(h, grid); list.append(sec);
+  }
+}
+
+// ---- controls ----
+for (const b of document.querySelectorAll("[data-tab]")) b.addEventListener("click", () => {
+  state.tab = b.dataset.tab; state.revealed.clear();
+  if (state.tab === "sentences" && state.cover === "zh") state.cover = "en";
+  savePrefs(); render(); window.scrollTo({ top: 0 });
+});
+for (const b of document.querySelectorAll("[data-cover]")) b.addEventListener("click", () => { state.cover = b.dataset.cover; state.revealed.clear(); savePrefs(); render(); });
+for (const b of document.querySelectorAll("[data-filter]")) b.addEventListener("click", () => { state.filter = b.dataset.filter; savePrefs(); render(); });
+$("shuffle").addEventListener("click", () => { state.shuffle = !state.shuffle; order = {}; savePrefs(); render(); });
+
+function rebuildReset() {
+  const wrap = $("reset-wrap");
+  const b = el("button", "tool danger", "清除本页标记");
+  b.id = "reset";
+  b.addEventListener("click", () => {
+    const box = el("span", "confirm");
+    const yes = el("button", "tool danger", "确认清除");
+    const no = el("button", "tool", "取消");
+    box.append("清除当前这一页的所有标记？", yes, no);
+    wrap.replaceChildren(box);
+    no.addEventListener("click", rebuildReset);
+    yes.addEventListener("click", () => { for (const i of ITEMS[state.tab]) delete state.marks[i.id]; persist(); rebuildReset(); render(); });
+  });
+  wrap.replaceChildren(b);
+}
+rebuildReset();
+
+function setMark(id, v) {
+  if (v) state.marks[id] = v; else delete state.marks[id];
+  persist(); render();
+}
+
+// ---- persistence: account storage when available, browser storage otherwise ----
+let remote = null, writing = Promise.resolve(), timer = null, remoteFailed = false;
+function persist() {
+  writeLocal(marksKey, state.marks);
+  if (!remote || remoteFailed) return;
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    const body = { marks: { ...state.marks }, updatedAt: Date.now() };
+    writing = writing.then(() => remote.set(body)).then(
+      () => { $("sync").textContent = "标记已保存到你的账号"; },
+      (e) => { if (e && e.code === "invalid_argument") { remoteFailed = true; } $("sync").textContent = "标记暂存在本浏览器"; }
+    );
+  }, 600);
+}
+
+async function initRemote() {
+  if (!window.claude || !window.claude.use) return;
+  try {
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if (!db || !user) return;
+    const uid = await user.id();
+    if (!uid) return;
+    remote = db.doc("data/users/" + uid + "/progress");
+    const snap = await remote.get();
+    if (snap.exists) {
+      const saved = snap.data().marks || {};
+      const merged = { ...state.marks, ...saved };
+      state.marks = merged;
+      writeLocal(marksKey, state.marks);
+      render();
+      if (JSON.stringify(merged) !== JSON.stringify(saved)) persist();
+    } else if (Object.keys(state.marks).length) {
+      persist();
+    }
+    $("sync").textContent = "标记已保存到你的账号";
+    remote.onSnapshot((s) => {
+      if (!s.exists || s.metadata.hasPendingWrites) return;
+      const saved = s.data().marks || {};
+      if (JSON.stringify(saved) !== JSON.stringify(state.marks)) { state.marks = { ...saved }; writeLocal(marksKey, state.marks); render(); }
+    }, () => {});
+  } catch (e) {
+    remote = null;
+  }
+}
+
+render();
+initRemote();
+</script>
