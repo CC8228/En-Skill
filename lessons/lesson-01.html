@@ -89,7 +89,10 @@
   .num { font: 500 11px/1 var(--font-num); color: var(--muted); margin-right: 6px; }
   .covered { color: transparent !important; background: repeating-linear-gradient(135deg, var(--cover) 0 6px, transparent 6px 10px); border-radius: 3px; user-select: none; }
   .covered .num { color: transparent; }
-  .marks { display: flex; gap: 4px; }
+  .marks { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
+  .say { grid-column: 1 / -1; display: inline-flex; align-items: center; justify-content: center; gap: 4px; font: 600 12px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+  .say svg { width: 14px; height: 14px; fill: currentColor; }
+  .say.playing { background: var(--accent); border-color: var(--accent); color: #fff; }
   .mk-btn { font: 600 12px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 6px; padding: 7px 8px; cursor: pointer; min-width: 40px; }
   .mk-btn.k[aria-pressed="true"] { background: var(--known); border-color: var(--known); color: #fff; }
   .mk-btn.u[aria-pressed="true"] { background: var(--unknown); border-color: var(--unknown); color: #fff; }
@@ -134,6 +137,12 @@
           <button id="flt-unknown" data-filter="unknown" aria-pressed="false">只看不会</button>
         </span>
       </span>
+      <span class="ctl" id="speed-ctl"><span class="label">发音</span>
+        <span class="seg" role="group" aria-label="语速">
+          <button id="spd-normal" data-speed="0.95" aria-pressed="true">正常</button>
+          <button id="spd-slow" data-speed="0.7" aria-pressed="false">慢速</button>
+        </span>
+      </span>
       <button class="tool" id="shuffle" aria-pressed="false">打乱顺序</button>
       <span id="reset-wrap"><button class="tool danger" id="reset">清除本页标记</button></span>
       <span class="sync" id="sync">标记保存在本浏览器</span>
@@ -141,7 +150,7 @@
     <div class="chips" id="chips" hidden></div>
   </div>
 
-  <p class="hint" id="hint">点卡片显示被遮住的部分，再点一次重新遮住。按“会 / 不会”标记；“待复习”= 不会 + 还没标的。</p>
+  <p class="hint" id="hint">点卡片显示被遮住的部分，再点一次重新遮住。按“会 / 不会”标记；“待复习”= 不会 + 还没标的。点“发音”听英文读音，遮着英文时也能先听再说。</p>
   <main id="list"></main>
 </div>
 
@@ -158,7 +167,7 @@ const INDUSTRIES = DATA.industry.map((g) => g.name);
 
 // ---- state ----
 const prefsKey = "lesson1-prefs", marksKey = "lesson1-marks";
-const state = { tab: "phrases", cover: "en", filter: "all", shuffle: false, industries: [], marks: {}, revealed: new Set() };
+const state = { tab: "phrases", cover: "en", filter: "all", shuffle: false, industries: [], speed: 0.95, marks: {}, revealed: new Set() };
 function readLocal(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
 function writeLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 Object.assign(state, readLocal(prefsKey) || {});
@@ -166,7 +175,7 @@ state.revealed = new Set();
 state.marks = readLocal(marksKey) || {};
 let order = {};
 
-function savePrefs() { const { tab, cover, filter, shuffle, industries } = state; writeLocal(prefsKey, { tab, cover, filter, shuffle, industries }); }
+function savePrefs() { const { tab, cover, filter, shuffle, industries, speed } = state; writeLocal(prefsKey, { tab, cover, filter, shuffle, industries, speed }); }
 
 // ---- rendering ----
 const $ = (id) => document.getElementById(id);
@@ -212,6 +221,14 @@ function card(item, sentence) {
     b.addEventListener("click", () => setMark(item.id, m === v ? null : v));
     marks.append(b);
   }
+  if (canSpeak) {
+    const say = el("button", "say");
+    say.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+    say.append(document.createTextNode("发音"));
+    say.setAttribute("aria-label", "播放发音：" + item.en);
+    say.addEventListener("click", () => speak(item.en, say));
+    marks.append(say);
+  }
   c.append(face, marks);
   return c;
 }
@@ -222,6 +239,7 @@ function render() {
   for (const b of document.querySelectorAll("[data-cover]")) b.setAttribute("aria-pressed", String(b.dataset.cover === state.cover));
   for (const b of document.querySelectorAll("[data-filter]")) b.setAttribute("aria-pressed", String(b.dataset.filter === state.filter));
   $("shuffle").setAttribute("aria-pressed", String(state.shuffle));
+  for (const b of document.querySelectorAll("[data-speed]")) b.setAttribute("aria-pressed", String(Number(b.dataset.speed) === (state.speed || 0.95)));
 
   // industry chips
   const chips = $("chips");
@@ -283,6 +301,36 @@ function render() {
   }
 }
 
+// ---- pronunciation (the browser's built-in English voice) ----
+const synth = window.speechSynthesis;
+const canSpeak = !!(synth && window.SpeechSynthesisUtterance);
+let voice = null;
+function pickVoice() {
+  if (!canSpeak) return;
+  const vs = synth.getVoices().filter((v) => /^en[-_]/i.test(v.lang));
+  const rank = (v) => (/en[-_]US/i.test(v.lang) ? 0 : /en[-_]GB/i.test(v.lang) ? 1 : 2) * 10
+    + (/(natural|neural|google|samantha|aria|jenny|ava|alex)/i.test(v.name) ? 0 : 5) + (v.localService ? 0 : 1);
+  voice = vs.sort((a, b) => rank(a) - rank(b))[0] || null;
+}
+if (canSpeak) { pickVoice(); synth.addEventListener?.("voiceschanged", pickVoice); }
+function spoken(text) {
+  return text.replace(/\bsb\./g, "somebody").replace(/\bsth\./g, "something").replace(/\s\/\s/g, ", or ");
+}
+let playingBtn = null;
+function speak(text, btn) {
+  if (!canSpeak) return;
+  synth.cancel();
+  if (playingBtn) playingBtn.classList.remove("playing");
+  const u = new SpeechSynthesisUtterance(spoken(text));
+  u.lang = voice ? voice.lang : "en-US";
+  if (voice) u.voice = voice;
+  u.rate = state.speed || 0.95;
+  playingBtn = btn; btn.classList.add("playing");
+  const done = () => { btn.classList.remove("playing"); if (playingBtn === btn) playingBtn = null; };
+  u.onend = done; u.onerror = done;
+  synth.speak(u);
+}
+
 // ---- controls ----
 for (const b of document.querySelectorAll("[data-tab]")) b.addEventListener("click", () => {
   state.tab = b.dataset.tab; state.revealed.clear();
@@ -291,6 +339,8 @@ for (const b of document.querySelectorAll("[data-tab]")) b.addEventListener("cli
 });
 for (const b of document.querySelectorAll("[data-cover]")) b.addEventListener("click", () => { state.cover = b.dataset.cover; state.revealed.clear(); savePrefs(); render(); });
 for (const b of document.querySelectorAll("[data-filter]")) b.addEventListener("click", () => { state.filter = b.dataset.filter; savePrefs(); render(); });
+for (const b of document.querySelectorAll("[data-speed]")) b.addEventListener("click", () => { state.speed = Number(b.dataset.speed); savePrefs(); render(); });
+if (!canSpeak) $("speed-ctl").hidden = true;
 $("shuffle").addEventListener("click", () => { state.shuffle = !state.shuffle; order = {}; savePrefs(); render(); });
 
 function rebuildReset() {
