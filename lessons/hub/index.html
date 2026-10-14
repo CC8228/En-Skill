@@ -1,0 +1,206 @@
+<title>职场英语课程目录</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+  /* Layout: one column of lesson rows (newest first); each row = lesson number, topic, contents, actions, personal log. */
+  :root {
+    --bg: #f3f5f8;
+    --surface: #ffffff;
+    --ink: #17202b;
+    --muted: #5d6877;
+    --line: #dde2ea;
+    --accent: #1f4fa3;
+    --accent-soft: #e6edf9;
+    --done: #1d7a4c;
+    --done-soft: #e5f4ec;
+    --doing: #a86410;
+    --doing-soft: #fbf0e0;
+    --font-en: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --font-zh: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-num: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11161d; --surface: #19202a; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3442;
+      --accent: #7ea6f0; --accent-soft: #1d2a40; --done: #5cc690; --done-soft: #16302a;
+      --doing: #e9a654; --doing-soft: #3a2c17; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11161d; --surface: #19202a; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3442;
+    --accent: #7ea6f0; --accent-soft: #1d2a40; --done: #5cc690; --done-soft: #16302a;
+    --doing: #e9a654; --doing-soft: #3a2c17; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-zh); font-size: 15px; line-height: 1.5; }
+  .wrap { max-width: 880px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 56px; }
+  header { display: grid; gap: 6px; margin-bottom: 18px; }
+  h1 { margin: 0; font-size: 24px; font-weight: 700; text-wrap: balance; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  .summary { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 4px; font: 500 13px/1.4 var(--font-num); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .summary b { color: var(--ink); font-weight: 500; }
+
+  .lessons { display: grid; gap: 12px; }
+  .lesson { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; grid-template-columns: 64px 1fr; gap: 4px 16px; }
+  .no { grid-row: span 4; font: 700 30px/1 var(--font-num); color: var(--accent); }
+  .no small { display: block; margin-top: 6px; font: 500 11px/1 var(--font-zh); color: var(--muted); letter-spacing: 0.08em; }
+  .lesson h2 { margin: 0; font-size: 17px; font-weight: 700; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .pill { font: 600 12px/1 var(--font-zh); border-radius: 999px; padding: 4px 9px; background: var(--accent-soft); color: var(--muted); }
+  .pill.doing { background: var(--doing-soft); color: var(--doing); }
+  .pill.done { background: var(--done-soft); color: var(--done); }
+  .meta { color: var(--muted); font-size: 13px; }
+  .contents { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .contents span { font-size: 12.5px; border: 1px solid var(--line); border-radius: 4px; padding: 2px 7px; color: var(--muted); }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; font: 600 13.5px/1 var(--font-zh); text-decoration: none; border-radius: 6px; padding: 9px 13px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .log { grid-column: 2; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; color: var(--muted); }
+  .log label { display: inline-flex; align-items: center; gap: 6px; }
+  .log select { font: 13px var(--font-zh); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
+  .log .dates { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+  .note { margin-top: 22px; color: var(--muted); font-size: 13px; }
+  .status { font-size: 12px; color: var(--muted); }
+  @media (max-width: 520px) {
+    .lesson { grid-template-columns: 1fr; }
+    .no { grid-row: auto; font-size: 22px; display: flex; align-items: baseline; gap: 8px; }
+    .no small { display: inline; margin: 0; }
+    .log { grid-column: 1; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>职场英语课程目录</h1>
+    <p>项目经理 · 项目协调 · 现场售后方向。所有课程都在这里，最新的在最上面。</p>
+    <div class="summary" id="summary"></div>
+    <div class="status" id="sync">学习记录保存在本浏览器</div>
+  </header>
+
+  <div class="lessons" id="lessons"></div>
+
+  <p class="note">“网页练习”可以遮英文 / 遮中文、点开对照、听发音，并标记会和不会。“打开 PDF”是两页 A4 的打印版练习纸。每次复习完点“今天复习了”，这里会记下日期。</p>
+</div>
+
+<script>
+// Add one entry per new lesson, newest last; the page shows newest first.
+const LESSONS = [
+  {
+    no: 1,
+    title: "项目协调与现场售后",
+    date: "2026-10-13",
+    level: "B2–C1（雅思 6.0–7.0）",
+    contents: ["60 个职业词组", "88 个行业词汇", "24 句中译英", "补全动词搭配 18 个"],
+    web: "https://claude.ai/artifact/L8f8cpGaYq1vNxqerM6UXY",
+    pdf: "pdf/lesson-01.pdf",
+  },
+];
+
+const $ = (id) => document.getElementById(id);
+const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+
+// ---- personal log: { [lessonNo]: { status, reviews: ["YYYY-MM-DD", ...] } } ----
+const LOCAL = "course-log";
+let log = {};
+try { log = JSON.parse(localStorage.getItem(LOCAL) || "{}") || {}; } catch { log = {}; }
+let remote = null, writing = Promise.resolve();
+function today() { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function save() {
+  try { localStorage.setItem(LOCAL, JSON.stringify(log)); } catch {}
+  if (!remote) return;
+  const body = { log: JSON.parse(JSON.stringify(log)), updatedAt: Date.now() };
+  writing = writing.then(() => remote.set(body)).then(
+    () => { $("sync").textContent = "学习记录已保存到你的账号"; },
+    () => { $("sync").textContent = "学习记录暂存在本浏览器"; }
+  );
+}
+
+const STATUS = [["todo", "未开始"], ["doing", "进行中"], ["done", "已完成"]];
+
+function render() {
+  const list = $("lessons");
+  list.replaceChildren();
+  const done = LESSONS.filter((l) => (log[l.no] || {}).status === "done").length;
+  const reviews = LESSONS.reduce((s, l) => s + ((log[l.no] || {}).reviews || []).length, 0);
+  $("summary").replaceChildren();
+  for (const [k, v] of [["课程", LESSONS.length], ["已完成", done], ["累计复习", reviews + " 次"]]) {
+    const s = el("span", null, k + " "); s.append(el("b", null, String(v))); $("summary").append(s);
+  }
+
+  for (const l of [...LESSONS].reverse()) {
+    const rec = log[l.no] || { status: "todo", reviews: [] };
+    const card = el("article", "lesson");
+    const no = el("div", "no", String(l.no).padStart(2, "0")); no.append(el("small", null, "第 " + l.no + " 课"));
+    const h = el("h2", null, l.title);
+    const st = STATUS.find(([k]) => k === rec.status) || STATUS[0];
+    h.append(el("span", "pill " + st[0], st[1]));
+    const meta = el("div", "meta", l.date + " · 难度 " + l.level);
+    const contents = el("div", "contents"); l.contents.forEach((c) => contents.append(el("span", null, c)));
+    const actions = el("div", "actions");
+    const web = el("a", "btn primary", "网页练习"); web.href = l.web; web.target = "_blank"; web.rel = "noopener";
+    actions.append(web);
+    if (l.pdf) {
+      const pdf = el("a", "btn", "打开 PDF"); pdf.href = l.pdf; pdf.target = "_blank"; pdf.rel = "noopener";
+      actions.append(pdf);
+      if (downloads) {
+        const dl = el("button", "btn", "保存 PDF");
+        dl.addEventListener("click", async () => {
+          try {
+            const blob = await (await fetch(l.pdf)).blob();
+            await downloads.save({ filename: "职场英语第" + l.no + "课.pdf", data: blob });
+          } catch (e) { /* declined or unavailable: nothing to do */ }
+        });
+        actions.append(dl);
+      }
+    }
+    const logRow = el("div", "log");
+    const lab = el("label", null, "状态");
+    const sel = el("select"); sel.id = "status-" + l.no;
+    for (const [k, v] of STATUS) { const o = el("option", null, v); o.value = k; if (k === rec.status) o.selected = true; sel.append(o); }
+    sel.addEventListener("change", () => { log[l.no] = { ...rec, status: sel.value }; save(); render(); });
+    lab.append(sel);
+    const rv = el("button", "btn", "今天复习了");
+    const already = (rec.reviews || []).includes(today());
+    if (already) { rv.textContent = "今天已复习"; rv.disabled = true; }
+    rv.addEventListener("click", () => {
+      const reviews = [...(rec.reviews || []), today()];
+      log[l.no] = { ...rec, status: rec.status === "todo" ? "doing" : rec.status, reviews };
+      save(); render();
+    });
+    const rs = rec.reviews || [];
+    const dates = el("span", "dates", rs.length ? "复习 " + rs.length + " 次 · 最近 " + rs.slice(-3).reverse().join(" / ") : "还没有复习记录");
+    logRow.append(lab, rv, dates);
+    card.append(no, h, meta, contents, actions, logRow);
+    list.append(card);
+  }
+}
+
+let downloads = null;
+render();
+
+(async () => {
+  if (!window.claude || !window.claude.use) return;
+  try {
+    downloads = await window.claude.use("downloads");
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    const uid = user ? await user.id() : null;
+    if (db && uid) {
+      remote = db.doc("data/users/" + uid + "/course-log");
+      const snap = await remote.get();
+      if (snap.exists) {
+        const saved = snap.data().log || {};
+        const merged = { ...log, ...saved };
+        const changed = JSON.stringify(merged) !== JSON.stringify(saved);
+        log = merged;
+        try { localStorage.setItem(LOCAL, JSON.stringify(log)); } catch {}
+        if (changed) save();
+      } else if (Object.keys(log).length) {
+        save();
+      }
+      $("sync").textContent = "学习记录已保存到你的账号";
+    }
+  } catch { remote = null; }
+  render();
+})();
+</script>
