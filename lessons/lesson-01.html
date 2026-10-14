@@ -90,8 +90,8 @@
   .covered { color: transparent !important; background: repeating-linear-gradient(135deg, var(--cover) 0 6px, transparent 6px 10px); border-radius: 3px; user-select: none; }
   .covered .num { color: transparent; }
   .marks { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
-  .say { grid-column: 1 / -1; display: inline-flex; align-items: center; justify-content: center; gap: 4px; font: 600 12px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 6px; padding: 6px 8px; cursor: pointer; }
-  .say svg { width: 14px; height: 14px; fill: currentColor; }
+  .say, .ask { display: inline-flex; align-items: center; justify-content: center; gap: 4px; font: 600 12px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+  .say svg, .ask svg { width: 14px; height: 14px; fill: currentColor; }
   .say.playing { background: var(--accent); border-color: var(--accent); color: #fff; }
   .mk-btn { font: 600 12px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 6px; padding: 7px 8px; cursor: pointer; min-width: 40px; }
   .mk-btn.k[aria-pressed="true"] { background: var(--known); border-color: var(--known); color: #fff; }
@@ -112,6 +112,36 @@
   .verdict .ans { font-family: var(--font-en); }
   .verdict .miss { color: var(--unknown); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
   .tally { font: 500 13px/1 var(--font-num); color: var(--accent); font-variant-numeric: tabular-nums; }
+  /* explanation drawer */
+  .scrim { position: fixed; inset: 0; background: rgba(10, 16, 24, 0.35); z-index: 20; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100%); z-index: 21;
+    background: var(--surface); border-left: 1px solid var(--line); box-shadow: -12px 0 32px rgba(10, 16, 24, 0.18);
+    display: grid; grid-template-rows: auto 1fr auto; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (max-width: 560px) { .drawer { top: auto; height: 86%; width: 100%; border-left: 0; border-top: 1px solid var(--line); border-radius: 12px 12px 0 0; } }
+  .dr-head { padding: 14px 16px 12px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: start; }
+  .dr-head .t-en { font: 700 18px/1.3 var(--font-en); overflow-wrap: anywhere; }
+  .dr-head .t-zh { font: 14px/1.4 var(--font-zh); color: var(--muted); }
+  .dr-close { font: 600 13px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 6px; padding: 8px 10px; cursor: pointer; }
+  .dr-body { overflow-y: auto; padding: 14px 16px 18px; font: 14.5px/1.65 var(--font-zh); min-width: 0; }
+  .dr-body h4 { margin: 14px 0 4px; font: 700 14px/1.4 var(--font-zh); color: var(--accent); }
+  .dr-body h4:first-child { margin-top: 0; }
+  .dr-body p { margin: 4px 0; }
+  .dr-body ul, .dr-body ol { margin: 4px 0; padding-left: 20px; }
+  .dr-body li { margin: 2px 0; }
+  .dr-body .q-you { margin: 16px 0 6px; padding: 8px 10px; border-radius: 6px; background: var(--accent-soft); color: var(--ink); font-weight: 500; }
+  .dr-body .thinking { color: var(--muted); }
+  .dr-body .err { color: var(--unknown); }
+  .dr-foot { border-top: 1px solid var(--line); padding: 10px 16px 12px; display: grid; gap: 8px; }
+  .ask-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+  .ask-in { min-width: 0; font: 14px/1.3 var(--font-zh); color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 6px; padding: 9px 10px; }
+  .ask-in:focus { outline: none; border-color: var(--accent); }
+  .dr-btn { font: 600 13px/1 var(--font-zh); border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 6px; padding: 9px 12px; cursor: pointer; white-space: nowrap; }
+  .dr-btn.ghost { background: var(--surface); color: var(--accent); }
+  .dr-btn[disabled] { opacity: 0.5; cursor: default; }
+  .dr-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 12px/1.4 var(--font-zh); color: var(--muted); }
+  .copybox { width: 100%; font: 13px/1.5 var(--font-zh); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; resize: vertical; }
   .empty { margin-top: 28px; padding: 22px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-family: var(--font-zh); text-align: center; }
   .hint { margin-top: 10px; color: var(--muted); font: 13px/1.5 var(--font-zh); }
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -168,6 +198,26 @@
   <p class="hint" id="hint">点卡片显示被遮住的部分，再点一次重新遮住。按“会 / 不会”标记；“待复习”= 不会 + 还没标的。<b>打字练习</b>：选“遮英文”后，在卡片下的输入框里打英文，<b>回车</b>检查（对了自动标“会”，错了自动标“不会”并显示答案），<b>Tab</b> 跳到下一个，Shift+Tab 回上一个；手机上检查后再按一次回车也会跳到下一个。</p>
   <main id="list"></main>
 </div>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dr-en" hidden>
+  <div class="dr-head">
+    <div><div class="t-en" id="dr-en"></div><div class="t-zh" id="dr-zh"></div></div>
+    <button class="dr-close" id="dr-close">关闭</button>
+  </div>
+  <div class="dr-body" id="dr-body" aria-live="polite"></div>
+  <div class="dr-foot">
+    <div class="ask-row" id="ask-row">
+      <input class="ask-in" id="ask-in" type="text" placeholder="继续问，比如：和 start the project 有什么区别？" autocomplete="off">
+      <button class="dr-btn" id="ask-send">发送</button>
+    </div>
+    <div class="dr-tools">
+      <button class="dr-btn ghost" id="dr-stop" hidden>停止</button>
+      <button class="dr-btn ghost" id="dr-regen">重新解释</button>
+      <button class="dr-btn ghost" id="dr-copy">复制问题</button>
+      <span id="dr-note"></span>
+    </div>
+  </div>
+</aside>
 
 <script>
 const DATA = {"phrases": [{"name": "项目推进", "en": "Project delivery", "items": [["kick off the project", "启动项目"], ["set clear milestones", "设定明确的里程碑"], ["meet a tight deadline", "赶上紧迫的期限"], ["fall behind schedule", "进度落后"], ["get back on track", "回到正轨"], ["allocate resources", "分配资源"], ["scope creep", "需求范围蔓延"], ["a critical-path task", "关键路径任务"], ["identify potential risks", "识别潜在风险"], ["draw up a contingency plan", "制定应急预案"], ["sign off on the design", "签字确认设计"], ["hand over the project", "移交项目"]]}, {"name": "沟通协调", "en": "Coordination", "items": [["keep stakeholders in the loop", "随时同步相关方"], ["follow up on an action item", "跟进待办事项"], ["escalate the issue", "把问题上报（给上级）"], ["align on priorities", "对齐优先级"], ["address customer concerns", "回应客户顾虑"], ["reach a compromise", "达成妥协"], ["set expectations", "事先讲清楚预期"], ["touch base with sb.", "和某人碰个头"], ["circulate the meeting minutes", "分发会议纪要"], ["give a status update", "做进度汇报"], ["bring sb. up to speed", "让某人了解最新进展"], ["put the project on hold", "暂停项目"]]}, {"name": "现场与故障", "en": "On-site & troubleshooting", "items": [["carry out a site survey", "做现场勘察"], ["troubleshoot the fault", "排查故障"], ["pinpoint the root cause", "找准根本原因"], ["an intermittent fault", "间歇性故障"], ["trip the circuit breaker", "使断路器跳闸"], ["run a diagnostic test", "运行诊断测试"], ["calibrate the sensor", "校准传感器"], ["a temporary workaround", "临时解决办法"], ["unplanned downtime", "计划外停机"], ["restore normal operation", "恢复正常运行"], ["commission the equipment", "调试设备"], ["perform preventive maintenance", "做预防性维护"]]}, {"name": "质量与交付", "en": "Quality & delivery", "items": [["meet the specifications", "符合规格"], ["fail the acceptance test", "验收测试不通过"], ["issue a non-conformance report", "开不合格报告"], ["take corrective action", "采取纠正措施"], ["conduct a quality audit", "进行质量审核"], ["tighten quality control", "加强质量控制"], ["expedite the delivery", "加急交货"], ["a lead time of six weeks", "六周的交货周期"], ["source parts locally", "本地采购零件"], ["a supply chain disruption", "供应链中断"], ["bear the extra cost", "承担额外费用"], ["stay within budget", "控制在预算内"]]}, {"name": "客户与售后", "en": "Customer & after-sales", "items": [["log a service request", "登记服务请求"], ["respond within 24 hours", "24 小时内响应"], ["dispatch an engineer", "派工程师（到现场）"], ["be covered under warranty", "在保修范围内"], ["replace sth. free of charge", "免费更换"], ["file a complaint", "提出投诉"], ["handle a complaint", "处理投诉"], ["provide remote support", "提供远程支持"], ["a service-level agreement", "服务级别协议 SLA"], ["exceed customer expectations", "超出客户预期"], ["build a long-term relationship", "建立长期合作"], ["write up a service report", "写服务报告"]]}], "industry": [{"name": "医疗", "items": [["sterilization", "灭菌"], ["ventilator", "呼吸机"], ["catheter", "导管"], ["ultrasound", "超声"], ["implant", "植入物"], ["sterile", "无菌的"], ["clinical trial", "临床试验"], ["regulatory approval", "注册审批"]]}, {"name": "信息", "items": [["server", "服务器"], ["database", "数据库"], ["firewall", "防火墙"], ["bandwidth", "带宽"], ["latency", "延迟"], ["deployment", "部署"], ["interface", "接口"], ["encryption", "加密"]]}, {"name": "电气", "items": [["voltage", "电压"], ["transformer", "变压器"], ["switchgear", "开关柜"], ["inverter", "逆变器"], ["relay", "继电器"], ["grounding", "接地"], ["insulation", "绝缘"], ["short circuit", "短路"]]}, {"name": "工程", "items": [["blueprint", "图纸"], ["tolerance", "公差"], ["welding", "焊接"], ["load-bearing", "承重的"], ["prototype", "样机"], ["simulation", "仿真"], ["durability", "耐久性"], ["retrofit", "改造升级"]]}, {"name": "制造", "items": [["assembly line", "装配线"], ["yield", "良率"], ["defect rate", "不良率"], ["fixture", "夹具"], ["mold", "模具"], ["machining", "机加工"], ["throughput", "产出量"], ["lean manufacturing", "精益生产"]]}, {"name": "汽车", "items": [["chassis", "底盘"], ["powertrain", "动力总成"], ["transmission", "变速箱"], ["OEM", "整车厂"], ["Tier 1 supplier", "一级供应商"], ["battery pack", "电池包"], ["recall", "召回"], ["homologation", "型式认证"]]}, {"name": "电子信息", "items": [["semiconductor", "半导体"], ["wafer", "晶圆"], ["PCB", "印刷电路板"], ["soldering", "焊接（电子）"], ["firmware", "固件"], ["connector", "连接器"], ["SMT", "表面贴装"], ["embedded system", "嵌入式系统"]]}, {"name": "物流", "items": [["freight", "货运"], ["warehouse", "仓库"], ["consignment", "托运货物"], ["customs clearance", "清关"], ["bill of lading", "提单"], ["container", "集装箱"], ["freight forwarder", "货代"], ["pallet", "托盘"]]}, {"name": "供应链", "items": [["inventory", "库存"], ["forecast", "需求预测"], ["bottleneck", "瓶颈"], ["safety stock", "安全库存"], ["shortage", "短缺"], ["traceability", "可追溯性"], ["just-in-time", "准时制"], ["backlog", "积压订单"]]}, {"name": "采购", "items": [["quotation", "报价"], ["RFQ", "询价单"], ["tender", "招标"], ["purchase order", "采购订单"], ["vendor", "供应商"], ["payment terms", "付款条件"], ["invoice", "发票"], ["procurement", "采购"]]}, {"name": "项目管理", "items": [["deliverable", "交付物"], ["Gantt chart", "甘特图"], ["baseline", "基线"], ["change request", "变更请求"], ["risk log", "风险清单"], ["WBS", "工作分解结构"], ["KPI", "关键绩效指标"], ["agile", "敏捷（开发）"]]}], "sentences": [["因为供应链中断，项目进度落后了两周，我们需要尽快制定一个应急预案。", "Because of a supply chain disruption, the project has fallen behind schedule by two weeks, so we need to draw up a contingency plan as soon as possible."], ["我们下周一启动项目，并在第一次会议上设定明确的里程碑。", "We'll kick off the project next Monday and set clear milestones at the first meeting."], ["在设计签字确认之前，请让所有相关方随时了解情况。", "Please keep all stakeholders in the loop before we sign off on the design."], ["如果这周还解决不了，我会把问题上报给管理层。", "If we can't solve it this week, I'll escalate the issue to management."], ["工程师花了三个小时排查故障，最后找准了根本原因：一个传感器没有校准好。", "The engineer spent three hours troubleshooting the fault and finally pinpointed the root cause: a sensor that hadn't been calibrated properly."], ["这是一个间歇性故障，所以我们先给客户一个临时解决办法。", "This is an intermittent fault, so we'll give the customer a temporary workaround first."], ["我们运行了诊断测试，现在设备已经恢复正常运行。", "We ran a diagnostic test, and the equipment has now been restored to normal operation."], ["这台设备还在保修范围内，所以我们会免费更换控制板。", "The equipment is still covered under warranty, so we'll replace the control board free of charge."], ["客户登记服务请求后，我们会在 24 小时内响应，必要时派工程师到现场。", "Once a customer logs a service request, we respond within 24 hours and dispatch an engineer to the site if necessary."], ["这批零件不符合规格，质量部门已经开了不合格报告。", "This batch of parts doesn't meet the specifications, and the quality department has already issued a non-conformance report."], ["我们已经采取了纠正措施，并会加强质量控制，避免同样的问题再次发生。", "We've taken corrective action and will tighten quality control to make sure the same problem doesn't happen again."], ["为了赶上这个紧迫的截止日期，我们需要重新分配资源。", "To meet this tight deadline, we need to reallocate resources."], ["正常交货周期是六周；如果要加急交货，客户需要承担额外费用。", "The standard lead time is six weeks. If you want us to expedite the delivery, you'll need to bear the extra cost."], ["我们正在考虑本地采购零件，这样可以缩短交货周期，也能控制在预算内。", "We're considering sourcing parts locally, which would shorten the lead time and help us stay within budget."], ["我们明天能不能碰个头，对齐一下下个月的优先级？", "Can we touch base tomorrow to align on priorities for next month?"], ["会议结束后，请分发会议纪要，并跟进每一个待办事项。", "After the meeting, please circulate the meeting minutes and follow up on every action item."], ["新同事下周加入，你能帮他了解一下项目的最新情况吗？", "A new colleague is joining next week. Could you bring them up to speed on the project?"], ["由于预算问题，客户决定暂停项目，直到明年一季度。", "Due to budget issues, the customer has decided to put the project on hold until Q1 next year."], ["安装之前，我们需要先做现场勘察，确认电源和空间都满足要求。", "Before the installation, we need to carry out a site survey to make sure the power supply and the space meet the requirements."], ["我们不仅解决了问题，还提供了远程支持，超出了客户的预期。", "We not only solved the problem but also provided remote support, which exceeded the customer's expectations."], ["这次计划外停机让客户损失了大约十个小时的产量。", "This unplanned downtime cost the customer about ten hours of production."], ["每次维修后，工程师都要写服务报告，并请客户签字确认。", "After every repair, the engineer has to write up a service report and ask the customer to sign it."], ["客户对延期提出了投诉，我们需要在今天下班前回应他们的顾虑。", "The customer has filed a complaint about the delay, and we need to address their concerns before the end of the day."], ["项目验收测试没通过，所以我们还不能把项目移交给客户。", "The project failed the acceptance test, so we can't hand it over to the customer yet."]]};
@@ -347,6 +397,12 @@ function card(item, sentence) {
     say.addEventListener("click", () => speak(item.en, say));
     marks.append(say);
   }
+  const ask = el("button", "ask");
+  ask.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 17h-2v-2h2v2zm2.1-7.7-.9.9c-.7.7-1.2 1.3-1.2 2.8h-2v-.5c0-1.1.5-2.1 1.2-2.8l1.2-1.3a2 2 0 1 0-3.4-1.4H8a4 4 0 1 1 7.1 2.3z"/></svg>';
+  ask.append(document.createTextNode("解释"));
+  ask.setAttribute("aria-label", "让 Claude 解释：" + item.en);
+  ask.addEventListener("click", () => openExplain(item, ask));
+  marks.append(ask);
   c.append(face, marks);
   if (typingOn()) c.append(typer(item));
   return c;
@@ -467,6 +523,202 @@ function speak(text, btn) {
   synth.speak(u);
 }
 
+// ---- explanations from Claude ----
+let sampleFn = null;        // claude.use("sample") result, null when unavailable
+let sampleBlocked = false;  // viewer declined or Claude unavailable in this view
+let dbRef = null, userId = null;
+const explainCache = {};    // id -> turns
+let cur = null;             // { item, turns, ctl, opener }
+let lastError = "";
+
+const KIND = { phrases: "职场词组", industry: "行业词汇", sentences: "句子" };
+function kindOf(item) { return item.id[0] === "p" ? "phrases" : item.id[0] === "i" ? "industry" : "sentences"; }
+const LEARNER = "学习者：中文母语，英语大约雅思 5 分，目标是能在项目经理、项目协调、现场售后工作中开口说英语（行业可能是医疗、电气、制造、汽车、电子、物流、采购）。";
+function promptFor(item) {
+  const k = kindOf(item);
+  if (k === "sentences") {
+    return "你是职场英语老师。" + LEARNER + "\n请用中文讲解下面这个句子，英文部分保持英文。\n中文：" + item.zh + "\n参考英文：" + item.en +
+      "\n\n按下面的结构输出，每部分 2-4 行，简洁，不要开场白和结束语：\n### 句子结构\n### 关键词组\n### 更口语的说法\n### 更正式的说法（写邮件用）\n### 中国人常见错误\n### 发音和停顿提示";
+  }
+  return "你是职场英语老师。" + LEARNER + "\n请用中文讲解下面这个" + KIND[k] + "，英文例句保持英文。\n条目：" + item.en + "（" + item.zh + "）" +
+    "\n\n按下面的结构输出，简洁，不要开场白和结束语：\n### 意思和用法\n### 发音要点（用大写标出重读，比如 kick OFF；说明连读或易错音）\n### 常见搭配（3-5 个）\n### 工作例句（3 句，项目或现场售后场景，每句后面附中文）\n### 中国人常见错误（1-2 条）\n### 近义说法（如果有）";
+}
+function copyPromptFor(item) {
+  return kindOf(item) === "sentences"
+    ? "请讲解这个职场英语句子：" + item.en + "（" + item.zh + "）。包括句子结构、关键词组、更口语和更正式的说法、常见错误、发音停顿。"
+    : "请讲解这个职场英语" + KIND[kindOf(item)] + "：" + item.en + "（" + item.zh + "）。包括意思用法、发音要点、常见搭配、3 个项目或现场售后场景的例句、中国人常见错误、近义说法。";
+}
+
+// Minimal Markdown to DOM (headings, lists, bold) without innerHTML.
+function inline(parent, text) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  for (const part of parts) {
+    if (/^\*\*[^*]+\*\*$/.test(part)) parent.append(el("strong", null, part.slice(2, -2)));
+    else if (part) parent.append(document.createTextNode(part));
+  }
+}
+function renderMarkdown(text, into) {
+  let list = null;
+  for (const raw of text.split("\n")) {
+    const line = raw.trimEnd();
+    const h = line.match(/^#{1,6}\s+(.*)$/);
+    const ul = line.match(/^\s*[-*•]\s+(.*)$/);
+    const ol = line.match(/^\s*\d+[.)]\s+(.*)$/);
+    if (h) { list = null; const e = el("h4"); inline(e, h[1]); into.append(e); }
+    else if (ul || ol) {
+      const tag = ul ? "UL" : "OL";
+      if (!list || list.tagName !== tag) { list = el(tag.toLowerCase()); into.append(list); }
+      const li = el("li"); inline(li, (ul || ol)[1]); list.append(li);
+    } else if (line.trim()) { list = null; const p = el("p"); inline(p, line); into.append(p); }
+    else list = null;
+  }
+}
+
+function drawTurns(streaming) {
+  const body = $("dr-body");
+  body.replaceChildren();
+  const turns = cur.turns;
+  for (let i = 1; i < turns.length; i++) {
+    const t = turns[i];
+    if (t.role === "user") body.append(el("div", "q-you", t.content));
+    else { const box = el("div"); renderMarkdown(t.content, box); body.append(box); }
+  }
+  if (streaming !== undefined) {
+    const box = el("div");
+    if (streaming) renderMarkdown(streaming, box); else box.append(el("p", "thinking", "Claude 正在写解释……"));
+    body.append(box);
+    return box;
+  }
+}
+
+function setBusy(busy) {
+  $("dr-stop").hidden = !busy;
+  $("ask-send").disabled = busy;
+  $("dr-regen").disabled = busy;
+}
+
+async function saveExplain(item) {
+  explainCache[item.id] = cur.turns;
+  if (!dbRef || !userId) return;
+  try { await dbRef.doc("data/users/" + userId + "/explain-" + item.id).set({ turns: cur.turns, updatedAt: Date.now() }); } catch {}
+}
+
+const ERRORS = {
+  rate_limited: "请求太频繁或已到使用上限，稍后再试。",
+  session_expired: "登录已过期，请重新登录 claude.ai 后再试。",
+  refused: "Claude 没有回答这个问题，换个问法试试。",
+  empty_completion: "没有得到回答，换个问法试试。",
+  upstream_error: "连接中断了，点“重新解释”或再发一次。",
+};
+
+async function runSample(item, turns) {
+  if (!sampleFn || sampleBlocked) { showCopyFallback(item); return null; }
+  const ctl = new AbortController();
+  cur.ctl = ctl;
+  setBusy(true);
+  let box = drawTurns("");
+  $("dr-note").textContent = ""; lastError = "已停止。";
+  try {
+    const input = turns.length === 1 ? turns[0].content : turns;
+    const { text } = await sampleFn(input, {
+      modelTier: "quick", signal: ctl.signal, cache: turns.length === 1 ? true : false,
+      onText: ({ text }) => { if (cur && cur.item === item) { box.replaceChildren(); renderMarkdown(text, box); } },
+    });
+    return text;
+  } catch (e) {
+    const code = e && e.code;
+    if (code === "cancelled") { $("dr-note").textContent = "已停止。"; return e.text || null; }
+    if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(code)) {
+      sampleBlocked = true; showCopyFallback(item); return null;
+    }
+    lastError = ERRORS[code] || ERRORS.upstream_error;
+    box.replaceChildren(); if (e && e.text) renderMarkdown(e.text, box);
+    box.append(el("p", "err", lastError));
+    return null;
+  } finally {
+    if (cur) { cur.ctl = null; setBusy(false); }
+  }
+}
+
+function showCopyFallback(item) {
+  const body = $("dr-body");
+  body.replaceChildren();
+  body.append(el("p", null, "这里暂时不能直接调用 Claude（可能是没有允许，或当前环境不支持）。可以复制下面的问题，粘贴到 Claude 对话里问："));
+  const ta = el("textarea", "copybox"); ta.rows = 4; ta.value = copyPromptFor(item); ta.readOnly = true; ta.id = "copy-" + item.id;
+  body.append(ta);
+  $("ask-row").hidden = true; $("dr-regen").hidden = true;
+}
+
+async function loadSaved(item) {
+  if (explainCache[item.id]) return explainCache[item.id];
+  if (!dbRef || !userId) return null;
+  try {
+    const snap = await dbRef.doc("data/users/" + userId + "/explain-" + item.id).get();
+    if (snap.exists && Array.isArray(snap.data().turns)) return (explainCache[item.id] = snap.data().turns);
+  } catch {}
+  return null;
+}
+
+async function openExplain(item, opener) {
+  if (cur && cur.ctl) cur.ctl.abort();
+  cur = { item, turns: [{ role: "user", content: promptFor(item) }], ctl: null, opener };
+  $("dr-en").textContent = item.en; $("dr-zh").textContent = item.zh;
+  $("ask-row").hidden = false; $("dr-regen").hidden = false; $("dr-note").textContent = "";
+  $("ask-in").value = "";
+  $("drawer").hidden = false; $("scrim").hidden = false;
+  $("dr-close").focus();
+  const saved = await loadSaved(item);
+  if (!cur || cur.item !== item) return;
+  if (saved && saved.length > 1) { cur.turns = saved.map((t) => ({ ...t })); drawTurns(); $("dr-note").textContent = "这是之前保存的解释。"; return; }
+  const text = await runSample(item, cur.turns);
+  if (text && cur && cur.item === item) { cur.turns.push({ role: "assistant", content: text }); drawTurns(); saveExplain(item); }
+}
+
+async function askFollowUp() {
+  if (!cur || cur.ctl) return;
+  const q = $("ask-in").value.trim();
+  if (!q) return;
+  if (cur.turns.length < 2) return;
+  const item = cur.item;
+  $("ask-in").value = "";
+  cur.turns.push({ role: "user", content: q });
+  const recent = [cur.turns[0], ...cur.turns.slice(1).slice(-12)];
+  const text = await runSample(item, recent);
+  if (cur && cur.item === item) {
+    if (text) { cur.turns.push({ role: "assistant", content: text }); drawTurns(); saveExplain(item); }
+    else if (!sampleBlocked) { cur.turns.pop(); drawTurns(); $("ask-in").value = q; $("dr-note").textContent = lastError; }
+  }
+}
+
+function closeExplain() {
+  if (!cur) return;
+  if (cur.ctl) cur.ctl.abort();
+  const opener = cur.opener; cur = null;
+  $("drawer").hidden = true; $("scrim").hidden = true;
+  if (opener && opener.isConnected) opener.focus();
+}
+
+$("dr-close").addEventListener("click", closeExplain);
+$("scrim").addEventListener("click", closeExplain);
+$("dr-stop").addEventListener("click", () => { if (cur && cur.ctl) cur.ctl.abort(); });
+$("ask-send").addEventListener("click", askFollowUp);
+$("ask-in").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); askFollowUp(); } });
+$("dr-regen").addEventListener("click", async () => {
+  if (!cur || cur.ctl) return;
+  const item = cur.item;
+  cur.turns = [{ role: "user", content: promptFor(item) }];
+  delete explainCache[item.id];
+  const text = await runSample(item, cur.turns);
+  if (text && cur && cur.item === item) { cur.turns.push({ role: "assistant", content: text }); drawTurns(); saveExplain(item); }
+});
+$("dr-copy").addEventListener("click", async () => {
+  if (!cur) return;
+  const text = copyPromptFor(cur.item);
+  try { await navigator.clipboard.writeText(text); $("dr-note").textContent = "已复制，可以粘贴到 Claude 对话里。"; }
+  catch { showCopyFallback(cur.item); const ta = document.querySelector(".copybox"); if (ta) { ta.focus(); ta.select(); } $("dr-note").textContent = "请手动复制上面的文字。"; }
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && cur) closeExplain(); });
+
 // ---- controls ----
 for (const b of document.querySelectorAll("[data-tab]")) b.addEventListener("click", () => {
   state.tab = b.dataset.tab; state.revealed.clear(); sticky.clear();
@@ -529,6 +781,7 @@ async function initRemote() {
     if (!db || !user) return;
     const uid = await user.id();
     if (!uid) return;
+    dbRef = db; userId = uid;
     remote = db.doc("data/users/" + uid + "/progress");
     const snap = await remote.get();
     if (snap.exists) {
@@ -554,4 +807,5 @@ async function initRemote() {
 
 render();
 initRemote();
+(async () => { try { sampleFn = window.claude && window.claude.use ? await window.claude.use("sample") : null; } catch { sampleFn = null; } })();
 </script>
