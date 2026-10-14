@@ -99,6 +99,19 @@
   .card.unknown .mk-btn { background: var(--surface); }
   .card.unknown .mk-btn.u[aria-pressed="true"] { background: var(--unknown); }
 
+  .typer { grid-column: 1 / -1; display: grid; gap: 5px; margin-top: 2px; }
+  .type-in { width: 100%; min-width: 0; font: 500 15px/1.3 var(--font-en); color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+  .type-in::placeholder { color: var(--muted); font-family: var(--font-zh); font-size: 13px; }
+  .type-in:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+  .type-in.ok { border-color: var(--known); background: var(--known-soft); }
+  .type-in.bad { border-color: var(--unknown); background: var(--surface); }
+  .verdict { font: 13px/1.5 var(--font-zh); overflow-wrap: anywhere; }
+  .verdict.ok { color: var(--known); font-weight: 600; }
+  .verdict.bad { color: var(--ink); }
+  .verdict .tag { color: var(--unknown); font-weight: 600; margin-right: 6px; }
+  .verdict .ans { font-family: var(--font-en); }
+  .verdict .miss { color: var(--unknown); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+  .tally { font: 500 13px/1 var(--font-num); color: var(--accent); font-variant-numeric: tabular-nums; }
   .empty { margin-top: 28px; padding: 22px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-family: var(--font-zh); text-align: center; }
   .hint { margin-top: 10px; color: var(--muted); font: 13px/1.5 var(--font-zh); }
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -143,6 +156,8 @@
           <button id="spd-slow" data-speed="0.7" aria-pressed="false">慢速</button>
         </span>
       </span>
+      <button class="tool" id="typing" aria-pressed="true">打字练习</button>
+      <span class="tally" id="tally" hidden></span>
       <button class="tool" id="shuffle" aria-pressed="false">打乱顺序</button>
       <span id="reset-wrap"><button class="tool danger" id="reset">清除本页标记</button></span>
       <span class="sync" id="sync">标记保存在本浏览器</span>
@@ -150,7 +165,7 @@
     <div class="chips" id="chips" hidden></div>
   </div>
 
-  <p class="hint" id="hint">点卡片显示被遮住的部分，再点一次重新遮住。按“会 / 不会”标记；“待复习”= 不会 + 还没标的。点“发音”听英文读音，遮着英文时也能先听再说。</p>
+  <p class="hint" id="hint">点卡片显示被遮住的部分，再点一次重新遮住。按“会 / 不会”标记；“待复习”= 不会 + 还没标的。<b>打字练习</b>：选“遮英文”后，在卡片下的输入框里打英文，<b>回车</b>检查（对了自动标“会”，错了自动标“不会”并显示答案），<b>Tab</b> 跳到下一个，Shift+Tab 回上一个；手机上检查后再按一次回车也会跳到下一个。</p>
   <main id="list"></main>
 </div>
 
@@ -167,7 +182,9 @@ const INDUSTRIES = DATA.industry.map((g) => g.name);
 
 // ---- state ----
 const prefsKey = "lesson1-prefs", marksKey = "lesson1-marks";
-const state = { tab: "phrases", cover: "en", filter: "all", shuffle: false, industries: [], speed: 0.95, marks: {}, revealed: new Set() };
+const state = { tab: "phrases", cover: "en", filter: "all", shuffle: false, industries: [], speed: 0.95, typing: true, marks: {}, revealed: new Set() };
+const typed = {};          // id -> { value, result: "ok" | "bad" | null }
+const sticky = new Set();  // items answered this round stay on screen even if the filter would hide them
 function readLocal(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
 function writeLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 Object.assign(state, readLocal(prefsKey) || {});
@@ -175,13 +192,14 @@ state.revealed = new Set();
 state.marks = readLocal(marksKey) || {};
 let order = {};
 
-function savePrefs() { const { tab, cover, filter, shuffle, industries, speed } = state; writeLocal(prefsKey, { tab, cover, filter, shuffle, industries, speed }); }
+function savePrefs() { const { tab, cover, filter, shuffle, industries, speed, typing } = state; writeLocal(prefsKey, { tab, cover, filter, shuffle, industries, speed, typing }); }
 
 // ---- rendering ----
 const $ = (id) => document.getElementById(id);
 function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 
 function visible(item) {
+  if (sticky.has(item.id)) return true;
   const m = state.marks[item.id];
   if (state.filter === "review") return m !== "k";
   if (state.filter === "unknown") return m === "u";
@@ -192,6 +210,106 @@ function shuffled(list, key) {
   if (!order[key]) { order[key] = list.map((x) => x.id).sort(() => Math.random() - 0.5); }
   const pos = new Map(order[key].map((id, i) => [id, i]));
   return [...list].sort((a, b) => pos.get(a.id) - pos.get(b.id));
+}
+
+// ---- typing practice ----
+function norm(t) {
+  return t.toLowerCase()
+    .replace(/[‘’ʼ`]/g, "'")
+    .replace(/won't/g, "will not").replace(/can't|cannot/g, "can not").replace(/n't\b/g, " not")
+    .replace(/\bcant\b/g, "can not").replace(/\b(do|does|did|is|are|was|were|have|has|had|could|should|would)nt\b/g, "$1 not").replace(/'ll\b/g, " will").replace(/'re\b/g, " are").replace(/'ve\b/g, " have").replace(/'m\b/g, " am").replace(/'d\b/g, " would")
+    .replace(/[-–—_/]/g, " ")
+    .replace(/[^a-z0-9' ]+/g, " ")
+    .replace(/\s+/g, " ").trim();
+}
+function answers(en) {
+  let forms = [en];
+  if (en.includes(" / ")) forms = forms.concat(en.split(" / "));
+  const out = new Set();
+  for (const f of forms) {
+    for (const sb of ["sb.", "somebody", "someone"]) for (const sth of ["sth.", "something"]) {
+      out.add(norm(f.replace(/\bsb\./g, sb).replace(/\bsth\./g, sth)));
+    }
+  }
+  return out;
+}
+function isCorrect(value, item) { return answers(item.en).has(norm(value)); }
+// Words of the reference answer that the typed answer did not match (longest common subsequence on words).
+function same(ref, w) {
+  return ref === w || (ref === "sb" && (w === "somebody" || w === "someone")) || (ref === "sth" && w === "something");
+}
+function missedWords(value, en) {
+  const words = en.split(/\s+/);
+  const parts = [];  // [wordIndex, normalizedPart]
+  words.forEach((w, wi) => norm(w).split(" ").filter(Boolean).forEach((p) => parts.push([wi, p])));
+  const a = norm(value).split(" ").filter(Boolean);
+  const L = Array.from({ length: parts.length + 1 }, () => new Array(a.length + 1).fill(0));
+  for (let i = parts.length - 1; i >= 0; i--) for (let j = a.length - 1; j >= 0; j--)
+    L[i][j] = same(parts[i][1], a[j]) ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const hit = new Array(parts.length).fill(false);
+  for (let i = 0, j = 0; i < parts.length && j < a.length;) {
+    if (same(parts[i][1], a[j])) { hit[i] = true; i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++;
+  }
+  const ok = words.map(() => true);
+  parts.forEach(([wi], k) => { if (!hit[k]) ok[wi] = false; });
+  return words.map((w, i) => [w, ok[i]]);
+}
+function typingOn() { return state.typing && state.cover === "en"; }
+function focusInput(id) {
+  const inp = document.querySelector('input.type-in[data-id="' + id + '"]');
+  if (inp) { inp.focus({ preventScroll: true }); inp.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+  return !!inp;
+}
+function moveFocus(fromId, dir) {
+  const all = [...document.querySelectorAll("input.type-in")];
+  const i = all.findIndex((x) => x.dataset.id === fromId);
+  const next = all[i + dir];
+  if (next) { next.focus({ preventScroll: true }); next.scrollIntoView({ block: "center", behavior: "smooth" }); }
+}
+function checkTyped(item, value) {
+  const ok = isCorrect(value, item);
+  typed[item.id] = { value, result: ok ? "ok" : "bad" };
+  sticky.add(item.id);
+  state.revealed.add(item.id);
+  setMark(item.id, ok ? "k" : "u");
+}
+function typer(item) {
+  const box = el("div", "typer");
+  const t = typed[item.id] || { value: "", result: null };
+  const inp = el("input", "type-in" + (t.result ? " " + t.result : ""));
+  inp.type = "text"; inp.id = "type-" + item.id; inp.dataset.id = item.id; inp.value = t.value;
+  inp.placeholder = "输入英文，回车检查";
+  inp.setAttribute("aria-label", "输入英文：" + item.zh);
+  for (const [k, v] of [["autocomplete", "off"], ["autocapitalize", "off"], ["autocorrect", "off"], ["spellcheck", "false"], ["lang", "en"], ["enterkeyhint", "next"]]) inp.setAttribute(k, v);
+  inp.addEventListener("keydown", (e) => {
+    if (e.isComposing) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const cur = typed[item.id];
+      if (cur && cur.result && cur.value === inp.value) moveFocus(item.id, 1);
+      else checkTyped(item, inp.value);
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      moveFocus(item.id, e.shiftKey ? -1 : 1);
+    }
+  });
+  inp.addEventListener("input", () => {
+    typed[item.id] = { value: inp.value, result: null };
+    inp.classList.remove("ok", "bad");
+    const v = box.querySelector(".verdict"); if (v) v.remove();
+  });
+  box.append(inp);
+  if (t.result === "ok") box.append(el("div", "verdict ok", "✓ 正确"));
+  if (t.result === "bad") {
+    const v = el("div", "verdict bad");
+    v.append(el("span", "tag", t.value.trim() ? "✗ 不对" : "✗ 没填"));
+    v.append("正确答案：");
+    const ans = el("span", "ans");
+    missedWords(t.value, item.en).forEach(([w, okw], i) => { if (i) ans.append(" "); ans.append(okw ? document.createTextNode(w) : el("span", "miss", w)); });
+    v.append(ans);
+    box.append(v);
+  }
+  return box;
 }
 
 function card(item, sentence) {
@@ -230,15 +348,33 @@ function card(item, sentence) {
     marks.append(say);
   }
   c.append(face, marks);
+  if (typingOn()) c.append(typer(item));
   return c;
 }
 
 function render() {
+  const act = document.activeElement;
+  const focusId = act && act.classList && act.classList.contains("type-in") ? act.dataset.id : null;
+  const caret = focusId ? act.selectionStart : null;
+  renderView();
+  if (focusId) {
+    const inp = document.querySelector('input.type-in[data-id="' + focusId + '"]');
+    if (inp) { inp.focus({ preventScroll: true }); try { inp.setSelectionRange(caret, caret); } catch {} }
+  }
+}
+function renderView() {
   const tab = state.tab;
   for (const b of document.querySelectorAll("[data-tab]")) b.setAttribute("aria-pressed", String(b.dataset.tab === tab));
   for (const b of document.querySelectorAll("[data-cover]")) b.setAttribute("aria-pressed", String(b.dataset.cover === state.cover));
   for (const b of document.querySelectorAll("[data-filter]")) b.setAttribute("aria-pressed", String(b.dataset.filter === state.filter));
   $("shuffle").setAttribute("aria-pressed", String(state.shuffle));
+  $("typing").setAttribute("aria-pressed", String(state.typing));
+  const tl = $("tally"); tl.hidden = !typingOn();
+  if (typingOn()) {
+    const ids = new Set(ITEMS[tab].map((i) => i.id));
+    const res = Object.entries(typed).filter(([id, t]) => ids.has(id) && t.result);
+    tl.textContent = "本轮打字 对 " + res.filter(([, t]) => t.result === "ok").length + " / " + res.length;
+  }
   for (const b of document.querySelectorAll("[data-speed]")) b.setAttribute("aria-pressed", String(Number(b.dataset.speed) === (state.speed || 0.95)));
 
   // industry chips
@@ -333,12 +469,18 @@ function speak(text, btn) {
 
 // ---- controls ----
 for (const b of document.querySelectorAll("[data-tab]")) b.addEventListener("click", () => {
-  state.tab = b.dataset.tab; state.revealed.clear();
+  state.tab = b.dataset.tab; state.revealed.clear(); sticky.clear();
   if (state.tab === "sentences" && state.cover === "zh") state.cover = "en";
   savePrefs(); render(); window.scrollTo({ top: 0 });
 });
-for (const b of document.querySelectorAll("[data-cover]")) b.addEventListener("click", () => { state.cover = b.dataset.cover; state.revealed.clear(); savePrefs(); render(); });
-for (const b of document.querySelectorAll("[data-filter]")) b.addEventListener("click", () => { state.filter = b.dataset.filter; savePrefs(); render(); });
+for (const b of document.querySelectorAll("[data-cover]")) b.addEventListener("click", () => { state.cover = b.dataset.cover; state.revealed.clear(); sticky.clear(); savePrefs(); render(); });
+for (const b of document.querySelectorAll("[data-filter]")) b.addEventListener("click", () => { state.filter = b.dataset.filter; sticky.clear(); savePrefs(); render(); });
+$("typing").addEventListener("click", () => {
+  state.typing = !state.typing; sticky.clear();
+  if (state.typing && state.cover !== "en") { state.cover = "en"; state.revealed.clear(); }
+  savePrefs(); render();
+  if (state.typing) { const first = document.querySelector("input.type-in"); if (first) first.focus(); }
+});
 for (const b of document.querySelectorAll("[data-speed]")) b.addEventListener("click", () => { state.speed = Number(b.dataset.speed); savePrefs(); render(); });
 if (!canSpeak) $("speed-ctl").hidden = true;
 $("shuffle").addEventListener("click", () => { state.shuffle = !state.shuffle; order = {}; savePrefs(); render(); });
