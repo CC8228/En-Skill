@@ -97,7 +97,7 @@
 
   <div class="lessons" id="lessons"></div>
 
-  <p class="note">“网页练习”可以遮外语 / 遮中文、点开对照、听发音、打字练习，并标记会和不会；德语课的名词带冠词和复数，还能看英语对照。“打开 PDF”是 A4 打印版练习纸（英语 2 页，德语 3 页）。每次复习完点“今天复习了”，这里会记下日期。</p>
+  <p class="note">“网页练习”可以遮外语 / 遮中文、点开对照、听发音、打字练习，并标记会和不会；德语课的名词带冠词和复数，还能看英语对照。每次复习完点“今天复习了”，这里会记下日期。</p>
 </div>
 
 <script>
@@ -109,9 +109,8 @@ const LESSONS = [
     title: "项目协调与现场售后",
     date: "2026-10-13",
     level: "B2–C1（雅思 6.0–7.0）",
-    contents: ["60 个职业词组", "88 个行业词汇", "24 句中译英", "补全动词搭配 18 个"],
+    contents: ["60 个职业词组", "88 个行业词汇", "24 句中译英"],
     web: "https://claude.ai/artifact/L8f8cpGaYq1vNxqerM6UXY",
-    pdf: "pdf/lesson-01.pdf",
   },
   {
     lang: "de",
@@ -122,10 +121,9 @@ const LESSONS = [
     pair: "和英语第 1 课同一主题",
     contents: ["60 个职业词组（含功能动词结构）", "112 个行业术语（带冠词）", "24 句 C1 句型中译德", "26 个德英易混"],
     web: "https://claude.ai/artifact/SWgDxto4AJ5h9R1kC1KwwP",
-    pdf: "pdf/de-lesson-01.pdf",
   },
 ];
-const LANGS = { en: { name: "英语", file: "职场英语" }, de: { name: "德语", file: "职场德语" } };
+const LANGS = { en: { name: "英语" }, de: { name: "德语" } };
 // English lessons keep their original log key (the lesson number) so earlier records still match.
 const keyOf = (l) => (l.lang === "en" ? String(l.no) : l.lang + "-" + l.no);
 
@@ -187,20 +185,6 @@ function render() {
     const actions = el("div", "actions");
     const web = el("a", "btn primary", "网页练习"); web.href = l.web; web.target = "_blank"; web.rel = "noopener";
     actions.append(web);
-    if (l.pdf) {
-      const pdf = el("a", "btn", "打开 PDF"); pdf.href = l.pdf; pdf.target = "_blank"; pdf.rel = "noopener";
-      actions.append(pdf);
-      if (downloads) {
-        const dl = el("button", "btn", "保存 PDF");
-        dl.addEventListener("click", async () => {
-          try {
-            const blob = await (await fetch(l.pdf)).blob();
-            await downloads.save({ filename: LANGS[l.lang].file + "第" + l.no + "课.pdf", data: blob });
-          } catch (e) { /* declined or unavailable: nothing to do */ }
-        });
-        actions.append(dl);
-      }
-    }
     const logRow = el("div", "log");
     const lab = el("label", null, "状态");
     const sel = el("select"); sel.id = "status-" + key;
@@ -223,13 +207,11 @@ function render() {
   }
 }
 
-let downloads = null;
 render();
 
 (async () => {
   if (!window.claude || !window.claude.use) return;
   try {
-    downloads = await window.claude.use("downloads");
     const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
     const uid = user ? await user.id() : null;
     if (db && uid) {
