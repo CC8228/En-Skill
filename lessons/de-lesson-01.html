@@ -1,0 +1,934 @@
+<title>职场德语第 1 课</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+  /* Layout: same system as the English course (sticky control bar, grouped card grids); violet accent marks the German course, der/die/das carry their own colors. */
+  :root {
+    --bg: #f4f3f8;
+    --surface: #ffffff;
+    --ink: #1b1d2b;
+    --muted: #5f6178;
+    --line: #dfdde9;
+    --accent: #5b3fa6;
+    --accent-soft: #ede8f8;
+    --known: #1d7a4c;
+    --known-soft: #e5f4ec;
+    --unknown: #c2352b;
+    --unknown-soft: #fcebea;
+    --cover: #cdc9da;
+    --der: #1f5fbf;
+    --die: #c02f63;
+    --das: #0f7f6c;
+    --font-de: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --font-zh: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-num: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #13121b; --surface: #1c1b27; --ink: #ebe9f4; --muted: #a3a1b8; --line: #2e2c3d;
+      --accent: #b9a5f0; --accent-soft: #2a2442; --known: #5cc690; --known-soft: #16302a;
+      --unknown: #f0786d; --unknown-soft: #3a1d1d; --cover: #3d3a50;
+      --der: #8fb4ff; --die: #ff8fb5; --das: #5fd3bd; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #13121b; --surface: #1c1b27; --ink: #ebe9f4; --muted: #a3a1b8; --line: #2e2c3d;
+    --accent: #b9a5f0; --accent-soft: #2a2442; --known: #5cc690; --known-soft: #16302a;
+    --unknown: #f0786d; --unknown-soft: #3a1d1d; --cover: #3d3a50;
+    --der: #8fb4ff; --die: #ff8fb5; --das: #5fd3bd; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-de), var(--font-zh); font-size: 15px; line-height: 1.45; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 0 48px; }
+
+  header.top { padding-block: 20px 8px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+  header.top h1 { margin: 0; font-family: var(--font-zh); font-size: 22px; font-weight: 700; letter-spacing: 0.01em; text-wrap: balance; }
+  header.top p { margin: 0; color: var(--muted); font-size: 13px; font-family: var(--font-zh); }
+  header.top a { color: var(--accent); font: 600 13px/1.4 var(--font-zh); text-decoration: none; border-bottom: 1px solid currentColor; }
+  header.top a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+  .tabs, .seg { display: inline-flex; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 2px; }
+  .tabs button, .seg button {
+    font: 600 13px/1 var(--font-zh); color: var(--muted); background: none; border: 0; border-radius: 6px; padding: 8px 11px; cursor: pointer; white-space: nowrap;
+  }
+  .tabs button[aria-pressed="true"] { background: var(--accent); color: var(--surface); }
+  .seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .label { font: 500 12px/1 var(--font-zh); color: var(--muted); letter-spacing: 0.04em; }
+  .ctl { display: inline-flex; align-items: center; gap: 6px; }
+  .stats { margin-left: auto; display: inline-flex; gap: 12px; font: 500 13px/1 var(--font-num); font-variant-numeric: tabular-nums; }
+  .stats .k { color: var(--known); } .stats .u { color: var(--unknown); } .stats .n { color: var(--muted); }
+  .meter { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; display: flex; }
+  .meter i { display: block; height: 100%; }
+  .meter .mk { background: var(--known); } .meter .mu { background: var(--unknown); }
+  .tool { font: 500 13px/1 var(--font-zh); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 11px; cursor: pointer; }
+  .tool[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  .tool.danger { color: var(--unknown); }
+  .sync, .voice-note { font: 12px/1.3 var(--font-zh); color: var(--muted); }
+  .confirm { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; font: 13px/1 var(--font-zh); }
+
+  .uml { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+  .uml button { font: 600 15px/1 var(--font-de); min-width: 34px; padding: 7px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); cursor: pointer; }
+  .uml button:active { background: var(--accent-soft); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font: 500 12.5px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 10px; cursor: pointer; }
+  .chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .legend { display: inline-flex; gap: 10px; font: 600 12.5px/1 var(--font-de); margin-left: 4px; }
+
+  section.group { margin-top: 22px; }
+  section.group h2 { margin: 0 0 10px; display: flex; align-items: baseline; gap: 10px; font: 700 15px/1.2 var(--font-zh); }
+  section.group h2 small { font: 500 12.5px/1 var(--font-de); color: var(--muted); letter-spacing: 0.02em; }
+  section.group h2 .cnt { margin-left: auto; font: 500 12px/1 var(--font-num); color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 8px; }
+  .grid.wide { grid-template-columns: repeat(auto-fill, minmax(440px, 1fr)); }
+  @media (max-width: 520px) { .grid, .grid.wide { grid-template-columns: 1fr; } }
+
+  .card {
+    position: relative; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--line);
+    border-radius: 6px; padding: 10px 10px 9px 12px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 7px; align-content: start; min-width: 0;
+  }
+  .card.known { border-left-color: var(--known); }
+  .card.unknown { border-left-color: var(--unknown); background: var(--unknown-soft); }
+  .face { min-width: 0; cursor: pointer; display: grid; gap: 3px; border-radius: 4px; align-content: start; }
+  .face:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .de { font: 600 15.5px/1.35 var(--font-de); overflow-wrap: anywhere; }
+  .zh { font: 400 14px/1.45 var(--font-zh); color: var(--muted); overflow-wrap: anywhere; }
+  .art { font-weight: 700; }
+  .art.der { color: var(--der); } .art.die { color: var(--die); } .art.das { color: var(--das); }
+  .en-ref { font: 400 13px/1.4 var(--font-de); color: var(--muted); overflow-wrap: anywhere; }
+  .en-ref .tag { font: 600 10.5px/1 var(--font-num); letter-spacing: 0.06em; color: var(--accent); border: 1px solid var(--line); border-radius: 3px; padding: 1px 4px; margin-right: 6px; vertical-align: 1px; }
+  .trap { font: 500 13px/1.45 var(--font-zh); color: var(--unknown); overflow-wrap: anywhere; }
+  .note { font: 400 12.5px/1.5 var(--font-zh); color: var(--muted); overflow-wrap: anywhere; border-top: 1px dashed var(--line); padding-top: 4px; margin-top: 2px; }
+  .note .pl { font: 500 12.5px/1.5 var(--font-de); color: var(--ink); margin-right: 8px; }
+  .sent .zh { color: var(--ink); font-size: 15px; }
+  .sent .de { font-weight: 500; font-size: 15px; }
+  .num { font: 500 11px/1 var(--font-num); color: var(--muted); margin-right: 6px; }
+  .covered { color: transparent !important; background: repeating-linear-gradient(135deg, var(--cover) 0 6px, transparent 6px 10px); border-radius: 3px; user-select: none; }
+  .covered * { color: transparent !important; }
+  .marks { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .marks .mk-btn.u + * { margin-left: auto; }
+  .say, .ask { display: inline-flex; align-items: center; justify-content: center; gap: 4px; font: 600 12px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+  .say svg, .ask svg { width: 14px; height: 14px; fill: currentColor; }
+  .say.playing { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+  .mk-btn { font: 600 12px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 6px; padding: 7px 8px; cursor: pointer; min-width: 40px; }
+  .mk-btn.k[aria-pressed="true"] { background: var(--known); border-color: var(--known); color: var(--surface); }
+  .mk-btn.u[aria-pressed="true"] { background: var(--unknown); border-color: var(--unknown); color: var(--surface); }
+  .card.unknown .mk-btn { background: var(--surface); }
+  .card.unknown .mk-btn.u[aria-pressed="true"] { background: var(--unknown); }
+
+  .typer { display: grid; gap: 5px; }
+  .type-in { width: 100%; min-width: 0; font: 500 15px/1.3 var(--font-de); color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+  .type-in::placeholder { color: var(--muted); font-family: var(--font-zh); font-size: 13px; }
+  .type-in:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+  .type-in.ok { border-color: var(--known); background: var(--known-soft); }
+  .type-in.bad { border-color: var(--unknown); background: var(--surface); }
+  .verdict { font: 13px/1.5 var(--font-zh); overflow-wrap: anywhere; }
+  .verdict.ok { color: var(--known); font-weight: 600; }
+  .verdict.ok .fix { color: var(--ink); font-weight: 400; }
+  .verdict.bad { color: var(--ink); }
+  .verdict .tag { color: var(--unknown); font-weight: 600; margin-right: 6px; }
+  .verdict .ans { font-family: var(--font-de); font-weight: 500; }
+  .verdict .miss { color: var(--unknown); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+  .tally { font: 500 13px/1 var(--font-num); color: var(--accent); font-variant-numeric: tabular-nums; }
+  /* explanation drawer */
+  .scrim { position: fixed; inset: 0; background: rgba(12, 10, 24, 0.38); z-index: 20; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100%); z-index: 21;
+    background: var(--surface); border-left: 1px solid var(--line); box-shadow: -12px 0 32px rgba(12, 10, 24, 0.18);
+    display: grid; grid-template-rows: auto 1fr auto; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); padding-right: env(safe-area-inset-right, 0px);
+  }
+  @media (max-width: 560px) { .drawer { top: auto; height: 86%; width: 100%; border-left: 0; border-top: 1px solid var(--line); border-radius: 12px 12px 0 0; padding-left: env(safe-area-inset-left, 0px); } }
+  .dr-head { padding: 14px 16px 12px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: start; }
+  .dr-head .t-de { font: 700 18px/1.3 var(--font-de); overflow-wrap: anywhere; }
+  .dr-head .t-zh { font: 14px/1.4 var(--font-zh); color: var(--muted); overflow-wrap: anywhere; }
+  .dr-close { font: 600 13px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 6px; padding: 8px 10px; cursor: pointer; }
+  .dr-body { overflow-y: auto; padding: 14px 16px 18px; font: 14.5px/1.65 var(--font-de), var(--font-zh); min-width: 0; }
+  .dr-body h4 { margin: 14px 0 4px; font: 700 14px/1.4 var(--font-zh); color: var(--accent); }
+  .dr-body h4:first-child { margin-top: 0; }
+  .dr-body p { margin: 4px 0; }
+  .dr-body ul, .dr-body ol { margin: 4px 0; padding-left: 20px; }
+  .dr-body li { margin: 2px 0; }
+  .dr-body .q-you { margin: 16px 0 6px; padding: 8px 10px; border-radius: 6px; background: var(--accent-soft); color: var(--ink); font-weight: 500; }
+  .dr-body .thinking { color: var(--muted); }
+  .dr-body .err { color: var(--unknown); }
+  .dr-foot { border-top: 1px solid var(--line); padding: 10px 16px 12px; display: grid; gap: 8px; }
+  .ask-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+  .ask-in { min-width: 0; font: 14px/1.3 var(--font-zh); color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 6px; padding: 9px 10px; }
+  .ask-in:focus { outline: none; border-color: var(--accent); }
+  .dr-btn { font: 600 13px/1 var(--font-zh); border: 1px solid var(--accent); background: var(--accent); color: var(--surface); border-radius: 6px; padding: 9px 12px; cursor: pointer; white-space: nowrap; }
+  .dr-btn.ghost { background: var(--surface); color: var(--accent); }
+  .dr-btn[disabled] { opacity: 0.5; cursor: default; }
+  .dr-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 12px/1.4 var(--font-zh); color: var(--muted); }
+  .copybox { width: 100%; font: 13px/1.5 var(--font-zh); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; resize: vertical; }
+  .empty { margin-top: 28px; padding: 22px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-family: var(--font-zh); text-align: center; }
+  .hint { margin: 10px 0 0; color: var(--muted); font: 13px/1.6 var(--font-zh); max-width: 78ch; }
+  .hint b { color: var(--ink); font-weight: 600; }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 640px) { .stats { margin-left: 0; } .bar { position: static; } }
+  @media (prefers-reduced-motion: no-preference) { .card { transition: background .15s, border-color .15s; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>职场德语 · 第 1 课</h1>
+    <p>项目协调与现场售后 · 60 个职业词组 · 112 个行业词汇 · 24 句中译德 · 26 个德英易混</p>
+    <a href="https://claude.ai/artifact/L8f8cpGaYq1vNxqerM6UXY" target="_blank" rel="noopener">对照英语第 1 课</a>
+  </header>
+
+  <div class="bar" id="bar">
+    <div class="row">
+      <div class="tabs" role="group" aria-label="内容">
+        <button id="tab-phrases" data-tab="phrases" aria-pressed="true">职业词组</button>
+        <button id="tab-industry" data-tab="industry" aria-pressed="false">行业词汇</button>
+        <button id="tab-sentences" data-tab="sentences" aria-pressed="false">中译德</button>
+        <button id="tab-friends" data-tab="friends" aria-pressed="false">德英易混</button>
+      </div>
+      <div class="stats" aria-live="polite"><span class="k" id="st-k">会 0</span><span class="u" id="st-u">不会 0</span><span class="n" id="st-n">未标 0</span></div>
+    </div>
+    <div class="meter" aria-hidden="true"><i class="mk" id="m-k"></i><i class="mu" id="m-u"></i></div>
+    <div class="row">
+      <span class="ctl"><span class="label">遮盖</span>
+        <span class="seg" role="group" aria-label="遮盖">
+          <button id="cov-none" data-cover="none" aria-pressed="false">不遮</button>
+          <button id="cov-de" data-cover="de" aria-pressed="true">遮德语</button>
+          <button id="cov-zh" data-cover="zh" aria-pressed="false">遮中文</button>
+        </span>
+      </span>
+      <span class="ctl"><span class="label">显示</span>
+        <span class="seg" role="group" aria-label="显示">
+          <button id="flt-all" data-filter="all" aria-pressed="true">全部</button>
+          <button id="flt-review" data-filter="review" aria-pressed="false">待复习</button>
+          <button id="flt-unknown" data-filter="unknown" aria-pressed="false">只看不会</button>
+        </span>
+      </span>
+      <span class="ctl" id="speed-ctl"><span class="label">发音</span>
+        <span class="seg" role="group" aria-label="语速">
+          <button id="spd-normal" data-speed="0.95" aria-pressed="true">正常</button>
+          <button id="spd-slow" data-speed="0.7" aria-pressed="false">慢速</button>
+        </span>
+      </span>
+      <button class="tool" id="typing" aria-pressed="true">打字练习</button>
+      <button class="tool" id="show-en" aria-pressed="true">英语对照</button>
+      <span class="tally" id="tally" hidden></span>
+      <button class="tool" id="shuffle" aria-pressed="false">打乱顺序</button>
+      <span id="reset-wrap"><button class="tool danger" id="reset">清除本页标记</button></span>
+      <span class="sync" id="sync">标记保存在本浏览器</span>
+      <span class="voice-note" id="voice-note" hidden>这台设备没有德语语音，发音可能不准</span>
+    </div>
+    <div class="row" id="uml-row" hidden>
+      <span class="label">德语字母</span>
+      <span class="uml" id="uml" role="group" aria-label="插入德语字母"></span>
+      <span class="label">没有德语键盘也可以打 ae / oe / ue / ss；手机键盘长按 a、o、u、s 也能打出来</span>
+    </div>
+    <div class="chips" id="chips" hidden></div>
+  </div>
+
+  <p class="hint" id="hint">点卡片显示被遮住的部分，再点一次重新遮住；按“会 / 不会”标记，“待复习”= 不会 + 还没标的。<b>打字练习</b>：选“遮德语”后在输入框里打德语，<b>回车</b>检查，<b>Tab</b> 跳到下一个。名词要<b>连冠词一起打</b>（<span class="art der">der</span> 阳性 · <span class="art die">die</span> 阴性 · <span class="art das">das</span> 中性）；大小写打错不扣分，但会提醒（德语名词首字母大写）。jdn. = jemanden（第四格），jdm. = jemandem（第三格），打缩写或全拼都算对。<b>英语对照</b>打开时，可以看着中文和英语说德语。</p>
+  <main id="list"></main>
+</div>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dr-de" hidden>
+  <div class="dr-head">
+    <div><div class="t-de" id="dr-de"></div><div class="t-zh" id="dr-zh"></div></div>
+    <button class="dr-close" id="dr-close">关闭</button>
+  </div>
+  <div class="dr-body" id="dr-body" aria-live="polite"></div>
+  <div class="dr-foot">
+    <div class="ask-row" id="ask-row">
+      <input class="ask-in" id="ask-in" type="text" placeholder="继续问，比如：这里为什么用第三格？" autocomplete="off">
+      <button class="dr-btn" id="ask-send">发送</button>
+    </div>
+    <div class="dr-tools">
+      <button class="dr-btn ghost" id="dr-stop" hidden>停止</button>
+      <button class="dr-btn ghost" id="dr-regen">重新解释</button>
+      <button class="dr-btn ghost" id="dr-copy">复制问题</button>
+      <span id="dr-note"></span>
+    </div>
+  </div>
+</aside>
+
+<script>
+const DATA = {"phrases":[{"name":"项目推进","de":"Projektablauf","items":[["ein Projekt aufsetzen","启动、搭建一个项目","set up a project","可分动词：Wir setzen das Projekt neu auf. 德企口头禅，比 starten 更像“正式立项”"],["Meilensteine festlegen","确定里程碑","set milestones","可分：Wir legen die Meilensteine fest. 单数 der Meilenstein"],["einen Termin einhalten","按期限完成","meet a deadline","Termin ≠ term。Termin = 约好的时间、期限、预约；也说 eine Frist einhalten"],["in Verzug geraten","（进度）出现延误","fall behind schedule","geraten 是强变化：geriet – ist geraten；状态说 im Verzug sein"],["den Rückstand aufholen","把落后的进度追回来","catch up / get back on track","可分：Wir holen den Rückstand bis Freitag auf."],["Ressourcen einplanen","把资源排进计划","allocate resources","可分：Wir planen zwei Monteure ein. 也说 Kapazitäten einplanen"],["ein Risiko abschätzen","评估风险","assess a risk","可分：Wir schätzen das Risiko ab. 复数 die Risiken"],["das Lastenheft erstellen","编写需求规格书（甲方）","write the requirements specification","Lastenheft = 客户写“要什么”；Pflichtenheft = 供应商写“怎么做”。英语没有这样固定的一对词"],["die Zeichnung freigeben","批准图纸（放行）","sign off on the drawing","可分：Der Kunde gibt die Zeichnung frei. 名词 die Freigabe：图纸、样件、付款都要走 Freigabe"],["das Projekt auf Eis legen","把项目暂停","put the project on hold","字面是“放到冰上”；英语也说 put on ice"]]},{"name":"沟通协调","de":"Abstimmung","items":[["jdn. auf dem Laufenden halten","随时向某人通报进展","keep sb. in the loop","jdn. = jemanden（第四格）：Halten Sie mich bitte auf dem Laufenden."],["sich mit jdm. abstimmen","和某人协调、对齐","align with sb.","反身 + 可分：Ich stimme mich mit dem Einkauf ab. 名词 die Abstimmung 是德企最高频的词之一"],["mit jdm. Rücksprache halten","和某人沟通确认","check with sb.","邮件常用：Nach Rücksprache mit Herrn Klein … = 经与 Klein 先生确认后……"],["jdm. Bescheid geben","告诉某人一声","let sb. know","jdm. = jemandem（第三格）：Geben Sie mir bitte kurz Bescheid."],["ein Problem eskalieren","把问题上报","escalate an issue","德企直接借用：etwas an die Geschäftsleitung eskalieren；-ieren 动词，Perfekt：hat eskaliert"],["Prioritäten setzen","确定优先级","set priorities","单数 die Priorität；höchste Priorität haben = 最优先"],["einen Kompromiss finden","找到折中方案","reach a compromise","英语用 reach，德语常用 finden 或 schließen"],["das Protokoll führen","做会议记录","take the minutes","Protokoll 在德企就是会议纪要，不是英语常说的 protocol（礼仪、协议）"],["jdn. auf den neuesten Stand bringen","让某人了解最新进展","bring sb. up to speed","auf + 第四格（方向）：auf den neuesten Stand；对比 auf dem Laufenden（第三格，状态）"],["an einem Strang ziehen","齐心协力","pull together","字面是“拉同一根绳”：Wir müssen alle an einem Strang ziehen."]]},{"name":"现场与故障","de":"Vor Ort & Störungen","items":[["eine Sicherheitsunterweisung erhalten","接受安全交底","get a safety briefing","德国工地和工厂进场前必须做 Unterweisung 并签字，没做不能开工"],["eine Störung beheben","排除故障","fix a fault","Störung = 设备故障、运行异常；Fehler = 错误（更泛）"],["die Fehlerursache ermitteln","查明故障原因","find the root cause","ermitteln = 查明（书面）；口语说 herausfinden"],["Die Anlage steht.","设备停机了","The line is down.","stehen 在这里是“停机”，不是“站着”；名词 der Stillstand"],["Die Sicherung ist rausgeflogen.","保险跳了（断路器跳闸）","The breaker has tripped.","口语；正式说 Der Leitungsschutzschalter hat ausgelöst."],["eine Messung durchführen","进行测量","take a measurement","“名词 + durchführen”是书面高频结构：eine Prüfung / Wartung durchführen"],["den Sensor kalibrieren","校准传感器","calibrate the sensor","-ieren 动词 Perfekt 不加 ge-：Ich habe den Sensor kalibriert."],["die Anlage in Betrieb nehmen","调试并投运设备","commission the plant","名词 die Inbetriebnahme（IBN），现场工程师的核心词"],["eine Wartung durchführen","做维护保养","carry out maintenance","vorbeugende Wartung = 预防性维护；Wartungsintervall = 保养周期"],["eine Übergangslösung finden","找个临时解决办法","find a temporary workaround","口语也说 ein Provisorium；provisorisch = 临时的"]]},{"name":"质量与合同","de":"Qualität & Vertrag","items":[["die Vorgaben erfüllen","满足规定要求","meet the specifications","die Vorgabe = 规定、要求；也说 die Spezifikation einhalten"],["die Abnahme durchführen","进行验收","carry out the acceptance","德国合同里 Abnahme 很关键：验收后才开始算保修期，也才能开尾款发票"],["einen Mangel rügen","就缺陷提出书面异议","give notice of a defect","名词 die Mängelrüge。企业之间买货要及时检验、及时提出，拖久了可能失去索赔权"],["einen Mangel beseitigen","消除缺陷（返修）","remedy a defect","复数 die Mängel；Mängelliste = 验收时列的缺陷清单"],["unter die Gewährleistung fallen","属于法定保修范围","be covered by the warranty","Gewährleistung = 法定瑕疵担保（买卖通常 2 年）；Garantie = 厂家自愿承诺。英语都叫 warranty"],["Korrekturmaßnahmen einleiten","启动纠正措施","take corrective action","可分：Wir leiten Maßnahmen ein. die Maßnahme = 措施"],["die Lieferung beschleunigen","加急交货","expedite the delivery","schnell → beschleunigen（加速）"],["die Mehrkosten tragen","承担额外费用","bear the extra cost","tragen = 承担（费用、责任）；也说 übernehmen"],["im Kostenrahmen bleiben","控制在预算内","stay within budget","der Kostenrahmen = 费用框架；也说 im Budget bleiben"],["eine Vertragsstrafe zahlen","支付违约金","pay a contractual penalty","工程项目常见：延期按天扣违约金；口语也叫 Pönale"]]},{"name":"客户与售后","de":"Kunde & Service","items":[["ein Ticket anlegen","建工单（登记服务请求）","log a ticket","可分：Ich lege ein Ticket an. anlegen = 新建（文件、账号、工单）"],["innerhalb von 24 Stunden reagieren","24 小时内响应","respond within 24 hours","innerhalb von + 第三格；die Reaktionszeit = 响应时间"],["einen Techniker schicken","派技术员（到现场）","dispatch a technician","德企现场人员常叫 Techniker 或 Monteur，很少说 Ingenieur"],["auf Kulanz","出于商业善意（免费处理）","as a goodwill gesture","不在保修范围内，但为了客户关系免费处理。英语没有一个词对应"],["ein Teil kostenlos austauschen","免费更换零件","replace a part free of charge","可分：Wir tauschen das Teil kostenlos aus."],["eine Reklamation bearbeiten","处理质量投诉","handle a complaint","Reklamation = 对产品质量的投诉、索赔；Beschwerde = 对服务、态度的投诉"],["Fernwartung anbieten","提供远程维护","provide remote support","可分：Wir bieten Fernwartung an. fern = 远"],["einen Servicebericht ausfüllen","填写服务报告","fill out a service report","可分：Ich fülle den Bericht aus."],["den Bericht abzeichnen lassen","让客户签字确认报告","have the report signed off","lassen + 不定式 = 让别人做；abzeichnen = 签名确认"],["Ersatzteile vorrätig haben","有备件库存","keep spare parts in stock","vorrätig = 有存货的；单数 das Ersatzteil"]]},{"name":"电话与邮件","de":"Telefon & E-Mail","items":[["Sehr geehrte Damen und Herren,","尊敬的女士们、先生们（不知道收件人）","Dear Sir or Madam,","知道姓名时：Sehr geehrte Frau Weber, / Sehr geehrter Herr Klein, 逗号后正文第一个词小写"],["Mit freundlichen Grüßen","此致敬礼（正式结尾）","Kind regards","后面不加逗号；熟一点用 Viele Grüße 或 Beste Grüße"],["Anbei sende ich Ihnen das Angebot.","随信附上报价单","Please find the quotation attached.","anbei = 附在这里；Sie / Ihnen 大写 = 您"],["Ich rufe wegen der Lieferung an.","我打电话是为了交货的事","I'm calling about the delivery.","wegen + 第二格（der Lieferung）；anrufen 可分"],["Könnten Sie mich bitte zurückrufen?","您能给我回个电话吗？","Could you call me back, please?","Könnten 是 Konjunktiv II，表示客气；zurückrufen 可分"],["Ich verbinde Sie.","我给您转接","I'll put you through.","接线员常用；问对方：Mit wem darf ich Sie verbinden?"],["einen Termin vereinbaren","约个时间（见面、开会）","arrange a meeting","vereinbaren 不可分：Wir haben einen Termin vereinbart."],["Vielen Dank für Ihre schnelle Rückmeldung.","感谢您的快速回复","Thanks for your quick reply.","die Rückmeldung = 反馈、回复，德企邮件高频"],["Ich bitte um Ihr Verständnis.","敬请谅解","Thank you for your understanding.","bitten um + 第四格；延误、道歉的邮件常用"],["Sollen wir uns duzen?","我们互相用 du 称呼吧？","Shall we use first names?","英语没有 Sie / du 之分。对客户、上级默认用 Sie，对方提出后才改用 du"]]}],"industry":[{"name":"医疗","de":"Medizintechnik","items":[["das Medizinprodukt","die Medizinprodukte","医疗器械","medical device","德语叫 Produkt，英语叫 device；欧盟法规 MDR"],["die Sterilisation","","灭菌","sterilization","steril = 无菌的；sterilisieren = 灭菌"],["das Beatmungsgerät","die Beatmungsgeräte","呼吸机","ventilator","beatmen（辅助呼吸）+ das Gerät（设备）"],["der Katheter","die Katheter","导管","catheter","复数不变"],["der Ultraschall","","超声","ultrasound","das Ultraschallgerät = 超声设备"],["das Implantat","die Implantate","植入物","implant",""],["die klinische Prüfung","die klinischen Prüfungen","临床试验","clinical trial","法规用词；日常也说 klinische Studie"],["die Zulassung","die Zulassungen","注册审批（上市许可）","regulatory approval","zulassen = 批准；汽车上牌也叫 Zulassung"]]},{"name":"电气","de":"Elektrotechnik","items":[["die Spannung","die Spannungen","电压","voltage","Spannung 也是“紧张”；Hochspannung = 高压"],["der Strom","","电流；电","current; electricity","der Stromausfall = 停电；Strom 也是“河流”"],["der Transformator","die Transformatoren","变压器","transformer","口语 der Trafo"],["der Schaltschrank","die Schaltschränke","电气控制柜","control cabinet","schalten（开关）+ der Schrank（柜子）"],["der Wechselrichter","die Wechselrichter","逆变器","inverter","der Wechselstrom = 交流电"],["das Relais","die Relais","继电器","relay","从法语来的词，复数不变"],["die Erdung","die Erdungen","接地","grounding / earthing","die Erde（地）→ erden（接地）"],["der Kurzschluss","die Kurzschlüsse","短路","short circuit","kurz + der Schluss"]]},{"name":"电子信息","de":"Elektronik & IT","items":[["der Halbleiter","die Halbleiter","半导体","semiconductor","halb（半）+ leiten（导）：和中文构词一样"],["die Leiterplatte","die Leiterplatten","印刷电路板 PCB","printed circuit board","口语 die Platine"],["das Löten","","锡焊（电子焊接）","soldering","löten = 锡焊；schweißen = 熔焊（机械）"],["die Firmware","","固件","firmware","ein Firmware-Update aufspielen = 刷固件"],["der Steckverbinder","die Steckverbinder","连接器","connector","口语 der Stecker（插头）"],["die Schnittstelle","die Schnittstellen","接口","interface","der Schnitt（切口）+ die Stelle（位置）"],["der Server","die Server","服务器","server","复数不变"],["die Datenbank","die Datenbanken","数据库","database","die Daten（数据）+ die Bank"]]},{"name":"能源","de":"Energietechnik","items":[["die Energiewende","","能源转型","energy transition","德国国家政策名词，英语媒体常直接用 Energiewende"],["die Windkraftanlage","die Windkraftanlagen","风电机组","wind turbine","口语 das Windrad"],["die Photovoltaikanlage","die Photovoltaikanlagen","光伏系统","PV system","口语 die PV-Anlage"],["der Stromspeicher","die Stromspeicher","储能系统","energy storage system","der Batteriespeicher = 电池储能"],["das Stromnetz","die Stromnetze","电网","power grid","ans Netz gehen = 并网"],["das Umspannwerk","die Umspannwerke","变电站","substation","umspannen = 变压"],["die Einspeisung","die Einspeisungen","（向电网）馈电","grid feed-in","可分：Die Anlage speist Strom ins Netz ein."],["die Wärmepumpe","die Wärmepumpen","热泵","heat pump","die Wärme（热）+ die Pumpe"]]},{"name":"现场工程师","de":"Montage & Inbetriebnahme","items":[["die Inbetriebnahme","die Inbetriebnahmen","调试投运","commissioning","缩写 IBN；das Inbetriebnahmeprotokoll = 调试记录"],["die Baustelle","die Baustellen","工地、安装现场","construction site / job site","设备安装现场也常叫 Baustelle"],["die Montage","die Montagen","安装","installation / assembly","≠ montage（蒙太奇）；der Monteur = 安装工"],["der Schaltplan","die Schaltpläne","电气原理图","wiring diagram","schalten + der Plan"],["die SPS","die SPSen","PLC 可编程控制器","PLC","= speicherprogrammierbare Steuerung"],["die Schutzausrüstung","","防护装备","protective equipment","PSA = persönliche Schutzausrüstung（PPE）"],["die Gefährdungsbeurteilung","die Gefährdungsbeurteilungen","危险评估（安全）","risk assessment","德国劳动保护法要求开工前要做"],["das Messgerät","die Messgeräte","测量仪器","measuring instrument","messen（测）+ das Gerät"]]},{"name":"售后工程师","de":"Kundendienst","items":[["der Kundendienst","","售后服务（部门）","customer service / after-sales","der Kunde（客户）+ der Dienst（服务）"],["der Servicetechniker","die Servicetechniker","售后技术员","field service technician","女性：die Servicetechnikerin"],["das Ersatzteil","die Ersatzteile","备件","spare part","ersetzen（替换）+ das Teil"],["der Wartungsvertrag","die Wartungsverträge","维保合同","maintenance contract","warten = 维护（也是“等待”）"],["die Reklamation","die Reklamationen","质量投诉","complaint / claim","≠ reclamation；reklamieren = 投诉质量问题"],["die Ausfallzeit","die Ausfallzeiten","停机时间","downtime","ausfallen = 失效、停掉"],["die Fernwartung","","远程维护","remote maintenance","fern（远）+ die Wartung"],["der Einsatz","die Einsätze","（一次）现场出勤","call-out / service visit","Einsatz vor Ort = 现场出勤；der Einsatzbericht = 出勤报告"]]},{"name":"物流","de":"Logistik","items":[["die Fracht","die Frachten","货物；运费","freight","Fracht 既指货物也指运费"],["das Lager","die Lager","仓库","warehouse","在机械里 Lager 是“轴承”"],["die Sendung","die Sendungen","货件","shipment / consignment","Sendung 也是“电视节目”"],["die Verzollung","die Verzollungen","清关","customs clearance","der Zoll = 海关、关税"],["der Frachtbrief","die Frachtbriefe","运单","waybill / consignment note","海运提单叫 das Konnossement"],["der Container","die Container","集装箱","container","复数不变"],["die Spedition","die Speditionen","货运代理公司","freight forwarder","der Spediteur = 货代"],["die Palette","die Paletten","托盘","pallet","die Europalette = 欧标托盘 1200 × 800 mm"]]},{"name":"供应链","de":"Lieferkette","items":[["die Lieferkette","die Lieferketten","供应链","supply chain","liefern（交付）+ die Kette（链）"],["der Lieferant","die Lieferanten","供应商","supplier","弱变化名词：den / dem / des Lieferanten"],["der Bestand","die Bestände","库存","inventory / stock","der Lagerbestand = 仓库库存"],["der Sicherheitsbestand","die Sicherheitsbestände","安全库存","safety stock",""],["der Engpass","die Engpässe","瓶颈；短缺","bottleneck; shortage","eng（窄）+ der Pass（通道）"],["die Bedarfsprognose","die Bedarfsprognosen","需求预测","demand forecast","der Bedarf = 需求"],["die Lieferzeit","die Lieferzeiten","交货周期","lead time","Die Lieferzeit beträgt sechs Wochen."],["die Rückverfolgbarkeit","","可追溯性","traceability","zurück + verfolgen + -bar + -keit"]]},{"name":"汽车","de":"Automobil","items":[["das Fahrgestell","die Fahrgestelle","底盘","chassis","也说 das Chassis"],["der Antriebsstrang","die Antriebsstränge","动力总成","powertrain","der Antrieb（驱动）+ der Strang"],["das Getriebe","die Getriebe","变速箱","gearbox / transmission","复数不变"],["der Fahrzeughersteller","die Fahrzeughersteller","整车厂","OEM / vehicle manufacturer","德企里也直接说 OEM"],["der Zulieferer","die Zulieferer","零部件供应商","supplier","Tier-1-Zulieferer = 一级供应商"],["die Hochvoltbatterie","die Hochvoltbatterien","动力电池（高压电池）","high-voltage battery","HV-Batterie；维修需要 HV 资质"],["der Rückruf","die Rückrufe","召回","recall","zurückrufen 也是“回电话”"],["die Typgenehmigung","die Typgenehmigungen","型式认证","type approval","德国由 KBA（联邦机动车管理局）颁发"]]},{"name":"制造业","de":"Fertigung","items":[["das Fließband","die Fließbänder","流水线","assembly line","fließen（流动）+ das Band（带）"],["die Ausbeute","","良率","yield","die Ausbeute steigern = 提高良率"],["die Ausschussquote","die Ausschussquoten","废品率","scrap rate","der Ausschuss = 废品"],["die Vorrichtung","die Vorrichtungen","夹具、工装","fixture / jig",""],["das Werkzeug","die Werkzeuge","工具；（注塑）模具","tool; mould","注塑厂说 Werkzeug 就是模具"],["die Zerspanung","","切削加工","machining","der Span = 切屑；CNC-Zerspanung"],["die Taktzeit","die Taktzeiten","节拍时间","takt time / cycle time","英语 takt time 就来自德语 Takt"],["die Schicht","die Schichten","班次","shift","Früh-, Spät-, Nachtschicht = 早、中、晚班"]]},{"name":"项目管理","de":"Projektmanagement","items":[["das Lastenheft","die Lastenhefte","需求规格书（甲方）","requirements specification","客户写：要什么"],["das Pflichtenheft","die Pflichtenhefte","实施规格书（乙方）","functional specification","供应商写：怎么实现"],["der Meilenstein","die Meilensteine","里程碑","milestone","die Meile + der Stein，和英语同源"],["das Arbeitspaket","die Arbeitspakete","工作包","work package",""],["der Projektstrukturplan","die Projektstrukturpläne","工作分解结构","WBS","缩写 PSP"],["der Terminplan","die Terminpläne","进度计划","schedule","Termin 又出现了：日期、期限"],["der Änderungsantrag","die Änderungsanträge","变更请求","change request","口语也说 Change Request"],["der Lenkungsausschuss","die Lenkungsausschüsse","（项目）指导委员会","steering committee","der Ausschuss = 委员会；在工厂里也是“废品”"]]},{"name":"机械","de":"Maschinenbau","items":[["die Welle","die Wellen","轴","shaft","也是“波浪”"],["das Kugellager","die Kugellager","滚珠轴承","ball bearing","die Kugel（球）+ das Lager"],["das Zahnrad","die Zahnräder","齿轮","gear","der Zahn（牙）+ das Rad（轮）"],["die Toleranz","die Toleranzen","公差","tolerance",""],["die technische Zeichnung","die technischen Zeichnungen","工程图纸","technical drawing","形容词要变格：eine technische / die technischen"],["das Schweißen","","焊接（熔焊）","welding","der Schweißer = 焊工"],["der Verschleiß","","磨损","wear","das Verschleißteil = 易损件"],["die Schraube","die Schrauben","螺钉、螺栓","screw / bolt","螺母是 die Mutter，复数 die Muttern（“妈妈”的复数是 Mütter）"]]},{"name":"建筑","de":"Bauwesen","items":[["der Bauherr","die Bauherren","业主（甲方）","client / building owner","弱变化：den / dem / des Bauherrn"],["die Ausschreibung","die Ausschreibungen","招标","tender","ausschreiben 可分"],["die Baugenehmigung","die Baugenehmigungen","施工许可证","building permit",""],["der Bauleiter","die Bauleiter","工地负责人","site manager","die Bauleitung = 施工管理"],["das Fundament","die Fundamente","地基","foundation",""],["der Beton","","混凝土","concrete","der Stahlbeton = 钢筋混凝土"],["das Gerüst","die Gerüste","脚手架","scaffolding",""],["die Bauabnahme","die Bauabnahmen","竣工验收","final inspection","Abnahme 又出现了"]]},{"name":"生物技术","de":"Biotechnologie","items":[["der Bioreaktor","die Bioreaktoren","生物反应器","bioreactor","也叫 der Fermenter"],["der Reinraum","die Reinräume","洁净室","cleanroom","rein（洁净）+ der Raum"],["die Zellkultur","die Zellkulturen","细胞培养","cell culture",""],["die Fermentation","","发酵","fermentation",""],["die Validierung","die Validierungen","验证","validation","GMP 必备：IQ / OQ / PQ"],["die Verunreinigung","die Verunreinigungen","污染、杂质","contamination","rein（干净）→ verunreinigen（弄脏）"],["die Charge","die Chargen","批次","batch / lot","读音像法语 [ˈʃarʒə]；die Chargennummer = 批号"],["die Probe","die Proben","样品","sample","≠ probe（探针）；Probe 也是“排练”"]]}],"sentences":[["因为供货短缺，项目进度落后了两周。","Wegen eines Lieferengpasses liegt das Projekt zwei Wochen hinter dem Zeitplan.","Because of a supply bottleneck, the project is two weeks behind schedule.","wegen + 第二格：eines Lieferengpasses；hinter dem Zeitplan liegen = 落后于进度"],["我们下周一启动项目，在第一次会议上确定里程碑。","Wir starten das Projekt nächsten Montag und legen in der ersten Besprechung die Meilensteine fest.","We'll kick off the project next Monday and set the milestones in the first meeting.","用现在时表示将来；可分动词 festlegen → legen … fest"],["在图纸批准之前，请让所有相关方随时了解进展。","Bitte halten Sie alle Beteiligten auf dem Laufenden, bis die Zeichnung freigegeben ist.","Please keep all stakeholders in the loop until the drawing has been signed off.","bis 从句动词放句末；freigegeben ist = 状态被动"],["如果这周还解决不了，我会把问题上报给管理层。","Wenn wir das Problem diese Woche nicht lösen können, eskaliere ich es an die Geschäftsleitung.","If we can't solve the problem this week, I'll escalate it to management.","wenn 从句在前，主句动词紧跟逗号：„…, eskaliere ich“"],["技术员花了三个小时找故障，最后找到了原因：一个传感器没有校准好。","Der Techniker hat drei Stunden nach dem Fehler gesucht und schließlich die Ursache gefunden: Ein Sensor war nicht richtig kalibriert.","The technician spent three hours looking for the fault and finally found the cause: a sensor hadn't been calibrated properly.","Perfekt：hat … gesucht / gefunden；冒号后是完整句，首字母大写"],["这是一个偶发故障，所以我们先给客户一个临时解决办法。","Es handelt sich um einen sporadischen Fehler, deshalb bieten wir dem Kunden zunächst eine Übergangslösung an.","This is an intermittent fault, so we'll offer the customer a temporary workaround first.","es handelt sich um = 这是（书面）；deshalb 后动词在第二位；anbieten 可分"],["我们做了测量，现在设备又运转起来了。","Wir haben eine Messung durchgeführt, und die Anlage läuft jetzt wieder.","We carried out a measurement, and the plant is running again now.","机器“运转”用 laufen：Die Anlage läuft."],["这台机器还在保修范围内，所以我们免费更换控制板。","Die Maschine fällt noch unter die Gewährleistung, deshalb tauschen wir die Steuerplatine kostenlos aus.","The machine is still covered by the warranty, so we'll replace the control board free of charge.","unter + 第四格；austauschen 可分 → tauschen … aus"],["客户一建工单，我们就在 24 小时内响应，必要时派技术员去客户那里。","Sobald ein Kunde ein Ticket anlegt, reagieren wir innerhalb von 24 Stunden und schicken bei Bedarf einen Techniker zum Kunden.","As soon as a customer logs a ticket, we respond within 24 hours and send a technician to the customer if necessary.","sobald 从句里可分动词合在一起放句末：anlegt；bei Bedarf = 必要时"],["这批货不符合要求，质量部已经向供应商提出了投诉。","Diese Lieferung erfüllt die Vorgaben nicht; die Qualitätssicherung hat sie bereits beim Lieferanten reklamiert.","This delivery doesn't meet the specifications; quality assurance has already filed a complaint with the supplier.","nicht 放句末否定整句；reklamieren 的 Perfekt 不加 ge-；beim Lieferanten（弱变化）"],["我们已经启动了纠正措施，确保同样的问题不再发生。","Wir haben bereits Korrekturmaßnahmen eingeleitet, damit das gleiche Problem nicht wieder auftritt.","We've already initiated corrective action to make sure the same problem doesn't happen again.","damit 从句：可分动词合起来放句末（auftritt）"],["为了赶上期限，我们必须重新安排资源。","Um den Termin einzuhalten, müssen wir die Ressourcen neu einplanen.","To meet the deadline, we need to reallocate resources.","um … zu：可分动词把 zu 夹在中间 → einzuhalten"],["标准交货期是六周；如果要加急，您得承担额外费用。","Die Standardlieferzeit beträgt sechs Wochen. Wenn Sie eine Expresslieferung wünschen, müssten Sie die Mehrkosten tragen.","The standard lead time is six weeks. If you want express delivery, you would have to bear the extra cost.","数字用 betragen；müssten 是 Konjunktiv II，语气更客气"],["我们在考虑本地采购零件，这样能缩短交货期，也能控制在预算内。","Wir überlegen, die Teile lokal zu beschaffen. So können wir die Lieferzeit verkürzen und im Kostenrahmen bleiben.","We're considering sourcing the parts locally. That way we can shorten the lead time and stay within budget.","überlegen + zu 不定式；So 开头，动词在第二位"],["我们明天能不能简单碰一下，定一下下个月的优先级？","Können wir uns morgen kurz abstimmen, welche Prioritäten wir im nächsten Monat setzen?","Can we touch base briefly tomorrow on which priorities we'll set for next month?","sich abstimmen 反身；welche 引导的间接问句，动词放句末"],["会后请您发出会议纪要，并跟进所有待办事项。","Bitte verschicken Sie nach der Besprechung das Protokoll und verfolgen Sie alle offenen Punkte nach.","After the meeting, please send out the minutes and follow up on all open items.","Sie 的命令式：动词 + Sie；nachverfolgen 可分；offene Punkte = 待办事项"],["下周有位新同事入职，你能让他了解一下最新情况吗？","Nächste Woche fängt ein neuer Kollege an. Kannst du ihn auf den neuesten Stand bringen?","A new colleague starts next week. Could you bring him up to speed?","anfangen 可分 → fängt … an；同事之间常用 du"],["由于预算原因，客户决定把项目暂停到明年第一季度。","Aus Budgetgründen hat der Kunde beschlossen, das Projekt bis zum ersten Quartal nächsten Jahres auf Eis zu legen.","For budget reasons, the customer has decided to put the project on hold until Q1 next year.","aus … Gründen = 由于…原因；nächsten Jahres 是第二格"],["开工之前，现场每个人都必须接受安全交底。","Bevor wir auf der Baustelle anfangen, muss jeder eine Sicherheitsunterweisung erhalten.","Before we start on site, everyone has to get a safety briefing.","bevor 从句动词放句末；jeder 是单数 → muss"],["这不属于保修，但我们出于善意免费处理。","Das ist kein Gewährleistungsfall, aber wir erledigen es auf Kulanz.","This isn't covered by the warranty, but we'll take care of it as a goodwill gesture.","否定名词用 kein，不用 nicht"],["这次停机让客户损失了大约十个小时的产量。","Durch den Stillstand hat der Kunde etwa zehn Stunden Produktion verloren.","The downtime cost the customer about ten hours of production.","durch + 第四格表示原因；verlieren → verloren"],["每次维修后，技术员都要填写服务报告，并让客户签字确认。","Nach jeder Reparatur muss der Techniker einen Servicebericht ausfüllen und ihn vom Kunden abzeichnen lassen.","After every repair, the technician has to fill out a service report and have the customer sign it.","lassen + 不定式 = 让别人做；放在句子最后"],["客户对延误提出了投诉，我们今天下班前必须答复他们。","Der Kunde hat sich über die Verzögerung beschwert. Wir müssen ihm noch heute vor Feierabend antworten.","The customer has complained about the delay. We have to reply to them before the end of the day.","sich beschweren über + 第四格；antworten + 第三格（ihm）；Feierabend = 下班"],["客户拒绝验收，所以我们还不能开尾款发票。","Der Kunde hat die Abnahme verweigert, deshalb können wir die Schlussrechnung noch nicht stellen.","The customer refused acceptance, so we can't issue the final invoice yet.","开发票用动词 stellen：eine Rechnung stellen"]],"friends":[{"name":"职场高频","de":"Im Büro","items":[["der Chef","上司、老板","≠ chef（厨师）· 英语说 boss"],["der Termin","约好的时间、期限、预约","≠ term（术语、学期）· 英语说 appointment / deadline"],["eventuell","也许、可能","≠ eventually（最终 = schließlich）"],["aktuell","当前的、最新的","≠ actual（实际的 = tatsächlich）"],["das Protokoll","会议纪要","≠ protocol（礼仪、通信协议）· 英语说 minutes"],["die Reklamation","质量投诉","≠ reclamation（回收、填海）· 英语说 complaint"],["die Probe","样品；排练","≠ probe（探针）· 英语说 sample"],["die Montage","安装、装配","≠ montage（蒙太奇）· 英语说 installation"],["das Personal","员工、人员","≠ personal（个人的 = persönlich）· 英语说 staff"],["die Provision","佣金、提成","≠ provision（供应、条款）· 英语说 commission"],["der Prospekt","宣传册","≠ prospect（前景）· 英语说 brochure"],["die Hochschule","大学（尤指应用技术大学）","≠ high school（中学）· 英语说 university"]]},{"name":"日常小词","de":"Alltag","items":[["bekommen","得到、收到","≠ become（变成 = werden）"],["also","所以、那么","≠ also（也 = auch）"],["fast","几乎","≠ fast（快 = schnell）"],["das Handy","手机","英语说 mobile / cell phone · handy 是“方便的”"],["der Beamer","投影仪","英语说 projector"],["konsequent","始终如一的、坚决的","≠ consequent（随之而来的）· 英语说 consistent"],["sensibel","敏感的（人）","≠ sensible（明智的 = vernünftig）"],["das Gift","毒药","≠ gift（礼物 = das Geschenk）"],["die Rente","退休金","≠ rent（租金 = die Miete）"],["die Kaution","押金","≠ caution（小心 = die Vorsicht）"]]},{"name":"数字与时间","de":"Zahlen & Zeit","items":[["die Milliarde","十亿（10⁹）","= 英语 billion"],["die Billion","万亿（10¹²）","≠ billion！英语说 trillion。报价、营收最容易错"],["null Komma fünf","0,5（零点五）","德语小数点用逗号：0,5；千位用点：1.000"],["halb drei","两点半（2:30）","≠ half three（英式口语 = 3:30）"]]}]};
+
+// ---- items ----
+const ITEMS = { phrases: [], industry: [], sentences: [], friends: [] };
+let n = 0;
+DATA.phrases.forEach((g) => g.items.forEach(([de, zh, en, note]) => { n++; ITEMS.phrases.push({ id: "p" + n, n, de, zh, en, note, group: g.name, groupDe: g.de }); }));
+DATA.industry.forEach((g, gi) => g.items.forEach(([de, pl, zh, en, note], i) => ITEMS.industry.push({ id: "i" + gi + "-" + i, n: i + 1, de, pl, zh, en, note, group: g.name, groupDe: g.de })));
+DATA.sentences.forEach(([zh, de, en, note], i) => ITEMS.sentences.push({ id: "s" + (i + 1), n: i + 1, de, zh, en, note, group: "中译德" }));
+let fn = 0;
+DATA.friends.forEach((g) => g.items.forEach(([de, zh, trap]) => { fn++; ITEMS.friends.push({ id: "f" + fn, n: fn, de, zh, trap, group: g.name, groupDe: g.de }); }));
+const INDUSTRIES = DATA.industry.map((g) => g.name);
+const WITH_ARTICLE = new Set(["industry", "friends"]);   // tabs whose entries are nouns learned with der/die/das
+
+// ---- state ----
+const prefsKey = "de-lesson1-prefs", marksKey = "de-lesson1-marks";
+const state = { tab: "phrases", cover: "de", filter: "all", shuffle: false, industries: [], speed: 0.95, typing: true, showEn: true, marks: {}, revealed: new Set() };
+const typed = {};          // id -> { value, result: "ok" | "bad" | null, form }
+const sticky = new Set();  // items answered this round stay on screen even if the filter would hide them
+function readLocal(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
+function writeLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+Object.assign(state, readLocal(prefsKey) || {});
+if (!ITEMS[state.tab]) state.tab = "phrases";
+state.revealed = new Set();
+state.marks = readLocal(marksKey) || {};
+let order = {};
+
+function savePrefs() { const { tab, cover, filter, shuffle, industries, speed, typing, showEn } = state; writeLocal(prefsKey, { tab, cover, filter, shuffle, industries, speed, typing, showEn }); }
+
+// ---- rendering ----
+const $ = (id) => document.getElementById(id);
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+function visible(item) {
+  if (sticky.has(item.id)) return true;
+  const m = state.marks[item.id];
+  if (state.filter === "review") return m !== "k";
+  if (state.filter === "unknown") return m === "u";
+  return true;
+}
+function shuffled(list, key) {
+  if (!state.shuffle) return list;
+  if (!order[key]) { order[key] = list.map((x) => x.id).sort(() => Math.random() - 0.5); }
+  const pos = new Map(order[key].map((id, i) => [id, i]));
+  return [...list].sort((a, b) => pos.get(a.id) - pos.get(b.id));
+}
+function kindOf(item) { return { p: "phrases", i: "industry", s: "sentences", f: "friends" }[item.id[0]]; }
+
+// ---- typing practice ----
+const ABBR = [["jdn.", "jemanden"], ["jdm.", "jemandem"], ["jds.", "jemandes"], ["etw.", "etwas"]];
+const GENDER = { der: "阳性", die: "阴性", das: "中性" };
+// Case-insensitive comparison key; umlauts fold to ae/oe/ue/ss so a keyboard without them still works.
+function fold(t) {
+  return t.toLowerCase()
+    .replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss")
+    .replace(/[-–—_/]/g, " ")
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ").trim();
+}
+function words(t) { return t.replace(/[-–—_/]/g, " ").replace(/[^\p{L}\p{N} ]+/gu, " ").split(/\s+/).filter(Boolean); }
+function forms(de) {
+  let fs = [de];
+  if (de.includes(" / ")) fs = fs.concat(de.split(" / "));
+  const out = [];
+  for (const f of fs) {
+    out.push(f);
+    let full = f; for (const [a, b] of ABBR) full = full.split(a).join(b);
+    if (full !== f) out.push(full);
+  }
+  return out;
+}
+function match(value, item) { const v = fold(value); return v ? forms(item.de).find((f) => fold(f) === v) || null : null; }
+// Words whose capitalization differs from the reference form (German nouns are capitalized).
+function caseNotes(value, form) {
+  const a = words(value), r = words(form);
+  if (a.length !== r.length) return [];
+  const up = (s) => s[0] !== s[0].toLowerCase();
+  return r.filter((w, i) => (up(w) && !up(a[i])) || (i > 0 && !up(w) && up(a[i])));
+}
+// For nouns: the typed answer is the word without its article, or with the wrong one.
+function articleIssue(value, item) {
+  if (!WITH_ARTICLE.has(kindOf(item))) return null;
+  const ref = fold(item.de).split(" ");
+  if (!GENDER[ref[0]]) return null;
+  const a = fold(value).split(" ");
+  const rest = ref.slice(1).join(" ");
+  if (a.join(" ") === rest) return { kind: "missing", art: ref[0] };
+  if (GENDER[a[0]] && a.slice(1).join(" ") === rest) return { kind: "wrong", art: ref[0] };
+  return null;
+}
+// Words of the reference answer that the typed answer did not match (longest common subsequence on words).
+function same(ref, w) {
+  return ref === w || (ref === "jdn" && w === "jemanden") || (ref === "jdm" && w === "jemandem") || (ref === "jds" && w === "jemandes") || (ref === "etw" && w === "etwas");
+}
+function missedWords(value, de) {
+  const ws = de.split(/\s+/);
+  const parts = [];  // [wordIndex, foldedPart]
+  ws.forEach((w, wi) => fold(w).split(" ").filter(Boolean).forEach((p) => parts.push([wi, p])));
+  const a = fold(value).split(" ").filter(Boolean);
+  const L = Array.from({ length: parts.length + 1 }, () => new Array(a.length + 1).fill(0));
+  for (let i = parts.length - 1; i >= 0; i--) for (let j = a.length - 1; j >= 0; j--)
+    L[i][j] = same(parts[i][1], a[j]) ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const hit = new Array(parts.length).fill(false);
+  for (let i = 0, j = 0; i < parts.length && j < a.length;) {
+    if (same(parts[i][1], a[j])) { hit[i] = true; i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++;
+  }
+  const ok = ws.map(() => true);
+  parts.forEach(([wi], k) => { if (!hit[k]) ok[wi] = false; });
+  return ws.map((w, i) => [w, ok[i]]);
+}
+function typingOn() { return state.typing && state.cover === "de"; }
+function moveFocus(fromId, dir) {
+  const all = [...document.querySelectorAll("input.type-in")];
+  const i = all.findIndex((x) => x.dataset.id === fromId);
+  const next = all[i + dir];
+  if (next) { next.focus({ preventScroll: true }); next.scrollIntoView({ block: "center", behavior: "smooth" }); }
+}
+function checkTyped(item, value) {
+  const form = match(value, item);
+  typed[item.id] = { value, result: form ? "ok" : "bad", form };
+  sticky.add(item.id);
+  state.revealed.add(item.id);
+  setMark(item.id, form ? "k" : "u");
+}
+function answerSpan(value, de) {
+  const ans = el("span", "ans");
+  missedWords(value, de).forEach(([w, okw], i) => { if (i) ans.append(" "); ans.append(okw ? document.createTextNode(w) : el("span", "miss", w)); });
+  return ans;
+}
+function typer(item) {
+  const box = el("div", "typer");
+  const t = typed[item.id] || { value: "", result: null };
+  const inp = el("input", "type-in" + (t.result ? " " + t.result : ""));
+  inp.type = "text"; inp.id = "type-" + item.id; inp.dataset.id = item.id; inp.value = t.value;
+  inp.placeholder = WITH_ARTICLE.has(kindOf(item)) && GENDER[item.de.split(" ")[0]] ? "连冠词打德语，回车检查" : "输入德语，回车检查";
+  inp.setAttribute("aria-label", "输入德语：" + item.zh);
+  for (const [k, v] of [["autocomplete", "off"], ["autocapitalize", "off"], ["autocorrect", "off"], ["spellcheck", "false"], ["lang", "de"], ["enterkeyhint", "next"]]) inp.setAttribute(k, v);
+  inp.addEventListener("keydown", (e) => {
+    if (e.isComposing) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const cur = typed[item.id];
+      if (cur && cur.result && cur.value === inp.value) moveFocus(item.id, 1);
+      else checkTyped(item, inp.value);
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      moveFocus(item.id, e.shiftKey ? -1 : 1);
+    }
+  });
+  inp.addEventListener("input", () => {
+    typed[item.id] = { value: inp.value, result: null };
+    inp.classList.remove("ok", "bad");
+    const v = box.querySelector(".verdict"); if (v) v.remove();
+  });
+  box.append(inp);
+  if (t.result === "ok") {
+    const v = el("div", "verdict ok", "✓ 正确");
+    if (words(t.value).join(" ") !== words(t.form).join(" ")) {
+      const cn = caseNotes(t.value, t.form);
+      const fix = el("span", "fix", (cn.length ? " · 注意大小写：" + cn.join("、") : "") + " · 标准写法：");
+      fix.append(el("span", "ans", t.form));
+      v.append(fix);
+    }
+    box.append(v);
+  }
+  if (t.result === "bad") {
+    const v = el("div", "verdict bad");
+    const ai = t.value.trim() ? articleIssue(t.value, item) : null;
+    v.append(el("span", "tag", !t.value.trim() ? "✗ 没填" : ai ? (ai.kind === "missing" ? "✗ 缺冠词" : "✗ 冠词不对") : "✗ 不对"));
+    v.append(ai ? "要连冠词一起记，是 " + ai.art + "（" + GENDER[ai.art] + "）：" : "正确答案：");
+    v.append(answerSpan(t.value, item.de));
+    box.append(v);
+  }
+  return box;
+}
+
+// German line; for nouns the article is colored by gender.
+function deLine(item, colored) {
+  const line = el("div", "de");
+  const m = colored ? item.de.match(/^(der|die|das) (.+)$/) : null;
+  if (m) { line.append(el("span", "art " + m[1], m[1]), " " + m[2]); }
+  else line.append(item.de);
+  return line;
+}
+
+function card(item, kind) {
+  const sentence = kind === "sentences";
+  const m = state.marks[item.id];
+  const c = el("div", "card" + (sentence ? " sent" : "") + (m === "k" ? " known" : m === "u" ? " unknown" : ""));
+  const face = el("div", "face");
+  face.tabIndex = 0;
+  face.setAttribute("role", "button");
+  const shown = state.revealed.has(item.id);
+  const deEl = deLine(item, WITH_ARTICLE.has(kind));
+  const zhEl = el("div", "zh", item.zh);
+  const lines = sentence ? [["zh", zhEl], ["de", deEl]] : [["de", deEl], ["zh", zhEl]];
+  lines[0][1].prepend(el("span", "num", String(item.n)));
+  for (const [k, line] of lines) {
+    if (state.cover === k && !shown) line.classList.add("covered");
+    face.append(line);
+  }
+  if (item.trap) face.append(el("div", "trap", item.trap));
+  else if (item.en && (state.showEn || shown)) {
+    const en = el("div", "en-ref"); en.append(el("span", "tag", "EN"), item.en); en.lang = "en";
+    face.append(en);
+  }
+  const deVisible = state.cover !== "de" || shown;
+  if (deVisible && (item.pl !== undefined || item.note)) {
+    const note = el("div", "note");
+    if (item.pl !== undefined) note.append(el("span", "pl", item.pl ? "复数 " + item.pl : "通常不用复数"));
+    if (item.note) note.append(item.note);
+    face.append(note);
+  }
+  face.setAttribute("aria-label", state.cover === "none" ? "卡片" : (shown ? "点击重新遮住" : "点击显示"));
+  const toggle = () => { if (state.cover === "none") return; shown ? state.revealed.delete(item.id) : state.revealed.add(item.id); render(); };
+  face.addEventListener("click", toggle);
+  face.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+  const marks = el("div", "marks");
+  for (const [v, label] of [["k", "会"], ["u", "不会"]]) {
+    const b = el("button", "mk-btn " + v, label);
+    b.setAttribute("aria-pressed", String(m === v));
+    b.addEventListener("click", () => setMark(item.id, m === v ? null : v));
+    marks.append(b);
+  }
+  if (canSpeak) {
+    const say = el("button", "say");
+    say.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+    say.append(document.createTextNode("发音"));
+    say.setAttribute("aria-label", "播放德语发音：" + item.de);
+    say.addEventListener("click", () => speak(item.de, say));
+    marks.append(say);
+  }
+  const ask = el("button", "ask");
+  ask.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 17h-2v-2h2v2zm2.1-7.7-.9.9c-.7.7-1.2 1.3-1.2 2.8h-2v-.5c0-1.1.5-2.1 1.2-2.8l1.2-1.3a2 2 0 1 0-3.4-1.4H8a4 4 0 1 1 7.1 2.3z"/></svg>';
+  ask.append(document.createTextNode("解释"));
+  ask.setAttribute("aria-label", "让 Claude 解释：" + item.de);
+  ask.addEventListener("click", () => openExplain(item, ask));
+  marks.append(ask);
+  c.append(face);
+  if (typingOn()) c.append(typer(item));
+  c.append(marks);
+  return c;
+}
+
+function render() {
+  const act = document.activeElement;
+  const focusId = act && act.classList && act.classList.contains("type-in") ? act.dataset.id : null;
+  const caret = focusId ? act.selectionStart : null;
+  renderView();
+  if (focusId) {
+    const inp = document.querySelector('input.type-in[data-id="' + focusId + '"]');
+    if (inp) { inp.focus({ preventScroll: true }); try { inp.setSelectionRange(caret, caret); } catch {} }
+  }
+}
+function renderView() {
+  const tab = state.tab;
+  for (const b of document.querySelectorAll("[data-tab]")) b.setAttribute("aria-pressed", String(b.dataset.tab === tab));
+  for (const b of document.querySelectorAll("[data-cover]")) b.setAttribute("aria-pressed", String(b.dataset.cover === state.cover));
+  for (const b of document.querySelectorAll("[data-filter]")) b.setAttribute("aria-pressed", String(b.dataset.filter === state.filter));
+  $("shuffle").setAttribute("aria-pressed", String(state.shuffle));
+  $("typing").setAttribute("aria-pressed", String(state.typing));
+  $("show-en").setAttribute("aria-pressed", String(state.showEn));
+  $("show-en").hidden = tab === "friends";
+  $("uml-row").hidden = !typingOn();
+  const tl = $("tally"); tl.hidden = !typingOn();
+  if (typingOn()) {
+    const ids = new Set(ITEMS[tab].map((i) => i.id));
+    const res = Object.entries(typed).filter(([id, t]) => ids.has(id) && t.result);
+    tl.textContent = "本轮打字 对 " + res.filter(([, t]) => t.result === "ok").length + " / " + res.length;
+  }
+  for (const b of document.querySelectorAll("[data-speed]")) b.setAttribute("aria-pressed", String(Number(b.dataset.speed) === (state.speed || 0.95)));
+
+  // industry chips
+  const chips = $("chips");
+  chips.hidden = tab !== "industry";
+  if (tab === "industry") {
+    chips.replaceChildren();
+    const all = el("button", "chip", "全部行业");
+    all.setAttribute("aria-pressed", String(state.industries.length === 0));
+    all.addEventListener("click", () => { state.industries = []; savePrefs(); render(); });
+    chips.append(all);
+    for (const name of INDUSTRIES) {
+      const b = el("button", "chip", name);
+      const on = state.industries.includes(name);
+      b.setAttribute("aria-pressed", String(on));
+      b.addEventListener("click", () => {
+        state.industries = on ? state.industries.filter((x) => x !== name) : [...state.industries, name];
+        savePrefs(); render();
+      });
+      chips.append(b);
+    }
+  }
+
+  let pool = ITEMS[tab];
+  if (tab === "industry" && state.industries.length) pool = pool.filter((i) => state.industries.includes(i.group));
+
+  // stats for the current pool (before the display filter)
+  const k = pool.filter((i) => state.marks[i.id] === "k").length;
+  const u = pool.filter((i) => state.marks[i.id] === "u").length;
+  $("st-k").textContent = "会 " + k; $("st-u").textContent = "不会 " + u; $("st-n").textContent = "未标 " + (pool.length - k - u);
+  $("m-k").style.width = (pool.length ? (k / pool.length) * 100 : 0) + "%";
+  $("m-u").style.width = (pool.length ? (u / pool.length) * 100 : 0) + "%";
+
+  const list = $("list");
+  list.replaceChildren();
+  const shown = pool.filter(visible);
+  if (!shown.length) {
+    const msg = state.filter === "unknown" ? "这一页没有标成“不会”的条目。" : "这一页的条目都已经标成“会”了。切到“全部”可以重新看。";
+    list.append(el("div", "empty", msg));
+    return;
+  }
+  const wide = tab === "sentences" ? " wide" : "";
+  if (state.shuffle) {
+    const sec = el("section", "group");
+    const h = el("h2", null, "打乱顺序"); h.append(el("span", "cnt", shown.length + " 条"));
+    const grid = el("div", "grid" + wide);
+    shuffled(shown, tab + state.industries.join()).forEach((i) => grid.append(card(i, tab)));
+    sec.append(h, grid); list.append(sec);
+    return;
+  }
+  const groups = [...new Set(shown.map((i) => i.group))];
+  for (const g of groups) {
+    const items = shown.filter((i) => i.group === g);
+    const sec = el("section", "group");
+    const h = el("h2", null, g);
+    if (items[0].groupDe) { const s = el("small", null, items[0].groupDe); s.lang = "de"; h.append(s); }
+    h.append(el("span", "cnt", items.length + " 条"));
+    const grid = el("div", "grid" + wide);
+    items.forEach((i) => grid.append(card(i, tab)));
+    sec.append(h, grid); list.append(sec);
+  }
+}
+
+// ---- umlaut keys: insert into the input that was focused last ----
+let lastInputId = null;
+document.addEventListener("focusin", (e) => { if (e.target.classList && e.target.classList.contains("type-in")) lastInputId = e.target.dataset.id; });
+for (const ch of ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"]) {
+  const b = el("button", null, ch);
+  b.type = "button";
+  b.setAttribute("aria-label", "插入 " + ch);
+  b.addEventListener("pointerdown", (e) => e.preventDefault());   // keep the caret in the input
+  b.addEventListener("mousedown", (e) => e.preventDefault());
+  b.addEventListener("click", () => {
+    const inp = (lastInputId && document.querySelector('input.type-in[data-id="' + lastInputId + '"]')) || document.querySelector("input.type-in");
+    if (!inp) return;
+    inp.focus({ preventScroll: true });
+    const s = inp.selectionStart ?? inp.value.length, e2 = inp.selectionEnd ?? s;
+    inp.setRangeText(ch, s, e2, "end");
+    inp.dispatchEvent(new Event("input", { bubbles: true }));
+  });
+  $("uml").append(b);
+}
+
+// ---- pronunciation (the browser's built-in German voice) ----
+const synth = window.speechSynthesis;
+const canSpeak = !!(synth && window.SpeechSynthesisUtterance);
+let voice = null;
+function pickVoice() {
+  if (!canSpeak) return;
+  const all = synth.getVoices();
+  const vs = all.filter((v) => /^de([-_]|$)/i.test(v.lang));
+  const rank = (v) => (/de[-_]DE/i.test(v.lang) ? 0 : 1) * 10
+    + (/(natural|neural|google|anna|helena|katja|conrad|markus|petra|yannick|seraphina|florian|amala|vicki)/i.test(v.name) ? 0 : 5) + (v.localService ? 0 : 1);
+  voice = vs.sort((a, b) => rank(a) - rank(b))[0] || null;
+  $("voice-note").hidden = !(all.length && !voice);
+}
+if (canSpeak) { pickVoice(); synth.addEventListener?.("voiceschanged", pickVoice); }
+function spoken(text) {
+  let t = text; for (const [a, b] of ABBR) t = t.split(a).join(b);
+  return t.replace(/\s\/\s/g, ", oder ");
+}
+let playingBtn = null;
+function speak(text, btn) {
+  if (!canSpeak) return;
+  synth.cancel();
+  if (playingBtn) playingBtn.classList.remove("playing");
+  const u = new SpeechSynthesisUtterance(spoken(text));
+  u.lang = voice ? voice.lang : "de-DE";
+  if (voice) u.voice = voice;
+  u.rate = state.speed || 0.95;
+  playingBtn = btn; btn.classList.add("playing");
+  const done = () => { btn.classList.remove("playing"); if (playingBtn === btn) playingBtn = null; };
+  u.onend = done; u.onerror = done;
+  synth.speak(u);
+}
+
+// ---- explanations from Claude ----
+let sampleFn = null;        // claude.use("sample") result, null when unavailable
+let sampleBlocked = false;  // viewer declined or Claude unavailable in this view
+let dbRef = null, userId = null;
+const explainCache = {};    // id -> turns
+let cur = null;             // { item, turns, ctl, opener }
+let lastError = "";
+
+const KIND = { phrases: "职场词组", industry: "行业词汇", sentences: "句子", friends: "德英易混词" };
+const LEARNER = "学习者：中文母语，英语大约雅思 5–6 分，正在同时学德语（大约 A2–B1），目标是在德企或德国项目上做项目经理、项目协调、现场或售后工程师（行业包括医疗、电气、电子信息、能源、物流、供应链、汽车、制造、机械、建筑、生物技术）。讲解时多和英语对比，帮学习者把两种语言连起来。";
+function promptFor(item) {
+  const k = kindOf(item);
+  if (k === "sentences") {
+    return "你是职场德语老师。" + LEARNER + "\n请用中文讲解下面这个德语句子，德语部分保持德语。\n中文：" + item.zh + "\n参考德语：" + item.de + "\n英语对照：" + item.en +
+      "\n\n按下面的结构输出，每部分 2-4 行，简洁，不要开场白和结束语：\n### 句子结构（动词位置、从句语序）\n### 关键词组\n### 更口语的说法（和同事说，用 du）\n### 更正式的说法（写邮件，用 Sie）\n### 和英语句子对比\n### 中国人常见错误";
+  }
+  if (k === "friends") {
+    return "你是职场德语老师。" + LEARNER + "\n请用中文讲解下面这个德英易混词，德语例句保持德语。\n德语：" + item.de + "（真正的意思：" + item.zh + "）\n英语陷阱：" + item.trap +
+      "\n\n按下面的结构输出，简洁，不要开场白和结束语：\n### 真正的意思和用法\n### 英语里的陷阱（为什么容易错）\n### 工作例句（3 句，项目、现场或售后场景，每句后面附中文）\n### 怎么记住";
+  }
+  return "你是职场德语老师。" + LEARNER + "\n请用中文讲解下面这个德语" + KIND[k] + "，德语例句保持德语。\n条目：" + item.de + "（" + item.zh + "；英语：" + item.en + "）" + (item.pl ? "\n复数：" + item.pl : "") +
+    "\n\n按下面的结构输出，简洁，不要开场白和结束语：\n### 意思和用法\n### 语法要点（只写相关的：名词的性和复数、可分动词、支配的格或介词、Perfekt 形式）\n### 常见搭配（3-5 个）\n### 工作例句（3 句，项目、现场或售后场景，每句后面附中文）\n### 和英语对比（英语怎么说，哪里一样，哪里会被英语带偏）\n### 中国人常见错误（1-2 条）";
+}
+function copyPromptFor(item) {
+  const k = kindOf(item);
+  if (k === "sentences") return "请讲解这个职场德语句子：" + item.de + "（" + item.zh + "；英语：" + item.en + "）。包括句子结构和动词位置、关键词组、更口语和更正式的说法、和英语的对比、常见错误。不需要讲发音。";
+  if (k === "friends") return "请讲解这个德英易混词：" + item.de + "（" + item.zh + "；" + item.trap + "）。包括真正的用法、英语里的陷阱、3 个工作例句、怎么记住。不需要讲发音。";
+  return "请讲解这个职场德语" + KIND[k] + "：" + item.de + "（" + item.zh + "；英语：" + item.en + "）。包括意思用法、语法要点（性、复数、可分动词、支配的格）、常见搭配、3 个项目或现场售后场景的例句、和英语的对比、中国人常见错误。不需要讲发音。";
+}
+
+// Minimal Markdown to DOM (headings, lists, bold) without innerHTML.
+function inline(parent, text) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  for (const part of parts) {
+    if (/^\*\*[^*]+\*\*$/.test(part)) parent.append(el("strong", null, part.slice(2, -2)));
+    else if (part) parent.append(document.createTextNode(part));
+  }
+}
+function renderMarkdown(text, into) {
+  let list = null, skip = false;
+  for (const raw of text.split("\n")) {
+    const line = raw.trimEnd();
+    const h = line.match(/^#{1,6}\s+(.*)$/);
+    if (h) skip = /发音/.test(h[1]);   // pronunciation notes are left out on purpose
+    if (skip) continue;
+    const ul = line.match(/^\s*[-*•]\s+(.*)$/);
+    const ol = line.match(/^\s*\d+[.)]\s+(.*)$/);
+    if (h) { list = null; const e = el("h4"); inline(e, h[1]); into.append(e); }
+    else if (ul || ol) {
+      const tag = ul ? "UL" : "OL";
+      if (!list || list.tagName !== tag) { list = el(tag.toLowerCase()); into.append(list); }
+      const li = el("li"); inline(li, (ul || ol)[1]); list.append(li);
+    } else if (line.trim()) { list = null; const p = el("p"); inline(p, line); into.append(p); }
+    else list = null;
+  }
+}
+
+function drawTurns(streaming) {
+  const body = $("dr-body");
+  body.replaceChildren();
+  const turns = cur.turns;
+  for (let i = 1; i < turns.length; i++) {
+    const t = turns[i];
+    if (t.role === "user") body.append(el("div", "q-you", t.content));
+    else { const box = el("div"); renderMarkdown(t.content, box); body.append(box); }
+  }
+  if (streaming !== undefined) {
+    const box = el("div");
+    if (streaming) renderMarkdown(streaming, box); else box.append(el("p", "thinking", "Claude 正在写解释……"));
+    body.append(box);
+    return box;
+  }
+}
+
+function setBusy(busy) {
+  $("dr-stop").hidden = !busy;
+  $("ask-send").disabled = busy;
+  $("dr-regen").disabled = busy;
+}
+
+async function saveExplain(item) {
+  explainCache[item.id] = cur.turns;
+  if (!dbRef || !userId) return;
+  try { await dbRef.doc("data/users/" + userId + "/explain-" + item.id).set({ turns: cur.turns, updatedAt: Date.now() }); } catch {}
+}
+
+const ERRORS = {
+  rate_limited: "请求太频繁或已到使用上限，稍后再试。",
+  session_expired: "登录已过期，请重新登录 claude.ai 后再试。",
+  refused: "Claude 没有回答这个问题，换个问法试试。",
+  empty_completion: "没有得到回答，换个问法试试。",
+  upstream_error: "连接中断了，点“重新解释”或再发一次。",
+};
+
+async function runSample(item, turns) {
+  if (!sampleFn || sampleBlocked) { showCopyFallback(item); return null; }
+  const ctl = new AbortController();
+  cur.ctl = ctl;
+  setBusy(true);
+  let box = drawTurns("");
+  $("dr-note").textContent = ""; lastError = "已停止。";
+  try {
+    const input = turns.length === 1 ? turns[0].content : turns;
+    const { text } = await sampleFn(input, {
+      modelTier: "quick", signal: ctl.signal, cache: turns.length === 1 ? true : false,
+      onText: ({ text }) => { if (cur && cur.item === item) { box.replaceChildren(); renderMarkdown(text, box); } },
+    });
+    return text;
+  } catch (e) {
+    const code = e && e.code;
+    if (code === "cancelled") { $("dr-note").textContent = "已停止。"; return e.text || null; }
+    if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(code)) {
+      sampleBlocked = true; showCopyFallback(item); return null;
+    }
+    lastError = ERRORS[code] || ERRORS.upstream_error;
+    box.replaceChildren(); if (e && e.text) renderMarkdown(e.text, box);
+    box.append(el("p", "err", lastError));
+    return null;
+  } finally {
+    if (cur) { cur.ctl = null; setBusy(false); }
+  }
+}
+
+function showCopyFallback(item) {
+  const body = $("dr-body");
+  body.replaceChildren();
+  body.append(el("p", null, "这里暂时不能直接调用 Claude（可能是没有允许，或当前环境不支持）。可以复制下面的问题，粘贴到 Claude 对话里问："));
+  const ta = el("textarea", "copybox"); ta.rows = 4; ta.value = copyPromptFor(item); ta.readOnly = true; ta.id = "copy-" + item.id;
+  body.append(ta);
+  $("ask-row").hidden = true; $("dr-regen").hidden = true;
+}
+
+async function loadSaved(item) {
+  if (explainCache[item.id]) return explainCache[item.id];
+  if (!dbRef || !userId) return null;
+  try {
+    const snap = await dbRef.doc("data/users/" + userId + "/explain-" + item.id).get();
+    if (snap.exists && Array.isArray(snap.data().turns)) return (explainCache[item.id] = snap.data().turns);
+  } catch {}
+  return null;
+}
+
+async function openExplain(item, opener) {
+  if (cur && cur.ctl) cur.ctl.abort();
+  cur = { item, turns: [{ role: "user", content: promptFor(item) }], ctl: null, opener };
+  $("dr-de").textContent = item.de;
+  $("dr-zh").textContent = item.zh + (item.en ? " · EN " + item.en : "");
+  $("ask-row").hidden = false; $("dr-regen").hidden = false; $("dr-note").textContent = "";
+  $("ask-in").value = "";
+  $("drawer").hidden = false; $("scrim").hidden = false;
+  $("dr-close").focus();
+  const saved = await loadSaved(item);
+  if (!cur || cur.item !== item) return;
+  if (saved && saved.length > 1) { cur.turns = saved.map((t) => ({ ...t })); drawTurns(); $("dr-note").textContent = "这是之前保存的解释。"; return; }
+  const text = await runSample(item, cur.turns);
+  if (text && cur && cur.item === item) { cur.turns.push({ role: "assistant", content: text }); drawTurns(); saveExplain(item); }
+}
+
+async function askFollowUp() {
+  if (!cur || cur.ctl) return;
+  const q = $("ask-in").value.trim();
+  if (!q) return;
+  if (cur.turns.length < 2) return;
+  const item = cur.item;
+  $("ask-in").value = "";
+  cur.turns.push({ role: "user", content: q });
+  const recent = [cur.turns[0], ...cur.turns.slice(1).slice(-12)];
+  const text = await runSample(item, recent);
+  if (cur && cur.item === item) {
+    if (text) { cur.turns.push({ role: "assistant", content: text }); drawTurns(); saveExplain(item); }
+    else if (!sampleBlocked) { cur.turns.pop(); drawTurns(); $("ask-in").value = q; $("dr-note").textContent = lastError; }
+  }
+}
+
+function closeExplain() {
+  if (!cur) return;
+  if (cur.ctl) cur.ctl.abort();
+  const opener = cur.opener; cur = null;
+  $("drawer").hidden = true; $("scrim").hidden = true;
+  if (opener && opener.isConnected) opener.focus();
+}
+
+$("dr-close").addEventListener("click", closeExplain);
+$("scrim").addEventListener("click", closeExplain);
+$("dr-stop").addEventListener("click", () => { if (cur && cur.ctl) cur.ctl.abort(); });
+$("ask-send").addEventListener("click", askFollowUp);
+$("ask-in").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); askFollowUp(); } });
+$("dr-regen").addEventListener("click", async () => {
+  if (!cur || cur.ctl) return;
+  const item = cur.item;
+  cur.turns = [{ role: "user", content: promptFor(item) }];
+  delete explainCache[item.id];
+  const text = await runSample(item, cur.turns);
+  if (text && cur && cur.item === item) { cur.turns.push({ role: "assistant", content: text }); drawTurns(); saveExplain(item); }
+});
+$("dr-copy").addEventListener("click", async () => {
+  if (!cur) return;
+  const text = copyPromptFor(cur.item);
+  try { await navigator.clipboard.writeText(text); $("dr-note").textContent = "已复制，可以粘贴到 Claude 对话里。"; }
+  catch { showCopyFallback(cur.item); const ta = document.querySelector(".copybox"); if (ta) { ta.focus(); ta.select(); } $("dr-note").textContent = "请手动复制上面的文字。"; }
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && cur) closeExplain(); });
+
+// ---- controls ----
+for (const b of document.querySelectorAll("[data-tab]")) b.addEventListener("click", () => {
+  state.tab = b.dataset.tab; state.revealed.clear(); sticky.clear();
+  if (state.tab === "sentences" && state.cover === "zh") state.cover = "de";
+  savePrefs(); render(); window.scrollTo({ top: 0 });
+});
+for (const b of document.querySelectorAll("[data-cover]")) b.addEventListener("click", () => { state.cover = b.dataset.cover; state.revealed.clear(); sticky.clear(); savePrefs(); render(); });
+for (const b of document.querySelectorAll("[data-filter]")) b.addEventListener("click", () => { state.filter = b.dataset.filter; sticky.clear(); savePrefs(); render(); });
+$("typing").addEventListener("click", () => {
+  state.typing = !state.typing; sticky.clear();
+  if (state.typing && state.cover !== "de") { state.cover = "de"; state.revealed.clear(); }
+  savePrefs(); render();
+  if (state.typing) { const first = document.querySelector("input.type-in"); if (first) first.focus(); }
+});
+$("show-en").addEventListener("click", () => { state.showEn = !state.showEn; savePrefs(); render(); });
+for (const b of document.querySelectorAll("[data-speed]")) b.addEventListener("click", () => { state.speed = Number(b.dataset.speed); savePrefs(); render(); });
+if (!canSpeak) $("speed-ctl").hidden = true;
+$("shuffle").addEventListener("click", () => { state.shuffle = !state.shuffle; order = {}; savePrefs(); render(); });
+
+function rebuildReset() {
+  const wrap = $("reset-wrap");
+  const b = el("button", "tool danger", "清除本页标记");
+  b.id = "reset";
+  b.addEventListener("click", () => {
+    const box = el("span", "confirm");
+    const yes = el("button", "tool danger", "确认清除");
+    const no = el("button", "tool", "取消");
+    box.append("清除当前这一页的所有标记？", yes, no);
+    wrap.replaceChildren(box);
+    no.addEventListener("click", rebuildReset);
+    yes.addEventListener("click", () => { for (const i of ITEMS[state.tab]) delete state.marks[i.id]; persist(); rebuildReset(); render(); });
+  });
+  wrap.replaceChildren(b);
+}
+rebuildReset();
+
+function setMark(id, v) {
+  if (v) state.marks[id] = v; else delete state.marks[id];
+  persist(); render();
+}
+
+// ---- persistence: account storage when available, browser storage otherwise ----
+let remote = null, writing = Promise.resolve(), timer = null, remoteFailed = false;
+function persist() {
+  writeLocal(marksKey, state.marks);
+  if (!remote || remoteFailed) return;
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    const body = { marks: { ...state.marks }, updatedAt: Date.now() };
+    writing = writing.then(() => remote.set(body)).then(
+      () => { $("sync").textContent = "标记已保存到你的账号"; },
+      (e) => { if (e && e.code === "invalid_argument") { remoteFailed = true; } $("sync").textContent = "标记暂存在本浏览器"; }
+    );
+  }, 600);
+}
+
+async function initRemote() {
+  if (!window.claude || !window.claude.use) return;
+  try {
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if (!db || !user) return;
+    const uid = await user.id();
+    if (!uid) return;
+    dbRef = db; userId = uid;
+    remote = db.doc("data/users/" + uid + "/progress");
+    const snap = await remote.get();
+    if (snap.exists) {
+      const saved = snap.data().marks || {};
+      const merged = { ...state.marks, ...saved };
+      state.marks = merged;
+      writeLocal(marksKey, state.marks);
+      render();
+      if (JSON.stringify(merged) !== JSON.stringify(saved)) persist();
+    } else if (Object.keys(state.marks).length) {
+      persist();
+    }
+    $("sync").textContent = "标记已保存到你的账号";
+    remote.onSnapshot((s) => {
+      if (!s.exists || s.metadata.hasPendingWrites) return;
+      const saved = s.data().marks || {};
+      if (JSON.stringify(saved) !== JSON.stringify(state.marks)) { state.marks = { ...saved }; writeLocal(marksKey, state.marks); render(); }
+    }, () => {});
+  } catch (e) {
+    remote = null;
+  }
+}
+
+render();
+initRemote();
+(async () => { try { sampleFn = window.claude && window.claude.use ? await window.claude.use("sample") : null; } catch { sampleFn = null; } })();
+</script>

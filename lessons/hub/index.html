@@ -16,6 +16,8 @@
     --done-soft: #e5f4ec;
     --doing: #a86410;
     --doing-soft: #fbf0e0;
+    --de: #5b3fa6;
+    --de-soft: #ede8f8;
     --font-en: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
     --font-zh: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
     --font-num: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -24,15 +26,16 @@
     :root:not([data-theme="light"]) {
       --bg: #11161d; --surface: #19202a; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3442;
       --accent: #7ea6f0; --accent-soft: #1d2a40; --done: #5cc690; --done-soft: #16302a;
-      --doing: #e9a654; --doing-soft: #3a2c17; color-scheme: dark;
+      --doing: #e9a654; --doing-soft: #3a2c17; --de: #b9a5f0; --de-soft: #2a2442; color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
     --bg: #11161d; --surface: #19202a; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3442;
     --accent: #7ea6f0; --accent-soft: #1d2a40; --done: #5cc690; --done-soft: #16302a;
-    --doing: #e9a654; --doing-soft: #3a2c17; color-scheme: dark;
+    --doing: #e9a654; --doing-soft: #3a2c17; --de: #b9a5f0; --de-soft: #2a2442; color-scheme: dark;
   }
   * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
   body { background: var(--bg); color: var(--ink); font-family: var(--font-zh); font-size: 15px; line-height: 1.5; }
   .wrap { max-width: 880px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 56px; }
   header { display: grid; gap: 6px; margin-bottom: 18px; }
@@ -49,6 +52,15 @@
   .pill { font: 600 12px/1 var(--font-zh); border-radius: 999px; padding: 4px 9px; background: var(--accent-soft); color: var(--muted); }
   .pill.doing { background: var(--doing-soft); color: var(--doing); }
   .pill.done { background: var(--done-soft); color: var(--done); }
+  .pill.lang-en { background: var(--accent-soft); color: var(--accent); }
+  .pill.lang-de { background: var(--de-soft); color: var(--de); }
+  .lesson.de .no { color: var(--de); }
+  .lesson.de .btn.primary { background: var(--de); border-color: var(--de); color: var(--surface); }
+  .langs { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 2px; margin-top: 6px; justify-self: start; }
+  .langs button { font: 600 13px/1 var(--font-zh); color: var(--muted); background: none; border: 0; border-radius: 6px; padding: 8px 12px; cursor: pointer; }
+  .langs button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .langs button[data-lang="de"][aria-pressed="true"] { background: var(--de-soft); color: var(--de); }
+  .langs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .meta { color: var(--muted); font-size: 13px; }
   .contents { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
   .contents span { font-size: 12.5px; border: 1px solid var(--line); border-radius: 4px; padding: 2px 7px; color: var(--muted); }
@@ -72,21 +84,27 @@
 
 <div class="wrap">
   <header>
-    <h1>职场英语课程目录</h1>
-    <p>项目经理 · 项目协调 · 现场售后方向。所有课程都在这里，最新的在最上面。</p>
+    <h1>职场英语 · 德语课程目录</h1>
+    <p>项目经理 · 项目协调 · 现场售后方向。英语和德语课程都在这里，最新的在最上面；同一课号的英语和德语是同一个主题，可以对照着学。</p>
     <div class="summary" id="summary"></div>
+    <div class="langs" role="group" aria-label="语言">
+      <button id="lang-all" data-lang="all" aria-pressed="true">全部</button>
+      <button id="lang-en" data-lang="en" aria-pressed="false">英语</button>
+      <button id="lang-de" data-lang="de" aria-pressed="false">德语</button>
+    </div>
     <div class="status" id="sync">学习记录保存在本浏览器</div>
   </header>
 
   <div class="lessons" id="lessons"></div>
 
-  <p class="note">“网页练习”可以遮英文 / 遮中文、点开对照、听发音，并标记会和不会。“打开 PDF”是两页 A4 的打印版练习纸。每次复习完点“今天复习了”，这里会记下日期。</p>
+  <p class="note">“网页练习”可以遮外语 / 遮中文、点开对照、听发音、打字练习，并标记会和不会；德语课的名词带冠词和复数，还能看英语对照。“打开 PDF”是 A4 打印版练习纸（英语 2 页，德语 3 页）。每次复习完点“今天复习了”，这里会记下日期。</p>
 </div>
 
 <script>
 // Add one entry per new lesson, newest last; the page shows newest first.
 const LESSONS = [
   {
+    lang: "en",
     no: 1,
     title: "项目协调与现场售后",
     date: "2026-10-13",
@@ -95,12 +113,36 @@ const LESSONS = [
     web: "https://claude.ai/artifact/L8f8cpGaYq1vNxqerM6UXY",
     pdf: "pdf/lesson-01.pdf",
   },
+  {
+    lang: "de",
+    no: 1,
+    title: "项目协调与现场售后",
+    date: "2026-10-14",
+    level: "A2–B1（对标职场 B1）",
+    pair: "和英语第 1 课同一主题",
+    contents: ["60 个职业词组", "112 个行业词汇（带冠词）", "24 句中译德", "26 个德英易混", "填冠词 24 个"],
+    web: "https://claude.ai/artifact/SWgDxto4AJ5h9R1kC1KwwP",
+    pdf: "pdf/de-lesson-01.pdf",
+  },
 ];
+const LANGS = { en: { name: "英语", file: "职场英语" }, de: { name: "德语", file: "职场德语" } };
+// English lessons keep their original log key (the lesson number) so earlier records still match.
+const keyOf = (l) => (l.lang === "en" ? String(l.no) : l.lang + "-" + l.no);
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 
-// ---- personal log: { [lessonNo]: { status, reviews: ["YYYY-MM-DD", ...] } } ----
+// ---- language filter: a per-viewer convenience ----
+let langFilter = "all";
+try { langFilter = localStorage.getItem("course-lang") || "all"; } catch {}
+if (langFilter !== "all" && !LANGS[langFilter]) langFilter = "all";
+for (const b of document.querySelectorAll("[data-lang]")) b.addEventListener("click", () => {
+  langFilter = b.dataset.lang;
+  try { localStorage.setItem("course-lang", langFilter); } catch {}
+  render();
+});
+
+// ---- personal log: { [lessonKey]: { status, reviews: ["YYYY-MM-DD", ...] } } ----
 const LOCAL = "course-log";
 let log = {};
 try { log = JSON.parse(localStorage.getItem(LOCAL) || "{}") || {}; } catch { log = {}; }
@@ -121,21 +163,26 @@ const STATUS = [["todo", "未开始"], ["doing", "进行中"], ["done", "已完�
 function render() {
   const list = $("lessons");
   list.replaceChildren();
-  const done = LESSONS.filter((l) => (log[l.no] || {}).status === "done").length;
-  const reviews = LESSONS.reduce((s, l) => s + ((log[l.no] || {}).reviews || []).length, 0);
+  const done = LESSONS.filter((l) => (log[keyOf(l)] || {}).status === "done").length;
+  const reviews = LESSONS.reduce((s, l) => s + ((log[keyOf(l)] || {}).reviews || []).length, 0);
+  const count = (lang) => LESSONS.filter((l) => l.lang === lang).length;
   $("summary").replaceChildren();
-  for (const [k, v] of [["课程", LESSONS.length], ["已完成", done], ["累计复习", reviews + " 次"]]) {
+  for (const [k, v] of [["英语", count("en") + " 课"], ["德语", count("de") + " 课"], ["已完成", done], ["累计复习", reviews + " 次"]]) {
     const s = el("span", null, k + " "); s.append(el("b", null, String(v))); $("summary").append(s);
   }
+  for (const b of document.querySelectorAll("[data-lang]")) b.setAttribute("aria-pressed", String(b.dataset.lang === langFilter));
 
   for (const l of [...LESSONS].reverse()) {
-    const rec = log[l.no] || { status: "todo", reviews: [] };
-    const card = el("article", "lesson");
+    if (langFilter !== "all" && l.lang !== langFilter) continue;
+    const key = keyOf(l);
+    const rec = log[key] || { status: "todo", reviews: [] };
+    const card = el("article", "lesson " + l.lang);
     const no = el("div", "no", String(l.no).padStart(2, "0")); no.append(el("small", null, "第 " + l.no + " 课"));
-    const h = el("h2", null, l.title);
+    const h = el("h2");
+    h.append(el("span", "pill lang-" + l.lang, LANGS[l.lang].name), l.title);
     const st = STATUS.find(([k]) => k === rec.status) || STATUS[0];
     h.append(el("span", "pill " + st[0], st[1]));
-    const meta = el("div", "meta", l.date + " · 难度 " + l.level);
+    const meta = el("div", "meta", l.date + " · 难度 " + l.level + (l.pair ? " · " + l.pair : ""));
     const contents = el("div", "contents"); l.contents.forEach((c) => contents.append(el("span", null, c)));
     const actions = el("div", "actions");
     const web = el("a", "btn primary", "网页练习"); web.href = l.web; web.target = "_blank"; web.rel = "noopener";
@@ -148,7 +195,7 @@ function render() {
         dl.addEventListener("click", async () => {
           try {
             const blob = await (await fetch(l.pdf)).blob();
-            await downloads.save({ filename: "职场英语第" + l.no + "课.pdf", data: blob });
+            await downloads.save({ filename: LANGS[l.lang].file + "第" + l.no + "课.pdf", data: blob });
           } catch (e) { /* declined or unavailable: nothing to do */ }
         });
         actions.append(dl);
@@ -156,16 +203,16 @@ function render() {
     }
     const logRow = el("div", "log");
     const lab = el("label", null, "状态");
-    const sel = el("select"); sel.id = "status-" + l.no;
+    const sel = el("select"); sel.id = "status-" + key;
     for (const [k, v] of STATUS) { const o = el("option", null, v); o.value = k; if (k === rec.status) o.selected = true; sel.append(o); }
-    sel.addEventListener("change", () => { log[l.no] = { ...rec, status: sel.value }; save(); render(); });
+    sel.addEventListener("change", () => { log[key] = { ...rec, status: sel.value }; save(); render(); });
     lab.append(sel);
     const rv = el("button", "btn", "今天复习了");
     const already = (rec.reviews || []).includes(today());
     if (already) { rv.textContent = "今天已复习"; rv.disabled = true; }
     rv.addEventListener("click", () => {
       const reviews = [...(rec.reviews || []), today()];
-      log[l.no] = { ...rec, status: rec.status === "todo" ? "doing" : rec.status, reviews };
+      log[key] = { ...rec, status: rec.status === "todo" ? "doing" : rec.status, reviews };
       save(); render();
     });
     const rs = rec.reviews || [];
