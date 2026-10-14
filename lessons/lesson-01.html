@@ -538,15 +538,15 @@ function promptFor(item) {
   const k = kindOf(item);
   if (k === "sentences") {
     return "你是职场英语老师。" + LEARNER + "\n请用中文讲解下面这个句子，英文部分保持英文。\n中文：" + item.zh + "\n参考英文：" + item.en +
-      "\n\n按下面的结构输出，每部分 2-4 行，简洁，不要开场白和结束语：\n### 句子结构\n### 关键词组\n### 更口语的说法\n### 更正式的说法（写邮件用）\n### 中国人常见错误\n### 发音和停顿提示";
+      "\n\n按下面的结构输出，每部分 2-4 行，简洁，不要开场白和结束语：\n### 句子结构\n### 关键词组\n### 更口语的说法\n### 更正式的说法（写邮件用）\n### 中国人常见错误";
   }
   return "你是职场英语老师。" + LEARNER + "\n请用中文讲解下面这个" + KIND[k] + "，英文例句保持英文。\n条目：" + item.en + "（" + item.zh + "）" +
-    "\n\n按下面的结构输出，简洁，不要开场白和结束语：\n### 意思和用法\n### 发音要点（用大写标出重读，比如 kick OFF；说明连读或易错音）\n### 常见搭配（3-5 个）\n### 工作例句（3 句，项目或现场售后场景，每句后面附中文）\n### 中国人常见错误（1-2 条）\n### 近义说法（如果有）";
+    "\n\n按下面的结构输出，简洁，不要开场白和结束语：\n### 意思和用法\n### 常见搭配（3-5 个）\n### 工作例句（3 句，项目或现场售后场景，每句后面附中文）\n### 中国人常见错误（1-2 条）\n### 近义说法（如果有）";
 }
 function copyPromptFor(item) {
   return kindOf(item) === "sentences"
-    ? "请讲解这个职场英语句子：" + item.en + "（" + item.zh + "）。包括句子结构、关键词组、更口语和更正式的说法、常见错误、发音停顿。"
-    : "请讲解这个职场英语" + KIND[kindOf(item)] + "：" + item.en + "（" + item.zh + "）。包括意思用法、发音要点、常见搭配、3 个项目或现场售后场景的例句、中国人常见错误、近义说法。";
+    ? "请讲解这个职场英语句子：" + item.en + "（" + item.zh + "）。包括句子结构、关键词组、更口语和更正式的说法、常见错误。不需要讲发音。"
+    : "请讲解这个职场英语" + KIND[kindOf(item)] + "：" + item.en + "（" + item.zh + "）。包括意思用法、常见搭配、3 个项目或现场售后场景的例句、中国人常见错误、近义说法。不需要讲发音。";
 }
 
 // Minimal Markdown to DOM (headings, lists, bold) without innerHTML.
@@ -558,10 +558,12 @@ function inline(parent, text) {
   }
 }
 function renderMarkdown(text, into) {
-  let list = null;
+  let list = null, skip = false;
   for (const raw of text.split("\n")) {
     const line = raw.trimEnd();
     const h = line.match(/^#{1,6}\s+(.*)$/);
+    if (h) skip = /发音/.test(h[1]);   // pronunciation notes are left out on purpose
+    if (skip) continue;
     const ul = line.match(/^\s*[-*•]\s+(.*)$/);
     const ol = line.match(/^\s*\d+[.)]\s+(.*)$/);
     if (h) { list = null; const e = el("h4"); inline(e, h[1]); into.append(e); }
