@@ -1,0 +1,41 @@
+{
+  "skill_name": "pixcake-retouch",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "我需要你做我的修片助理。流程：我把 raw 格式照片给你，你分析题材、色彩、影调，然后去 instagram 上找摄影博主的类似照片，学习博主的修片思路，再告诉我在像素蛋糕里怎么调，不用直接出图。",
+      "expected_output": "确认分工（用户在像素蛋糕操作、助理给思路和参数）；说明需要的输入（RAW 文件或无调整导出的 JPEG、想要的感觉）；如实说明 Instagram 可能无法直接访问，此时请用户发参考截图或给博主名，不承诺浏览 IG；简要说明每张照片会得到的输出结构（诊断 → 参考与博主思路 → 按面板顺序的步骤和判断标准）。不编造任何博主作品或参数。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "照片在 ./photos/DSC01234.ARW，傍晚在海边拍的女生半身照，帮我看看适合修成什么风格。",
+      "expected_output": "运行 scripts/analyze_raw.py 并 Read 预览图；给出一屏以内的诊断（题材、光线方向与颜色、主色、九种影调中的类型、RAW 溢出和噪点等技术问题）；提出 2–3 个风格方向并推荐一个（如金色时刻暖调或胶片感），说明理由；尝试访问 IG，失败则如实说明，并给出该方向的 hashtag、可看的摄影师（注明以实际搜索为准）和挑图标准，请用户发 2–5 张参考截图。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "这是我的原片 ./photos/IMG_2088.CR3，还有两张 ins 上找的参考截图 ./refs/a.png ./refs/b.png，帮我按参考修。",
+      "expected_output": "Read 截图，带 IG 界面的先用 analyze_raw.py --crop 裁掉；运行 compare_ref.py 原片 vs 两张参考；按 assets/edit-plan-template.md 输出：诊断、两张参考的共同处理（博主思路）、按像素蛋糕面板顺序的步骤表（面板 → 滑块 → 起步值 → 判断），曲线写成 0–255 输入→输出，颜色分级写角度和饱和；脚本结果与肉眼冲突的项（如白平衡受天空影响）说明取舍；数值标明是反推起步值而非博主参数。",
+      "files": []
+    },
+    {
+      "id": 4,
+      "prompt": "我想把这张东京夜景修成 Liam Wong 那种感觉，你直接去他 ins 上看看他怎么修的。",
+      "expected_output": "尝试访问失败时明确说看不到他的 IG，不描述未看到的图；可用 WebSearch 查公开的采访/教程并附链接，找不到就说明只基于对青/洋红赛博夜景风格的一般理解；给出城市夜景/赛博配方方向（降色温、压高光、橙黄去饱和或偏红、蓝偏青、紫偏洋红、颜色分级阴影蓝高光洋红、先降噪），并请用户发 2–3 张参考截图以便量化对比。",
+      "files": []
+    },
+    {
+      "id": 5,
+      "prompt": "我照你的方案调完了，导出图在 ./out/final.jpg，跟参考 ./refs/a.png 比总觉得还差点意思。",
+      "expected_output": "运行 compare_ref.py final.jpg vs 参考，并 Read 两张图对照；只给 3–5 条最影响观感的微调，按先影调、后颜色、最后质感排序，每条带面板、滑块、方向/幅度和判断；如果差距来自前期光线或场景，直接说明后期追不上的部分。",
+      "files": []
+    },
+    {
+      "id": 6,
+      "prompt": "一个博主分享的 Lightroom 参数：Temp +8, Tint +5, Exposure +0.35, Contrast -20, Highlights -45, Shadows +38, Whites +12, Blacks +15, Vibrance -8, HSL Green Hue +25 Sat -40, Orange Lum +15, Color Grading Shadows 210/12, Highlights 45/8, Grain 15。像素蛋糕里怎么对应？",
+      "expected_output": "按 references/pixcake-panels.md 的换算表逐项对应到像素蛋糕面板与滑块名（色温/色调、曝光、对比度、高光、阴影、白色、黑色、自然饱和度、HSL 绿色色相/饱和度、橙色明亮度、颜色分级阴影/高光色相与饱和度、颗粒）；说明 Temp +8 是非 RAW 刻度、RAW 下以 K 显示需按观感换算；提醒同一数值在两个软件效果不完全一致，给出每项的判断标准；识别这是偏日系清新的配方。",
+      "files": []
+    }
+  ]
+}
