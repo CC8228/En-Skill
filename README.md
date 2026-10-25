@@ -109,7 +109,8 @@ skills/pixcake-retouch/
 ├── references/
 │   ├── photo-analysis.md          # 诊断清单、报告解读、九种影调
 │   ├── reference-research.md      # 找参考、截图流程、hashtag/摄影师、拆解博主思路
-│   ├── style-recipes.md           # 11 种常见风格的像素蛋糕配方
+│   ├── photographers-jp.md        # 日系人像 15 位、风景 10 位摄影师及 IG 账号
+│   ├── style-recipes.md           # 12 种常见风格的像素蛋糕配方
 │   └── pixcake-panels.md          # 面板对照、操作顺序、滑块含义、曲线/色轮/HSL 方向、LR 换算
 ├── scripts/
 │   ├── analyze_raw.py             # 单张诊断，输出预览图、分析图和中文报告

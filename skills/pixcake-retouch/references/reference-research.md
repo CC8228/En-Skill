@@ -49,6 +49,8 @@ python3 scripts/compare_ref.py <原片> <目录>/ref1_preview.jpg <目录>/ref2_
 | 韩系 / 奶油 | #감성사진 #인물사진 #creamytones | — |
 | 街拍 | #streetphotography #streetphotographyinternational #lensculture | — |
 
+日系人像/风景的完整名单（15 + 10 位，标注了清淡通透还是油润方向）见 `references/photographers-jp.md`。
+
 账号来自公开报道和资料，**可能改名或停更**，推荐时请用户以 IG 实际搜索结果为准；标“—”的直接用标签搜。用户有自己关注的博主时优先用用户的。
 
 ## 4. 用户只给了博主名字

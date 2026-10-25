@@ -21,7 +21,7 @@ description: 修片助理：拿到用户的 RAW（或 JPEG）照片后，先诊�
 | 用户想要 | 读这个 | 用脚本 |
 |---|---|---|
 | 发来照片，要诊断 | `references/photo-analysis.md` | `scripts/analyze_raw.py` |
-| 找参考、学博主思路 | `references/reference-research.md` | `scripts/analyze_raw.py --crop`、`scripts/compare_ref.py` |
+| 找参考、学博主思路 | `references/reference-research.md`（日系摄影师名单：`references/photographers-jp.md`） | `scripts/analyze_raw.py --crop`、`scripts/compare_ref.py` |
 | 某种风格怎么调（日系、胶片、电影感、港风、暗调、夜景、风光、黑白、奶油、街拍） | `references/style-recipes.md` | — |
 | 像素蛋糕里某个面板/滑块在哪、管什么，LR 参数换算 | `references/pixcake-panels.md` | — |
 | 输出修图方案 | `assets/edit-plan-template.md` | `scripts/compare_ref.py` |
