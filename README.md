@@ -115,6 +115,7 @@ skills/pixcake-retouch/
 ├── scripts/
 │   ├── analyze_raw.py             # 单张诊断，输出预览图、分析图和中文报告
 │   ├── compare_ref.py             # 原片 vs 参考图，输出差异表和起步值
+│   ├── skin_tone.py               # 框选脸部比较肤色
 │   └── photo_stats.py             # 共用的读取与计算代码
 ├── assets/
 │   └── edit-plan-template.md      # 修图方案输出模板

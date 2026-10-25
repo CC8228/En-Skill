@@ -111,6 +111,15 @@ def neighbour(band, step):
     return BANDS[(i + step) % len(BANDS)]
 
 
+def tone_key(p50):
+    return "低" if p50 < 38 else ("高" if p50 > 62 else "中")
+
+
+def content_gap(me, ref):
+    """True when the overall brightness differs so much that it reflects scene content, not editing."""
+    return abs(ref["p50"] - me["p50"]) > 15 or tone_key(me["p50"]) != tone_key(ref["p50"])
+
+
 def suggest(me, ref, mine_meta):
     s = {"白平衡": [], "影调": [], "曲线": [], "HSL": [], "颜色分级": [], "效果": []}
     is_raw = mine_meta.get("raw") is not None
@@ -134,7 +143,12 @@ def suggest(me, ref, mine_meta):
 
     # exposure
     d50 = ref["p50"] - me["p50"]
-    if abs(d50) >= 3:
+    gap = content_gap(me, ref)
+    weak = "（画面内容差异大，仅供参考）" if gap else ""
+    if gap:
+        s["影调"].append(f"曝光：不按整图亮度对齐（参考 {tone_key(ref['p50'])}调 L* {ref['p50']:.0f}，你的 "
+                        f"{tone_key(me['p50'])}调 L* {me['p50']:.0f}，差距主要来自天空/背景等内容），以主体（脸）亮度为准")
+    elif abs(d50) >= 3:
         ev = round(d50 / 15, 1)
         line = f"曝光 {ev:+.1f} 左右（参考中位亮度 L* {ref['p50']:.0f}，你的 {me['p50']:.0f}）"
         if "中性 RAW 渲染" in mine_meta.get("rendered_from", ""):
@@ -145,14 +159,14 @@ def suggest(me, ref, mine_meta):
     du, dl = ref["upper"] - me["upper"], ref["lower"] - me["lower"]
     common = math.copysign(min(abs(du), abs(dl)), du) if du * dl > 0 else 0.0
     if abs(common) >= 3:
-        s["影调"].append(f"对比度 {clamp_round(common * 1.5, -60, 60):+d}（参考亮度跨度 {ref['range']:.0f}，你的 {me['range']:.0f}）")
+        s["影调"].append(f"对比度 {clamp_round(common * 1.5, -60, 60):+d}（参考亮度跨度 {ref['range']:.0f}，你的 {me['range']:.0f}）{weak}")
     ru, rl = du - common, dl - common
     if me["clip_high"] > 0.5 and ref["clip_high"] < me["clip_high"] / 2:
         s["影调"].append(f"高光 {min(-20, clamp_round(ru * 3, -70, -20)):+d} 起（你有 {me['clip_high']:.1f}% 高光溢出，参考 {ref['clip_high']:.1f}%）")
     elif abs(ru) >= 3:
-        s["影调"].append(f"高光 {clamp_round(ru * 3, -60, 60):+d}（参考图亮部{'拉得更开' if ru > 0 else '更收、更柔'}）")
+        s["影调"].append(f"高光 {clamp_round(ru * 3, -60, 60):+d}（参考图亮部{'拉得更开' if ru > 0 else '更收、更柔'}）{weak}")
     if abs(rl) >= 3:
-        s["影调"].append(f"阴影 {clamp_round(-rl * 3, -60, 60):+d}（参考图暗部{'更深' if rl > 0 else '更亮、更通透'}）")
+        s["影调"].append(f"阴影 {clamp_round(-rl * 3, -60, 60):+d}（参考图暗部{'更深' if rl > 0 else '更亮、更通透'}）{weak}")
 
     # black / white points
     if ref["p1"] >= 6 and ref["p1"] - me["p1"] >= 4:
@@ -189,7 +203,7 @@ def suggest(me, ref, mine_meta):
         if r < 0.85 or r > 1.15:
             out.append(f"饱和度 {clamp_round((r - 1) * 100, -70, 70):+d}")
         dL = (b["L"] - a["L"]) - d50
-        if abs(dL) >= 4:
+        if abs(dL) >= 4 and not gap:  # with a content gap d50 is not an exposure change, so dL is meaningless
             out.append(f"明亮度 {clamp_round(dL * 3, -60, 60):+d}")
         if out:
             s["HSL"].append(f"{label}：" + "，".join(out))
@@ -281,6 +295,9 @@ def main():
     ref = average(ref_ms)
     sugg = suggest(me, ref, mine_meta)
     warns = spread_warnings(ref_ms)
+    if content_gap(me, ref):
+        warns.insert(0, "你的照片和参考图的影调类型/整体亮度差很多，多半是画面内容不同（大片天空、深色地面）。"
+                        "曝光、对比、高光阴影、HSL 明亮度这些项别直接照搬；黑白位、肤色、颜色分级方向更可靠。")
 
     if args.json:
         print(json.dumps({"mine": me, "reference": ref, "suggestions": sugg, "warnings": warns},
