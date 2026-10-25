@@ -39,7 +39,8 @@ def face_stats(path, box):
     if m.sum() < 50:
         raise SystemExit(f"{os.path.basename(path)}：框里几乎没有肤色像素，检查框的位置（左,上,右,下 比例）")
     st = {"L": float(np.median(L[m])), "a": float(np.median(a[m])), "b": float(np.median(bb[m])),
-          "hsv_hue": ps.circ_mean(H[m]), "hsv_sat": float(np.median(S[m]) * 100), "n": int(m.sum())}
+          "hsv_hue": ps.circ_mean(H[m]), "hsv_sat": float(np.median(S[m]) * 100), "n": int(m.sum()),
+          "p90": float(np.percentile(L[m], 90))}
     st["lab_hue"] = math.degrees(math.atan2(st["b"], st["a"]))
     st["chroma"] = math.hypot(st["a"], st["b"])
     return st
@@ -47,7 +48,7 @@ def face_stats(path, box):
 
 def describe(st):
     return (f"L* {st['L']:4.1f}  a* {st['a']:5.1f}  b* {st['b']:5.1f}  色相 {st['lab_hue']:4.1f}°"
-            f"（HSV {st['hsv_hue']:4.1f}°）  彩度 C* {st['chroma']:4.1f}  像素 {st['n']}")
+            f"（HSV {st['hsv_hue']:4.1f}°）  彩度 C* {st['chroma']:4.1f}  亮部 p90 L* {st['p90']:4.1f}  像素 {st['n']}")
 
 
 def main():
@@ -62,7 +63,7 @@ def main():
     for (p, _), st in zip(args.ref, refs):
         print(f"{os.path.basename(p)[:8]:8s}  {describe(st)}")
 
-    ref = {k: sum(r[k] for r in refs) / len(refs) for k in ("L", "a", "b", "chroma", "lab_hue")}
+    ref = {k: sum(r[k] for r in refs) / len(refs) for k in ("L", "a", "b", "chroma", "lab_hue", "p90")}
     ref["hsv_hue"] = ps.circ_mean([r["hsv_hue"] for r in refs])
     dh = ps.circ_diff(ref["hsv_hue"], me["hsv_hue"])
     ratio = ref["chroma"] / me["chroma"] if me["chroma"] > 1 else 1.0
@@ -77,6 +78,11 @@ def main():
         print(f"- HSL 橙 饱和度 {clamp_round((ratio - 1) * 100, -60, 60):+d}：参考肤色{'更浓' if ratio > 1 else '更淡'}"
               f"（C* {ref['chroma']:.0f} vs 你 {me['chroma']:.0f}）；加暖白平衡和高光的颜色分级也会提高肤色饱和，"
               "这一项最后再补")
+    dhi = ref["p90"] - me["p90"]
+    if dhi <= -6:
+        print(f"- 脸上的亮部比参考亮（亮部 p90 L* {me['p90']:.0f} vs {ref['p90']:.0f}）：先压高光、白色"
+              "（或局部调色在脸上降高光），让亮部收住、留一层光泽，再看整体肤色要不要压暗")
+        dL -= dhi / 4  # compressing the hot highlights also lowers the median a little
     if abs(dL) >= 3:
         print(f"- 肤色明暗：参考{'更亮' if dL > 0 else '更暗、更“实”'}（L* {ref['L']:.0f} vs 你 {me['L']:.0f}）。"
               f"HSL 橙 明亮度 {clamp_round(dL * 2, -30, 30):+d}，或局部调色里主体曝光 {dL / 15:+.1f}")

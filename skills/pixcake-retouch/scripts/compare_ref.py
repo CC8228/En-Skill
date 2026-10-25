@@ -225,16 +225,30 @@ def suggest(me, ref, mine_meta):
     if me["toning"]["midtones"] and ref["toning"]["midtones"]:
         base = (ref["toning"]["midtones"]["a"] - me["toning"]["midtones"]["a"],
                 ref["toning"]["midtones"]["b"] - me["toning"]["midtones"]["b"])
-    for z, label in (("shadows", "阴影"), ("highlights", "高光")):
+    res = {}
+    for z in ("shadows", "highlights"):
         a, b = me["toning"][z], ref["toning"][z]
-        if not (a and b and base) or min(a["zone_pct"], b["zone_pct"]) < 3:
+        if a and b and base and min(a["zone_pct"], b["zone_pct"]) >= 3:
+            res[z] = ((b["a"] - a["a"]) - base[0], (b["b"] - a["b"]) - base[1])
+    big = {z: v for z, v in res.items() if math.hypot(*v) >= 2.5}
+    base_mag = math.hypot(*base) if base else 0.0
+    if len(big) == 2 and base_mag >= 2.5:
+        hs, hh = (ps.wheel_hue(*big[z]) for z in ("shadows", "highlights"))
+        hb = ps.wheel_hue(*base)
+        if abs(ps.circ_diff(hs, hh)) < 45 and abs(ps.circ_diff(hs, hb)) > 120:
+            # both ends need "less of the midtone shift": the reference tints its midtones, not the whole image
+            s["颜色分级"].append(f"中间调：色相约 {hb:.0f}°（{ps.hue_name(hb)}），饱和度约 {clamp_round(base_mag * 2.5, 5, 25)}"
+                              f"（参考图是中间调更{ps.hue_name(hb)}，阴影和高光没跟着变；用中间调上色，"
+                              "比整体拉白平衡再给两端补反色更干净，白平衡就只小调）")
+            big = {}
+    for z, label in (("shadows", "阴影"), ("highlights", "高光")):
+        if z not in big:
             continue
-        ra, rb = (b["a"] - a["a"]) - base[0], (b["b"] - a["b"]) - base[1]
+        ra, rb = big[z]
         mag = math.hypot(ra, rb)
-        if mag >= 2.5:
-            h = ps.wheel_hue(ra, rb)
-            s["颜色分级"].append(f"{label}：色相约 {h:.0f}°（{ps.hue_name(h)}），饱和度约 {clamp_round(mag * 4, 5, 50)}"
-                              f"（参考图{label}比你的多一层{ps.hue_name(h)}色）")
+        h = ps.wheel_hue(ra, rb)
+        s["颜色分级"].append(f"{label}：色相约 {h:.0f}°（{ps.hue_name(h)}），饱和度约 {clamp_round(mag * 4, 5, 30)}"
+                          f"（参考图{label}比你的多一层{ps.hue_name(h)}色）")
     sh, hi = ref["toning"]["shadows"], ref["toning"]["highlights"]
     if sh and hi and sh["chroma"] >= 4 and hi["chroma"] >= 4 and \
             abs(ps.circ_diff(sh["wheel_hue"], hi["wheel_hue"])) >= 90:
