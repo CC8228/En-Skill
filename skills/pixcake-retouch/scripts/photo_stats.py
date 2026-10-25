@@ -174,6 +174,10 @@ def _raw_info(raw):
     vis = raw.raw_image_visible
     black = float(np.mean(raw.black_level_per_channel))
     white = float(raw.white_level)
+    # white_level is the format maximum (16383 for 14-bit); many bodies saturate lower (Nikon Z 6: 15311)
+    cam_white = [w for w in (raw.camera_white_level_per_channel or []) if w and w > black]
+    if cam_white:
+        white = min(white, float(min(cam_white)))
     span = max(white - black, 1.0)
     step = max(1, int(math.sqrt(vis.size / 4e6)))  # sample about 4 MP
     v = vis[::step, ::step].astype(np.float64)
@@ -185,7 +189,8 @@ def _raw_info(raw):
     shot = list(raw.camera_whitebalance)[:3]
     day = list(raw.daylight_whitebalance)[:3]
     if shot[0] > 0 and shot[2] > 0 and day[0] > 0 and day[2] > 0:
-        # >1: the camera had to add red relative to daylight -> scene light was cooler than daylight
+        # >1: the camera added red relative to LibRaw's daylight estimate (it judged the light cool);
+        # <1: it added blue (judged the light warm). LibRaw's daylight estimate is approximate.
         info["wb_vs_daylight"] = float((shot[0] / shot[2]) / (day[0] / day[2]))
     return info
 
