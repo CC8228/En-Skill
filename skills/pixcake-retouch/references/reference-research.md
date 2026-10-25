@@ -36,6 +36,8 @@ python3 scripts/compare_ref.py <原片> <目录>/ref1_preview.jpg <目录>/ref2_
 | 日系清新 / 空气感 | #ポートレート #写真好きな人と繋がりたい #japaneseportrait #airyphotography | 濱田英明 Hideaki Hamada（@hamadahideaki，柔和自然光、低对比的家庭和儿童） |
 | 日本街头 / 人文 | #tokyostreet #streetsnap #ファインダー越しの私の世界 | Takashi Yasui（@_tuck4，沉静低调的日本日常与街景） |
 | 胶片感 | #portra400 #kodakportra #filmisnotdead #35mmfilm #shootfilm | 搜 “portra 400 portrait” 找真胶片作品当参考 |
+| 胶片油润感 | #portra400 #portra160 #kodakgold200 #ektar100 #filmportrait #mediumformatfilm #pentax67 #フィルムポートレート #필름사진 | 濱田英明（@hamadahideaki，Pentax 67 + 胶片自然光）；Oleg Oprisco（中画幅胶片、自然光，油画般浓郁的暖色，IG 搜名字）——优先看标了具体胶卷型号的帖子 |
+| 户外人像（85mm 自然光） | #85mm #naturallightportrait #outdoorportrait | Manny Ortiz（@mannyortizphoto，街头/户外人像，电影感调色）；Ippei & Janine（@ippei.janine，东京户外电影感人像） |
 | 电影感 / 青橙 | #cinematicphotography #moodygrams #tealandorange #cinestill800t | — |
 | 暗调情绪 | #moodyportrait #lowkeyphotography #darkmood | — |
 | 城市夜景 / 赛博 | #tokyonight #neonlights #cyberpunkphotography #nightphotography | Liam Wong（作品集 TO:KY:OO，青/洋红夜景） |
