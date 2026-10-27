@@ -100,7 +100,7 @@
   .card.unknown .mk-btn.u[aria-pressed="true"] { background: var(--unknown); }
 
   .typer { grid-column: 1 / -1; display: grid; gap: 5px; margin-top: 2px; }
-  .type-in { width: 100%; min-width: 0; font: 500 15px/1.3 var(--font-en); color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+  .type-in { display: block; width: 100%; min-width: 0; resize: none; overflow: hidden; font: 500 15px/1.45 var(--font-en); color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 6px; padding: 8px 10px; }
   .type-in::placeholder { color: var(--muted); font-family: var(--font-zh); font-size: 13px; }
   .type-in:focus { outline: none; border-color: var(--accent); background: var(--surface); }
   .type-in.ok { border-color: var(--known); background: var(--known-soft); }
@@ -306,12 +306,12 @@ function missedWords(value, en) {
 }
 function typingOn() { return state.typing && state.cover === "en"; }
 function focusInput(id) {
-  const inp = document.querySelector('input.type-in[data-id="' + id + '"]');
+  const inp = document.querySelector('.type-in[data-id="' + id + '"]');
   if (inp) { inp.focus({ preventScroll: true }); inp.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
   return !!inp;
 }
 function moveFocus(fromId, dir) {
-  const all = [...document.querySelectorAll("input.type-in")];
+  const all = [...document.querySelectorAll(".type-in")];
   const i = all.findIndex((x) => x.dataset.id === fromId);
   const next = all[i + dir];
   if (next) { next.focus({ preventScroll: true }); next.scrollIntoView({ block: "center", behavior: "smooth" }); }
@@ -323,11 +323,13 @@ function checkTyped(item, value) {
   state.revealed.add(item.id);
   setMark(item.id, ok ? "k" : "u");
 }
+// Grow the answer box with its text so a long sentence stays fully visible.
+function fitBox(box) { box.style.height = "auto"; box.style.height = box.scrollHeight + 2 + "px"; }
 function typer(item) {
   const box = el("div", "typer");
   const t = typed[item.id] || { value: "", result: null };
-  const inp = el("input", "type-in" + (t.result ? " " + t.result : ""));
-  inp.type = "text"; inp.id = "type-" + item.id; inp.dataset.id = item.id; inp.value = t.value;
+  const inp = el("textarea", "type-in" + (t.result ? " " + t.result : ""));
+  inp.rows = item.id[0] === "s" ? 2 : 1; inp.id = "type-" + item.id; inp.dataset.id = item.id; inp.value = t.value;
   inp.placeholder = "输入英文，回车检查";
   inp.setAttribute("aria-label", "输入英文：" + item.zh);
   for (const [k, v] of [["autocomplete", "off"], ["autocapitalize", "off"], ["autocorrect", "off"], ["spellcheck", "false"], ["lang", "en"], ["enterkeyhint", "next"]]) inp.setAttribute(k, v);
@@ -344,6 +346,7 @@ function typer(item) {
     }
   });
   inp.addEventListener("input", () => {
+    fitBox(inp);
     typed[item.id] = { value: inp.value, result: null };
     inp.classList.remove("ok", "bad");
     const v = box.querySelector(".verdict"); if (v) v.remove();
@@ -413,8 +416,9 @@ function render() {
   const focusId = act && act.classList && act.classList.contains("type-in") ? act.dataset.id : null;
   const caret = focusId ? act.selectionStart : null;
   renderView();
+  document.querySelectorAll(".type-in").forEach(fitBox);
   if (focusId) {
-    const inp = document.querySelector('input.type-in[data-id="' + focusId + '"]');
+    const inp = document.querySelector('.type-in[data-id="' + focusId + '"]');
     if (inp) { inp.focus({ preventScroll: true }); try { inp.setSelectionRange(caret, caret); } catch {} }
   }
 }
@@ -733,7 +737,7 @@ $("typing").addEventListener("click", () => {
   state.typing = !state.typing; sticky.clear();
   if (state.typing && state.cover !== "en") { state.cover = "en"; state.revealed.clear(); }
   savePrefs(); render();
-  if (state.typing) { const first = document.querySelector("input.type-in"); if (first) first.focus(); }
+  if (state.typing) { const first = document.querySelector(".type-in"); if (first) first.focus(); }
 });
 for (const b of document.querySelectorAll("[data-speed]")) b.addEventListener("click", () => { state.speed = Number(b.dataset.speed); savePrefs(); render(); });
 if (!canSpeak) $("speed-ctl").hidden = true;
@@ -809,5 +813,6 @@ async function initRemote() {
 
 render();
 initRemote();
+window.addEventListener("resize", () => document.querySelectorAll(".type-in").forEach(fitBox));
 (async () => { try { sampleFn = window.claude && window.claude.use ? await window.claude.use("sample") : null; } catch { sampleFn = null; } })();
 </script>
