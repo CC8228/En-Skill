@@ -1,9 +1,13 @@
 <title>职场英语课程目录</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
-  /* Layout: one column of lesson rows (newest first); each row = lesson number, topic, contents, actions, personal log. */
+  /* Layout: three modes from one page.
+     Phone (iPhone 15 Pro Max): single column, sticky language switch, full-width thumb buttons.
+     Tablet (iPad Air 5, portrait & landscape, touch): wider header, lesson cards two per row so EN/DE of the same lesson sit side by side.
+     Desktop (mouse, ≥1024px): left sticky sidebar (title, stats, filter), right list of wide rows with info left and actions/log right. */
   :root {
     --bg: #f3f5f8;
     --surface: #ffffff;
@@ -12,95 +16,204 @@
     --line: #dde2ea;
     --accent: #1f4fa3;
     --accent-soft: #e6edf9;
+    --on-accent: #ffffff;
     --done: #1d7a4c;
     --done-soft: #e5f4ec;
     --doing: #a86410;
     --doing-soft: #fbf0e0;
+    --de: #5b3fa6;
+    --de-soft: #ede8f8;
     --font-en: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
     --font-zh: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
     --font-num: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    --tap: 44px;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
       --bg: #11161d; --surface: #19202a; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3442;
-      --accent: #7ea6f0; --accent-soft: #1d2a40; --done: #5cc690; --done-soft: #16302a;
-      --doing: #e9a654; --doing-soft: #3a2c17; color-scheme: dark;
+      --accent: #7ea6f0; --accent-soft: #1d2a40; --on-accent: #0f1620; --done: #5cc690; --done-soft: #16302a;
+      --doing: #e9a654; --doing-soft: #3a2c17; --de: #b9a5f0; --de-soft: #2a2442; color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
     --bg: #11161d; --surface: #19202a; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3442;
-    --accent: #7ea6f0; --accent-soft: #1d2a40; --done: #5cc690; --done-soft: #16302a;
-    --doing: #e9a654; --doing-soft: #3a2c17; color-scheme: dark;
+    --accent: #7ea6f0; --accent-soft: #1d2a40; --on-accent: #0f1620; --done: #5cc690; --done-soft: #16302a;
+    --doing: #e9a654; --doing-soft: #3a2c17; --de: #b9a5f0; --de-soft: #2a2442; color-scheme: dark;
   }
   * { box-sizing: border-box; }
-  body { background: var(--bg); color: var(--ink); font-family: var(--font-zh); font-size: 15px; line-height: 1.5; }
-  .wrap { max-width: 880px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 56px; }
-  header { display: grid; gap: 6px; margin-bottom: 18px; }
-  h1 { margin: 0; font-size: 24px; font-weight: 700; text-wrap: balance; }
-  header p { margin: 0; color: var(--muted); font-size: 14px; }
-  .summary { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 4px; font: 500 13px/1.4 var(--font-num); color: var(--muted); font-variant-numeric: tabular-nums; }
-  .summary b { color: var(--ink); font-weight: 500; }
+  [hidden] { display: none !important; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-zh); font-size: 16px; line-height: 1.55; -webkit-tap-highlight-color: transparent; }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
 
-  .lessons { display: grid; gap: 12px; }
-  .lesson { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: grid; grid-template-columns: 64px 1fr; gap: 4px 16px; }
-  .no { grid-row: span 4; font: 700 30px/1 var(--font-num); color: var(--accent); }
-  .no small { display: block; margin-top: 6px; font: 500 11px/1 var(--font-zh); color: var(--muted); letter-spacing: 0.08em; }
-  .lesson h2 { margin: 0; font-size: 17px; font-weight: 700; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-  .pill { font: 600 12px/1 var(--font-zh); border-radius: 999px; padding: 4px 9px; background: var(--accent-soft); color: var(--muted); }
+  /* ---------- Phone (base) ---------- */
+  .wrap { max-width: 720px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 20px 48px; }
+  .layout { display: grid; gap: 0; }
+  .side-panel { display: grid; gap: 8px; min-width: 0; }
+  header { display: grid; gap: 8px; }
+  h1 { margin: 0; font-size: 22px; font-weight: 700; line-height: 1.3; text-wrap: balance; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+
+  .summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 8px; }
+  .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 6px; text-align: center; min-width: 0; }
+  .stat b { display: block; font: 500 18px/1.2 var(--font-num); color: var(--ink); font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 12px; color: var(--muted); }
+
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); margin-inline: -4px; padding: 10px 4px; }
+  .langs { display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+  .langs button { min-height: 40px; font: 600 15px/1 var(--font-zh); color: var(--muted); background: none; border: 0; border-radius: 7px; cursor: pointer; }
+  .langs button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .langs button[data-lang="de"][aria-pressed="true"] { background: var(--de-soft); color: var(--de); }
+  .status { font-size: 12px; color: var(--muted); text-align: center; margin-top: 6px; }
+
+  main { min-width: 0; }
+  .lessons { display: grid; gap: 12px; margin-top: 4px; }
+  .lesson { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+  .info, .act { display: grid; gap: 10px; min-width: 0; align-content: start; }
+  .top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .no { font: 700 15px/1 var(--font-num); color: var(--accent); letter-spacing: 0.04em; }
+  .lesson.de .no { color: var(--de); }
+  .top .pill.st { margin-left: auto; }
+  .pill { font: 600 12px/1 var(--font-zh); border-radius: 999px; padding: 5px 10px; background: var(--accent-soft); color: var(--muted); white-space: nowrap; }
   .pill.doing { background: var(--doing-soft); color: var(--doing); }
   .pill.done { background: var(--done-soft); color: var(--done); }
-  .meta { color: var(--muted); font-size: 13px; }
-  .contents { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-  .contents span { font-size: 12.5px; border: 1px solid var(--line); border-radius: 4px; padding: 2px 7px; color: var(--muted); }
-  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-  .btn { display: inline-flex; align-items: center; gap: 6px; font: 600 13.5px/1 var(--font-zh); text-decoration: none; border-radius: 6px; padding: 9px 13px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
-  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
-  .btn:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  .log { grid-column: 2; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line); display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; color: var(--muted); }
-  .log label { display: inline-flex; align-items: center; gap: 6px; }
-  .log select { font: 13px var(--font-zh); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 6px 8px; }
-  .log .dates { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
-  .note { margin-top: 22px; color: var(--muted); font-size: 13px; }
-  .status { font-size: 12px; color: var(--muted); }
-  @media (max-width: 520px) {
-    .lesson { grid-template-columns: 1fr; }
-    .no { grid-row: auto; font-size: 22px; display: flex; align-items: baseline; gap: 8px; }
-    .no small { display: inline; margin: 0; }
-    .log { grid-column: 1; }
+  .pill.lang-en { background: var(--accent-soft); color: var(--accent); }
+  .pill.lang-de { background: var(--de-soft); color: var(--de); }
+  .lesson h2 { margin: 0; font-size: 18px; font-weight: 700; line-height: 1.35; text-wrap: balance; }
+  .meta { color: var(--muted); font-size: 13px; display: grid; gap: 2px; }
+  .meta .d { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+  .contents { display: flex; flex-wrap: wrap; gap: 6px; }
+  .contents span { font-size: 13px; border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; color: var(--muted); }
+
+  .btn { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: var(--tap); font: 600 15px/1 var(--font-zh); text-decoration: none; border-radius: 9px; padding: 0 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
+  .lesson.de .btn.primary { background: var(--de); border-color: var(--de); color: var(--on-accent); }
+  .btn:disabled { color: var(--done); background: var(--done-soft); border-color: transparent; cursor: default; }
+  .btn:focus-visible, .seg button:focus-visible, .langs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .log { border-top: 1px dashed var(--line); padding-top: 12px; display: grid; gap: 10px; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; background: var(--bg); border-radius: 9px; padding: 3px; }
+  .seg button { min-height: 38px; font: 600 14px/1 var(--font-zh); color: var(--muted); background: none; border: 0; border-radius: 7px; cursor: pointer; }
+  .seg button[aria-pressed="true"][data-s="todo"] { background: var(--surface); color: var(--ink); }
+  .seg button[aria-pressed="true"][data-s="doing"] { background: var(--doing-soft); color: var(--doing); }
+  .seg button[aria-pressed="true"][data-s="done"] { background: var(--done-soft); color: var(--done); }
+  .dates { font: 500 12.5px/1.5 var(--font-num); color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
+
+  .note { margin-top: 20px; color: var(--muted); font-size: 13px; }
+
+  /* ---------- Tablet: iPad Air 5 (820 portrait / 1180 landscape, touch) ---------- */
+  @media (min-width: 640px) {
+    .wrap { max-width: 1120px; padding-left: max(28px, env(safe-area-inset-left, 0px)); padding-right: max(28px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; }
+    h1 { font-size: 28px; }
+    header p { font-size: 15px; max-width: 60ch; }
+    .summary { max-width: 560px; gap: 10px; }
+    .stat { padding: 12px 8px; }
+    .stat b { font-size: 22px; }
+    .bar { padding-block: 14px; }
+    .langs { max-width: 420px; }
+    .status { text-align: left; }
+    .lessons { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+    .lesson { padding: 20px; grid-template-rows: 1fr auto; }
+    .lesson h2 { font-size: 20px; }
+    .contents span { font-size: 13.5px; }
+    .note { font-size: 14px; max-width: 70ch; }
+  }
+
+  /* ---------- Desktop: mouse/trackpad, wide window ---------- */
+  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+    body { font-size: 15px; }
+    .wrap { max-width: 1240px; padding-block: 40px 72px; }
+    .layout { grid-template-columns: 300px minmax(0, 1fr); gap: 40px; align-items: start; }
+    .side-panel { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 32px); gap: 16px; }
+    h1 { font-size: 26px; }
+    header p { font-size: 14px; }
+    .summary { grid-template-columns: repeat(2, 1fr); max-width: none; }
+    .bar { position: static; padding: 0; margin: 0; background: none; }
+    .langs { max-width: none; }
+    .lessons { grid-template-columns: 1fr; gap: 14px; margin-top: 0; }
+    .lesson { grid-template-columns: minmax(0, 1fr) 260px; grid-template-rows: auto; gap: 24px; padding: 22px 24px; }
+    .act { border-left: 1px dashed var(--line); padding-left: 24px; }
+    .log { border-top: 0; padding-top: 0; }
+    .btn, .seg button, .langs button { min-height: 36px; font-size: 14px; }
+    .langs button { min-height: 34px; }
+    .btn:not(:disabled):hover { border-color: var(--accent); }
+    .btn.primary:hover { filter: brightness(1.08); }
+    .seg button:not([aria-pressed="true"]):hover, .langs button:not([aria-pressed="true"]):hover { color: var(--ink); }
+    .dates { text-align: left; }
+    .note { margin-top: 24px; }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .btn, .seg button, .langs button { transition: background-color .15s, color .15s, border-color .15s; }
   }
 </style>
 
 <div class="wrap">
-  <header>
-    <h1>职场英语课程目录</h1>
-    <p>项目经理 · 项目协调 · 现场售后方向。所有课程都在这里，最新的在最上面。</p>
-    <div class="summary" id="summary"></div>
-    <div class="status" id="sync">学习记录保存在本浏览器</div>
-  </header>
+  <div class="layout">
+    <div class="side-panel">
+      <header>
+        <h1>职场英语 · 德语课程目录</h1>
+        <p>项目经理 · 项目协调 · 现场售后方向。最新的在最上面；同一课号的英语和德语是同一个主题，可以对照着学。</p>
+        <div class="summary" id="summary"></div>
+      </header>
+      <div class="bar">
+        <div class="langs" role="group" aria-label="语言">
+          <button id="lang-all" data-lang="all" aria-pressed="true">全部</button>
+          <button id="lang-en" data-lang="en" aria-pressed="false">英语</button>
+          <button id="lang-de" data-lang="de" aria-pressed="false">德语</button>
+        </div>
+        <div class="status" id="sync">学习记录保存在本浏览器</div>
+      </div>
+    </div>
 
-  <div class="lessons" id="lessons"></div>
-
-  <p class="note">“网页练习”可以遮英文 / 遮中文、点开对照、听发音，并标记会和不会。“打开 PDF”是两页 A4 的打印版练习纸。每次复习完点“今天复习了”，这里会记下日期。</p>
+    <main>
+      <div class="lessons" id="lessons"></div>
+      <p class="note">“网页练习”可以遮外语 / 遮中文、点开对照、听发音、打字练习，并标记会和不会；德语课的名词带冠词和复数，还能看英语对照。每次复习完点“今天复习了”，这里会记下日期。</p>
+    </main>
+  </div>
 </div>
 
 <script>
 // Add one entry per new lesson, newest last; the page shows newest first.
 const LESSONS = [
   {
+    lang: "en",
     no: 1,
     title: "项目协调与现场售后",
     date: "2026-10-13",
     level: "B2–C1（雅思 6.0–7.0）",
-    contents: ["60 个职业词组", "88 个行业词汇", "24 句中译英", "补全动词搭配 18 个"],
+    contents: ["60 个职业词组（带例句）", "88 个行业词汇（带例句）", "5 篇情景短文", "24 句中译英"],
     web: "https://claude.ai/artifact/L8f8cpGaYq1vNxqerM6UXY",
-    pdf: "pdf/lesson-01.pdf",
+  },
+  {
+    lang: "de",
+    no: 1,
+    title: "项目协调与现场售后",
+    date: "2026-10-14",
+    level: "B1–C1（目标职场 C1）",
+    pair: "和英语第 1 课同一主题",
+    contents: ["60 个职业词组（含功能动词结构）", "112 个行业术语（带冠词）", "24 句 C1 句型中译德", "26 个德英易混"],
+    web: "https://claude.ai/artifact/SWgDxto4AJ5h9R1kC1KwwP",
   },
 ];
+const LANGS = { en: { name: "英语" }, de: { name: "德语" } };
+// English lessons keep their original log key (the lesson number) so earlier records still match.
+const keyOf = (l) => (l.lang === "en" ? String(l.no) : l.lang + "-" + l.no);
 
 const $ = (id) => document.getElementById(id);
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
 
-// ---- personal log: { [lessonNo]: { status, reviews: ["YYYY-MM-DD", ...] } } ----
+// ---- language filter: a per-viewer convenience ----
+let langFilter = "all";
+try { langFilter = localStorage.getItem("course-lang") || "all"; } catch {}
+if (langFilter !== "all" && !LANGS[langFilter]) langFilter = "all";
+for (const b of document.querySelectorAll("[data-lang]")) b.addEventListener("click", () => {
+  langFilter = b.dataset.lang;
+  try { localStorage.setItem("course-lang", langFilter); } catch {}
+  render();
+});
+
+// ---- personal log: { [lessonKey]: { status, reviews: ["YYYY-MM-DD", ...] } } ----
 const LOCAL = "course-log";
 let log = {};
 try { log = JSON.parse(localStorage.getItem(LOCAL) || "{}") || {}; } catch { log = {}; }
@@ -111,7 +224,7 @@ function save() {
   if (!remote) return;
   const body = { log: JSON.parse(JSON.stringify(log)), updatedAt: Date.now() };
   writing = writing.then(() => remote.set(body)).then(
-    () => { $("sync").textContent = "学习记录已保存到你的账号"; },
+    () => { $("sync").textContent = "学习记录已保存到你的账号，各设备同步"; },
     () => { $("sync").textContent = "学习记录暂存在本浏览器"; }
   );
 }
@@ -121,68 +234,64 @@ const STATUS = [["todo", "未开始"], ["doing", "进行中"], ["done", "已完�
 function render() {
   const list = $("lessons");
   list.replaceChildren();
-  const done = LESSONS.filter((l) => (log[l.no] || {}).status === "done").length;
-  const reviews = LESSONS.reduce((s, l) => s + ((log[l.no] || {}).reviews || []).length, 0);
+  const done = LESSONS.filter((l) => (log[keyOf(l)] || {}).status === "done").length;
+  const reviews = LESSONS.reduce((s, l) => s + ((log[keyOf(l)] || {}).reviews || []).length, 0);
+  const count = (lang) => LESSONS.filter((l) => l.lang === lang).length;
   $("summary").replaceChildren();
-  for (const [k, v] of [["课程", LESSONS.length], ["已完成", done], ["累计复习", reviews + " 次"]]) {
-    const s = el("span", null, k + " "); s.append(el("b", null, String(v))); $("summary").append(s);
+  for (const [k, v] of [["英语课", count("en")], ["德语课", count("de")], ["已完成", done], ["复习次数", reviews]]) {
+    const s = el("div", "stat"); s.append(el("b", null, String(v)), el("span", null, k)); $("summary").append(s);
   }
+  for (const b of document.querySelectorAll("[data-lang]")) b.setAttribute("aria-pressed", String(b.dataset.lang === langFilter));
 
   for (const l of [...LESSONS].reverse()) {
-    const rec = log[l.no] || { status: "todo", reviews: [] };
-    const card = el("article", "lesson");
-    const no = el("div", "no", String(l.no).padStart(2, "0")); no.append(el("small", null, "第 " + l.no + " 课"));
-    const h = el("h2", null, l.title);
+    if (langFilter !== "all" && l.lang !== langFilter) continue;
+    const key = keyOf(l);
+    const rec = log[key] || { status: "todo", reviews: [] };
+    const card = el("article", "lesson " + l.lang);
+
+    const info = el("div", "info");
+    const top = el("div", "top");
     const st = STATUS.find(([k]) => k === rec.status) || STATUS[0];
-    h.append(el("span", "pill " + st[0], st[1]));
-    const meta = el("div", "meta", l.date + " · 难度 " + l.level);
+    top.append(el("span", "no", "第 " + String(l.no).padStart(2, "0") + " 课"), el("span", "pill lang-" + l.lang, LANGS[l.lang].name), el("span", "pill st " + st[0], st[1]));
+    const h = el("h2", null, l.title);
+    const meta = el("div", "meta");
+    meta.append(el("span", "d", l.date), el("span", null, "难度 " + l.level));
+    if (l.pair) meta.append(el("span", null, l.pair));
     const contents = el("div", "contents"); l.contents.forEach((c) => contents.append(el("span", null, c)));
-    const actions = el("div", "actions");
-    const web = el("a", "btn primary", "网页练习"); web.href = l.web; web.target = "_blank"; web.rel = "noopener";
-    actions.append(web);
-    if (l.pdf) {
-      const pdf = el("a", "btn", "打开 PDF"); pdf.href = l.pdf; pdf.target = "_blank"; pdf.rel = "noopener";
-      actions.append(pdf);
-      if (downloads) {
-        const dl = el("button", "btn", "保存 PDF");
-        dl.addEventListener("click", async () => {
-          try {
-            const blob = await (await fetch(l.pdf)).blob();
-            await downloads.save({ filename: "职场英语第" + l.no + "课.pdf", data: blob });
-          } catch (e) { /* declined or unavailable: nothing to do */ }
-        });
-        actions.append(dl);
-      }
-    }
+    info.append(top, h, meta, contents);
+
+    const act = el("div", "act");
+    const web = el("a", "btn primary", "网页练习 ↗"); web.href = l.web; web.target = "_blank"; web.rel = "noopener";
     const logRow = el("div", "log");
-    const lab = el("label", null, "状态");
-    const sel = el("select"); sel.id = "status-" + l.no;
-    for (const [k, v] of STATUS) { const o = el("option", null, v); o.value = k; if (k === rec.status) o.selected = true; sel.append(o); }
-    sel.addEventListener("change", () => { log[l.no] = { ...rec, status: sel.value }; save(); render(); });
-    lab.append(sel);
-    const rv = el("button", "btn", "今天复习了");
-    const already = (rec.reviews || []).includes(today());
-    if (already) { rv.textContent = "今天已复习"; rv.disabled = true; }
+    const seg = el("div", "seg"); seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "学习状态");
+    for (const [k, v] of STATUS) {
+      const b = el("button", null, v); b.type = "button"; b.id = "status-" + key + "-" + k; b.dataset.s = k;
+      b.setAttribute("aria-pressed", String(k === st[0]));
+      b.addEventListener("click", () => { log[key] = { ...rec, status: k }; save(); render(); });
+      seg.append(b);
+    }
+    const rv = el("button", "btn", "今天复习了"); rv.type = "button"; rv.id = "review-" + key;
+    if ((rec.reviews || []).includes(today())) { rv.textContent = "今天已复习 ✓"; rv.disabled = true; }
     rv.addEventListener("click", () => {
       const reviews = [...(rec.reviews || []), today()];
-      log[l.no] = { ...rec, status: rec.status === "todo" ? "doing" : rec.status, reviews };
+      log[key] = { ...rec, status: rec.status === "todo" || !rec.status ? "doing" : rec.status, reviews };
       save(); render();
     });
     const rs = rec.reviews || [];
-    const dates = el("span", "dates", rs.length ? "复习 " + rs.length + " 次 · 最近 " + rs.slice(-3).reverse().join(" / ") : "还没有复习记录");
-    logRow.append(lab, rv, dates);
-    card.append(no, h, meta, contents, actions, logRow);
+    const dates = el("div", "dates", rs.length ? "复习 " + rs.length + " 次 · 最近 " + rs.slice(-3).reverse().join(" / ") : "还没有复习记录");
+    logRow.append(seg, rv, dates);
+    act.append(web, logRow);
+
+    card.append(info, act);
     list.append(card);
   }
 }
 
-let downloads = null;
 render();
 
 (async () => {
   if (!window.claude || !window.claude.use) return;
   try {
-    downloads = await window.claude.use("downloads");
     const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
     const uid = user ? await user.id() : null;
     if (db && uid) {
@@ -198,7 +307,7 @@ render();
       } else if (Object.keys(log).length) {
         save();
       }
-      $("sync").textContent = "学习记录已保存到你的账号";
+      $("sync").textContent = "学习记录已保存到你的账号，各设备同步";
     }
   } catch { remote = null; }
   render();

@@ -87,6 +87,17 @@
   .sent .zh { color: var(--ink); font-size: 15px; }
   .sent .en { font-weight: 400; font-size: 14.5px; color: var(--muted); }
   .num { font: 500 11px/1 var(--font-num); color: var(--muted); margin-right: 6px; }
+  .covered * { color: transparent !important; border-color: transparent !important; }
+  .ex { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--line); display: grid; gap: 2px; }
+  .ex-en { font: 400 14.5px/1.5 var(--font-en); overflow-wrap: anywhere; }
+  .ex-zh { font: 400 13.5px/1.5 var(--font-zh); color: var(--muted); overflow-wrap: anywhere; }
+  .hl { font-weight: 700; color: var(--accent); }
+  .story { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; margin-bottom: 10px; display: grid; gap: 8px; }
+  .story-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; color: var(--muted); font: 13px/1.4 var(--font-zh); }
+  .story-en { font: 400 15px/1.75 var(--font-en); cursor: pointer; border-radius: 4px; overflow-wrap: anywhere; }
+  .story-zh { font: 400 14px/1.75 var(--font-zh); color: var(--muted); cursor: pointer; border-radius: 4px; }
+  .verdict.near { color: var(--known); }
+  .verdict .need { color: var(--muted); }
   .covered { color: transparent !important; background: repeating-linear-gradient(135deg, var(--cover) 0 6px, transparent 6px 10px); border-radius: 3px; user-select: none; }
   .covered .num { color: transparent; }
   .marks { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
@@ -152,7 +163,7 @@
 <div class="wrap">
   <header class="top">
     <h1>职场英语 · 第 1 课</h1>
-    <p>项目协调与现场售后 · 60 个职业词组 · 88 个行业词汇 · 24 句中译英</p>
+    <p>项目协调与现场售后 · 60 个职业词组 · 88 个行业词汇（都带例句） · 5 篇情景短文 · 24 句中译英</p>
   </header>
 
   <div class="bar" id="bar">
@@ -160,6 +171,7 @@
       <div class="tabs" role="group" aria-label="内容">
         <button id="tab-phrases" data-tab="phrases" aria-pressed="true">职业词组</button>
         <button id="tab-industry" data-tab="industry" aria-pressed="false">行业词汇</button>
+        <button id="tab-stories" data-tab="stories" aria-pressed="false">情景短文</button>
         <button id="tab-sentences" data-tab="sentences" aria-pressed="false">中译英</button>
       </div>
       <div class="stats" aria-live="polite"><span class="k" id="st-k">会 0</span><span class="u" id="st-u">不会 0</span><span class="n" id="st-n">未标 0</span></div>
@@ -195,7 +207,7 @@
     <div class="chips" id="chips" hidden></div>
   </div>
 
-  <p class="hint" id="hint">点卡片显示被遮住的部分，再点一次重新遮住。按“会 / 不会”标记；“待复习”= 不会 + 还没标的。<b>打字练习</b>：选“遮英文”后，在卡片下的输入框里打英文，<b>回车</b>检查（对了自动标“会”，错了自动标“不会”并显示答案），<b>Tab</b> 跳到下一个，Shift+Tab 回上一个；手机上检查后再按一次回车也会跳到下一个。</p>
+  <p class="hint" id="hint">先看例句理解词组：读一遍、点“发音”听一遍、跟读一遍。再选<b>遮英文</b>，看中文<b>默写整句英文</b>，<b>回车</b>检查：整句对，或者句子略有不同但词组用对了，都自动标“会”；词组没用对标“不会”并显示参考答案。<b>Tab</b> 跳到下一句，Shift+Tab 回上一句；手机上检查后再按一次回车也会跳到下一句。点卡片可以临时翻开英文。</p>
   <main id="list"></main>
 </div>
 <div class="scrim" id="scrim" hidden></div>
@@ -220,14 +232,30 @@
 </aside>
 
 <script>
-const DATA = {"phrases": [{"name": "项目推进", "en": "Project delivery", "items": [["kick off the project", "启动项目"], ["set clear milestones", "设定明确的里程碑"], ["meet a tight deadline", "赶上紧迫的期限"], ["fall behind schedule", "进度落后"], ["get back on track", "回到正轨"], ["allocate resources", "分配资源"], ["scope creep", "需求范围蔓延"], ["a critical-path task", "关键路径任务"], ["identify potential risks", "识别潜在风险"], ["draw up a contingency plan", "制定应急预案"], ["sign off on the design", "签字确认设计"], ["hand over the project", "移交项目"]]}, {"name": "沟通协调", "en": "Coordination", "items": [["keep stakeholders in the loop", "随时同步相关方"], ["follow up on an action item", "跟进待办事项"], ["escalate the issue", "把问题上报（给上级）"], ["align on priorities", "对齐优先级"], ["address customer concerns", "回应客户顾虑"], ["reach a compromise", "达成妥协"], ["set expectations", "事先讲清楚预期"], ["touch base with sb.", "和某人碰个头"], ["circulate the meeting minutes", "分发会议纪要"], ["give a status update", "做进度汇报"], ["bring sb. up to speed", "让某人了解最新进展"], ["put the project on hold", "暂停项目"]]}, {"name": "现场与故障", "en": "On-site & troubleshooting", "items": [["carry out a site survey", "做现场勘察"], ["troubleshoot the fault", "排查故障"], ["pinpoint the root cause", "找准根本原因"], ["an intermittent fault", "间歇性故障"], ["trip the circuit breaker", "使断路器跳闸"], ["run a diagnostic test", "运行诊断测试"], ["calibrate the sensor", "校准传感器"], ["a temporary workaround", "临时解决办法"], ["unplanned downtime", "计划外停机"], ["restore normal operation", "恢复正常运行"], ["commission the equipment", "调试设备"], ["perform preventive maintenance", "做预防性维护"]]}, {"name": "质量与交付", "en": "Quality & delivery", "items": [["meet the specifications", "符合规格"], ["fail the acceptance test", "验收测试不通过"], ["issue a non-conformance report", "开不合格报告"], ["take corrective action", "采取纠正措施"], ["conduct a quality audit", "进行质量审核"], ["tighten quality control", "加强质量控制"], ["expedite the delivery", "加急交货"], ["a lead time of six weeks", "六周的交货周期"], ["source parts locally", "本地采购零件"], ["a supply chain disruption", "供应链中断"], ["bear the extra cost", "承担额外费用"], ["stay within budget", "控制在预算内"]]}, {"name": "客户与售后", "en": "Customer & after-sales", "items": [["log a service request", "登记服务请求"], ["respond within 24 hours", "24 小时内响应"], ["dispatch an engineer", "派工程师（到现场）"], ["be covered under warranty", "在保修范围内"], ["replace sth. free of charge", "免费更换"], ["file a complaint", "提出投诉"], ["handle a complaint", "处理投诉"], ["provide remote support", "提供远程支持"], ["a service-level agreement", "服务级别协议 SLA"], ["exceed customer expectations", "超出客户预期"], ["build a long-term relationship", "建立长期合作"], ["write up a service report", "写服务报告"]]}], "industry": [{"name": "医疗", "items": [["sterilization", "灭菌"], ["ventilator", "呼吸机"], ["catheter", "导管"], ["ultrasound", "超声"], ["implant", "植入物"], ["sterile", "无菌的"], ["clinical trial", "临床试验"], ["regulatory approval", "注册审批"]]}, {"name": "信息", "items": [["server", "服务器"], ["database", "数据库"], ["firewall", "防火墙"], ["bandwidth", "带宽"], ["latency", "延迟"], ["deployment", "部署"], ["interface", "接口"], ["encryption", "加密"]]}, {"name": "电气", "items": [["voltage", "电压"], ["transformer", "变压器"], ["switchgear", "开关柜"], ["inverter", "逆变器"], ["relay", "继电器"], ["grounding", "接地"], ["insulation", "绝缘"], ["short circuit", "短路"]]}, {"name": "工程", "items": [["blueprint", "图纸"], ["tolerance", "公差"], ["welding", "焊接"], ["load-bearing", "承重的"], ["prototype", "样机"], ["simulation", "仿真"], ["durability", "耐久性"], ["retrofit", "改造升级"]]}, {"name": "制造", "items": [["assembly line", "装配线"], ["yield", "良率"], ["defect rate", "不良率"], ["fixture", "夹具"], ["mold", "模具"], ["machining", "机加工"], ["throughput", "产出量"], ["lean manufacturing", "精益生产"]]}, {"name": "汽车", "items": [["chassis", "底盘"], ["powertrain", "动力总成"], ["transmission", "变速箱"], ["OEM", "整车厂"], ["Tier 1 supplier", "一级供应商"], ["battery pack", "电池包"], ["recall", "召回"], ["homologation", "型式认证"]]}, {"name": "电子信息", "items": [["semiconductor", "半导体"], ["wafer", "晶圆"], ["PCB", "印刷电路板"], ["soldering", "焊接（电子）"], ["firmware", "固件"], ["connector", "连接器"], ["SMT", "表面贴装"], ["embedded system", "嵌入式系统"]]}, {"name": "物流", "items": [["freight", "货运"], ["warehouse", "仓库"], ["consignment", "托运货物"], ["customs clearance", "清关"], ["bill of lading", "提单"], ["container", "集装箱"], ["freight forwarder", "货代"], ["pallet", "托盘"]]}, {"name": "供应链", "items": [["inventory", "库存"], ["forecast", "需求预测"], ["bottleneck", "瓶颈"], ["safety stock", "安全库存"], ["shortage", "短缺"], ["traceability", "可追溯性"], ["just-in-time", "准时制"], ["backlog", "积压订单"]]}, {"name": "采购", "items": [["quotation", "报价"], ["RFQ", "询价单"], ["tender", "招标"], ["purchase order", "采购订单"], ["vendor", "供应商"], ["payment terms", "付款条件"], ["invoice", "发票"], ["procurement", "采购"]]}, {"name": "项目管理", "items": [["deliverable", "交付物"], ["Gantt chart", "甘特图"], ["baseline", "基线"], ["change request", "变更请求"], ["risk log", "风险清单"], ["WBS", "工作分解结构"], ["KPI", "关键绩效指标"], ["agile", "敏捷（开发）"]]}], "sentences": [["因为供应链中断，项目进度落后了两周，我们需要尽快制定一个应急预案。", "Because of a supply chain disruption, the project has fallen behind schedule by two weeks, so we need to draw up a contingency plan as soon as possible."], ["我们下周一启动项目，并在第一次会议上设定明确的里程碑。", "We'll kick off the project next Monday and set clear milestones at the first meeting."], ["在设计签字确认之前，请让所有相关方随时了解情况。", "Please keep all stakeholders in the loop before we sign off on the design."], ["如果这周还解决不了，我会把问题上报给管理层。", "If we can't solve it this week, I'll escalate the issue to management."], ["工程师花了三个小时排查故障，最后找准了根本原因：一个传感器没有校准好。", "The engineer spent three hours troubleshooting the fault and finally pinpointed the root cause: a sensor that hadn't been calibrated properly."], ["这是一个间歇性故障，所以我们先给客户一个临时解决办法。", "This is an intermittent fault, so we'll give the customer a temporary workaround first."], ["我们运行了诊断测试，现在设备已经恢复正常运行。", "We ran a diagnostic test, and the equipment has now been restored to normal operation."], ["这台设备还在保修范围内，所以我们会免费更换控制板。", "The equipment is still covered under warranty, so we'll replace the control board free of charge."], ["客户登记服务请求后，我们会在 24 小时内响应，必要时派工程师到现场。", "Once a customer logs a service request, we respond within 24 hours and dispatch an engineer to the site if necessary."], ["这批零件不符合规格，质量部门已经开了不合格报告。", "This batch of parts doesn't meet the specifications, and the quality department has already issued a non-conformance report."], ["我们已经采取了纠正措施，并会加强质量控制，避免同样的问题再次发生。", "We've taken corrective action and will tighten quality control to make sure the same problem doesn't happen again."], ["为了赶上这个紧迫的截止日期，我们需要重新分配资源。", "To meet this tight deadline, we need to reallocate resources."], ["正常交货周期是六周；如果要加急交货，客户需要承担额外费用。", "The standard lead time is six weeks. If you want us to expedite the delivery, you'll need to bear the extra cost."], ["我们正在考虑本地采购零件，这样可以缩短交货周期，也能控制在预算内。", "We're considering sourcing parts locally, which would shorten the lead time and help us stay within budget."], ["我们明天能不能碰个头，对齐一下下个月的优先级？", "Can we touch base tomorrow to align on priorities for next month?"], ["会议结束后，请分发会议纪要，并跟进每一个待办事项。", "After the meeting, please circulate the meeting minutes and follow up on every action item."], ["新同事下周加入，你能帮他了解一下项目的最新情况吗？", "A new colleague is joining next week. Could you bring them up to speed on the project?"], ["由于预算问题，客户决定暂停项目，直到明年一季度。", "Due to budget issues, the customer has decided to put the project on hold until Q1 next year."], ["安装之前，我们需要先做现场勘察，确认电源和空间都满足要求。", "Before the installation, we need to carry out a site survey to make sure the power supply and the space meet the requirements."], ["我们不仅解决了问题，还提供了远程支持，超出了客户的预期。", "We not only solved the problem but also provided remote support, which exceeded the customer's expectations."], ["这次计划外停机让客户损失了大约十个小时的产量。", "This unplanned downtime cost the customer about ten hours of production."], ["每次维修后，工程师都要写服务报告，并请客户签字确认。", "After every repair, the engineer has to write up a service report and ask the customer to sign it."], ["客户对延期提出了投诉，我们需要在今天下班前回应他们的顾虑。", "The customer has filed a complaint about the delay, and we need to address their concerns before the end of the day."], ["项目验收测试没通过，所以我们还不能把项目移交给客户。", "The project failed the acceptance test, so we can't hand it over to the customer yet."]]};
+const DATA = {"phrases": [{"name": "项目推进", "en": "Project delivery", "items": [["kick off the project", "启动项目", "We'll [[kick off the project]] with a short meeting next Monday.", "我们下周一开个短会启动项目。"], ["set clear milestones", "设定明确的里程碑", "Let's [[set clear milestones]] so everyone knows what is due each month.", "我们设定明确的里程碑，让每个人都知道每个月要交付什么。"], ["meet a tight deadline", "赶上紧迫的期限", "We worked overtime last week to [[meet a tight deadline]].", "上周我们加班，为了赶上一个很紧的截止日期。"], ["fall behind schedule", "进度落后", "The installation has [[fallen behind schedule]] because the parts arrived late.", "因为零件到货晚了，安装进度落后了。", ["fallen behind schedule|fell behind schedule|falling behind schedule|is behind schedule"]], ["get back on track", "回到正轨", "If we add two more technicians, we can [[get back on track]] by Friday.", "如果再加两名技术员，我们周五前能回到正轨。"], ["allocate resources", "分配资源", "The manager needs to [[allocate resources]] to the most urgent tasks first.", "经理需要先把资源分配给最紧急的任务。"], ["scope creep", "需求范围蔓延", "The customer keeps adding new requests, and this [[scope creep]] is delaying the project.", "客户不断提出新要求，这种需求范围蔓延正在拖延项目。"], ["a critical-path task", "关键路径任务", "Testing is [[a critical-path task]], so any delay will push back the delivery.", "测试是关键路径任务，任何延误都会推迟交付。", ["critical path task"]], ["identify potential risks", "识别潜在风险", "At the kickoff meeting, we tried to [[identify potential risks]] early.", "在启动会上，我们尽早识别潜在风险。", ["identify potential risks|identified potential risks"]], ["draw up a contingency plan", "制定应急预案", "We should [[draw up a contingency plan]] in case the supplier is late again.", "我们应该制定一个应急预案，以防供应商再次延误。"], ["sign off on the design", "签字确认设计", "Production can't start until the customer [[signs off on the design]].", "客户签字确认设计之前，生产不能开始。", ["signs off on the design|sign off on the design|signed off on the design"]], ["hand over the project", "移交项目", "We plan to [[hand over the project]] to the customer at the end of March.", "我们计划三月底把项目移交给客户。"]]}, {"name": "沟通协调", "en": "Coordination", "items": [["keep stakeholders in the loop", "随时同步相关方", "Please [[keep all stakeholders in the loop]] with a short weekly email.", "请每周发一封简短邮件，让所有相关方随时了解情况。", ["stakeholders in the loop"]], ["follow up on an action item", "跟进待办事项", "I'll [[follow up on this action item]] with the supplier tomorrow.", "我明天和供应商跟进这个待办事项。", ["follow up on", "action item"]], ["escalate the issue", "把问题上报（给上级）", "If the customer is still unhappy, I'll [[escalate the issue]] to my manager.", "如果客户还是不满意，我会把问题上报给我的经理。"], ["align on priorities", "对齐优先级", "Let's have a quick call to [[align on priorities]] for next week.", "我们快速通个电话，对齐一下下周的优先级。"], ["address customer concerns", "回应客户顾虑", "Our sales team visited the site to [[address customer concerns]] about safety.", "我们的销售团队去了现场，回应客户对安全的顾虑。", ["address customer concerns|address the customer's concerns|address the customer concerns"]], ["reach a compromise", "达成妥协", "After a long discussion, we [[reached a compromise]] on the delivery date.", "经过长时间讨论，我们在交货日期上达成了妥协。", ["reached a compromise|reach a compromise"]], ["set expectations", "事先讲清楚预期", "It's important to [[set expectations]] clearly at the start of the project.", "在项目一开始就讲清楚预期很重要。"], ["touch base with sb.", "和某人碰个头", "I'll [[touch base with the site manager]] before the installation starts.", "安装开始前，我会和现场经理碰个头。", ["touch base with"]], ["circulate the meeting minutes", "分发会议纪要", "Could you [[circulate the meeting minutes]] by the end of today?", "你能在今天下班前分发会议纪要吗？"], ["give a status update", "做进度汇报", "Every Monday, each team leader [[gives a short status update]].", "每周一，每位组长都做一个简短的进度汇报。", ["status update"]], ["bring sb. up to speed", "让某人了解最新进展", "Could you [[bring the new engineer up to speed]] on this project?", "你能让新来的工程师了解一下这个项目的最新情况吗？", ["bring", "up to speed"]], ["put the project on hold", "暂停项目", "The customer [[put the project on hold]] because of budget cuts.", "由于预算削减，客户暂停了项目。"]]}, {"name": "现场与故障", "en": "On-site & troubleshooting", "items": [["carry out a site survey", "做现场勘察", "Before we quote, we need to [[carry out a site survey]] at the factory.", "报价之前，我们需要去工厂做一次现场勘察。"], ["troubleshoot the fault", "排查故障", "The engineer spent two hours [[troubleshooting the fault]] on the conveyor.", "工程师花了两个小时排查传送带的故障。", ["troubleshooting the fault|troubleshoot the fault"]], ["pinpoint the root cause", "找准根本原因", "We finally [[pinpointed the root cause]]: a loose cable in the control cabinet.", "我们终于找准了根本原因：控制柜里有一根电缆松了。", ["pinpointed the root cause|pinpoint the root cause"]], ["an intermittent fault", "间歇性故障", "It's [[an intermittent fault]], so it doesn't happen every time we test.", "这是个间歇性故障，所以不是每次测试都会出现。"], ["trip the circuit breaker", "使断路器跳闸", "The motor overheated and [[tripped the circuit breaker]] twice this morning.", "电机过热，今天上午让断路器跳闸了两次。", ["tripped the circuit breaker|trip the circuit breaker"]], ["run a diagnostic test", "运行诊断测试", "Let me [[run a diagnostic test]] before we replace any parts.", "换零件之前，我先运行一下诊断测试。"], ["calibrate the sensor", "校准传感器", "We need to [[calibrate the sensor]] every six months.", "我们每六个月需要校准一次传感器。"], ["a temporary workaround", "临时解决办法", "We gave the customer [[a temporary workaround]] until the new part arrives.", "在新零件到货之前，我们给客户提供了一个临时解决办法。", ["temporary workaround"]], ["unplanned downtime", "计划外停机", "[[Unplanned downtime]] costs the plant thousands of dollars an hour.", "计划外停机每小时会让工厂损失数千美元。"], ["restore normal operation", "恢复正常运行", "We [[restored normal operation]] within four hours of the call.", "接到电话后四小时内，我们就恢复了正常运行。", ["restored normal operation|restore normal operation"]], ["commission the equipment", "调试设备", "Our team will [[commission the equipment]] on site next week.", "我们的团队下周会在现场调试设备。"], ["perform preventive maintenance", "做预防性维护", "We [[perform preventive maintenance]] every quarter to avoid breakdowns.", "我们每季度做一次预防性维护，避免设备故障。", ["preventive maintenance"]]]}, {"name": "质量与交付", "en": "Quality & delivery", "items": [["meet the specifications", "符合规格", "All the parts in this batch [[meet the specifications]].", "这批零件全部符合规格。"], ["fail the acceptance test", "验收测试不通过", "The machine [[failed the acceptance test]] because the noise level was too high.", "因为噪音太大，这台机器验收测试没通过。", ["failed the acceptance test|fail the acceptance test"]], ["issue a non-conformance report", "开不合格报告", "The quality team will [[issue a non-conformance report]] for the damaged parts.", "质量团队会对损坏的零件开不合格报告。", ["non conformance report"]], ["take corrective action", "采取纠正措施", "The supplier has agreed to [[take corrective action]] within two weeks.", "供应商已同意在两周内采取纠正措施。"], ["conduct a quality audit", "进行质量审核", "The customer will [[conduct a quality audit]] at our plant next month.", "客户下个月会来我们工厂进行质量审核。", ["quality audit"]], ["tighten quality control", "加强质量控制", "After the complaint, we decided to [[tighten quality control]] on the welding line.", "投诉之后，我们决定加强焊接线的质量控制。"], ["expedite the delivery", "加急交货", "Can you [[expedite the delivery]]? The site is waiting for these parts.", "能加急交货吗？现场在等这些零件。"], ["a lead time of six weeks", "六周的交货周期", "This motor has [[a lead time of six weeks]], so we must order it now.", "这台电机的交货周期是六周，所以我们现在就得下单。", ["lead time of six weeks|six week lead time"]], ["source parts locally", "本地采购零件", "To save time, we decided to [[source parts locally]].", "为了节省时间，我们决定在本地采购零件。"], ["a supply chain disruption", "供应链中断", "[[A supply chain disruption]] in Asia delayed our shipment by a month.", "亚洲的供应链中断让我们的货晚了一个月。", ["supply chain disruption"]], ["bear the extra cost", "承担额外费用", "If the customer changes the design again, they will have to [[bear the extra cost]].", "如果客户再改设计，他们就得承担额外费用。"], ["stay within budget", "控制在预算内", "We cut some optional features to [[stay within budget]].", "为了控制在预算内，我们砍掉了一些可选功能。"]]}, {"name": "客户与售后", "en": "Customer & after-sales", "items": [["log a service request", "登记服务请求", "Customers can [[log a service request]] online or by phone.", "客户可以在线或打电话登记服务请求。"], ["respond within 24 hours", "24 小时内响应", "Our service team promises to [[respond within 24 hours]].", "我们的服务团队承诺 24 小时内响应。"], ["dispatch an engineer", "派工程师（到现场）", "We will [[dispatch an engineer]] to your site tomorrow morning.", "我们明天上午会派一名工程师到您现场。"], ["be covered under warranty", "在保修范围内", "The damaged pump is still [[covered under warranty]].", "损坏的泵还在保修范围内。"], ["replace sth. free of charge", "免费更换", "We will [[replace the faulty board free of charge]].", "我们会免费更换故障电路板。", ["replace", "free of charge"]], ["file a complaint", "提出投诉", "The customer [[filed a complaint]] about the late delivery.", "客户就交货延迟提出了投诉。", ["filed a complaint|file a complaint"]], ["handle a complaint", "处理投诉", "She is very good at [[handling complaints]] calmly.", "她很擅长冷静地处理投诉。", ["handling complaints|handling a complaint|handle complaints"]], ["provide remote support", "提供远程支持", "If the problem is simple, we can [[provide remote support]] by video call.", "如果问题简单，我们可以通过视频通话提供远程支持。"], ["a service-level agreement", "服务级别协议 SLA", "Our [[service-level agreement]] requires us to fix urgent issues within eight hours.", "我们的服务级别协议要求在八小时内解决紧急问题。", ["service level agreement|sla"]], ["exceed customer expectations", "超出客户预期", "The team finished early and [[exceeded customer expectations]].", "团队提前完成，超出了客户预期。", ["exceeded customer expectations|exceeded the customer's expectations|exceeded the customer expectations"]], ["build a long-term relationship", "建立长期合作", "Good after-sales service helps us [[build a long-term relationship]] with clients.", "好的售后服务帮我们和客户建立长期合作关系。", ["long term relationship"]], ["write up a service report", "写服务报告", "After each visit, the engineer [[writes up a service report]].", "每次上门后，工程师都会写一份服务报告。", ["up a service report"]]]}], "industry": [{"name": "医疗", "items": [["sterilization", "灭菌", "All surgical tools must go through [[sterilization]] before use.", "所有手术器械使用前都必须经过灭菌。"], ["ventilator", "呼吸机", "The hospital ordered twenty new [[ventilators]] for the ICU.", "医院为重症监护室订购了二十台新呼吸机。"], ["catheter", "导管", "The nurse checked the [[catheter]] for leaks.", "护士检查了导管有没有渗漏。"], ["ultrasound", "超声", "The new [[ultrasound]] machine gives much clearer images.", "新的超声设备成像清晰得多。"], ["implant", "植入物", "This [[implant]] is made of titanium.", "这个植入物是钛做的。"], ["sterile", "无菌的", "Keep the package sealed so the device stays [[sterile]].", "保持包装密封，让器械保持无菌。"], ["clinical trial", "临床试验", "The device is still in a [[clinical trial]] at three hospitals.", "这个器械还在三家医院做临床试验。"], ["regulatory approval", "注册审批", "We can't sell the product until we get [[regulatory approval]].", "拿到注册审批之前，我们不能销售这个产品。"]]}, {"name": "信息", "items": [["server", "服务器", "The [[server]] went down at midnight, so the system was offline.", "服务器半夜宕机了，所以系统掉线了。"], ["database", "数据库", "All customer orders are stored in one [[database]].", "所有客户订单都存在一个数据库里。"], ["firewall", "防火墙", "The [[firewall]] blocked the connection from the factory network.", "防火墙拦截了来自工厂网络的连接。"], ["bandwidth", "带宽", "Video calls need more [[bandwidth]] than the site network has.", "视频通话需要的带宽比现场网络能提供的多。"], ["latency", "延迟", "High [[latency]] makes the remote control software slow to respond.", "高延迟让远程控制软件反应很慢。"], ["deployment", "部署", "The software [[deployment]] is planned for Saturday night.", "软件部署计划在周六晚上进行。"], ["interface", "接口", "The new machine needs an [[interface]] to the customer's ERP system.", "新机器需要一个和客户 ERP 系统对接的接口。"], ["encryption", "加密", "All data is protected with [[encryption]] during transfer.", "所有数据在传输过程中都经过加密保护。"]]}, {"name": "电气", "items": [["voltage", "电压", "Check the [[voltage]] before you connect the motor.", "接电机之前先检查电压。"], ["transformer", "变压器", "The [[transformer]] failed during the storm last night.", "昨晚暴风雨期间变压器出了故障。"], ["switchgear", "开关柜", "The [[switchgear]] will be installed in the main electrical room.", "开关柜会安装在主配电室。"], ["inverter", "逆变器", "The solar [[inverter]] shows a fault code every afternoon.", "光伏逆变器每天下午都显示故障代码。"], ["relay", "继电器", "We replaced a faulty [[relay]] in the control panel.", "我们更换了控制面板里一个坏掉的继电器。"], ["grounding", "接地", "Poor [[grounding]] can cause electric shocks.", "接地不良会导致触电。"], ["insulation", "绝缘", "The cable [[insulation]] was damaged by heat.", "电缆的绝缘层被高温损坏了。"], ["short circuit", "短路", "Water in the cabinet caused a [[short circuit]].", "柜子里进水导致了短路。"]]}, {"name": "工程", "items": [["blueprint", "图纸", "Please send me the latest [[blueprint]] before the meeting.", "开会前请把最新的图纸发给我。"], ["tolerance", "公差", "This part is outside the [[tolerance]] by two tenths of a millimeter.", "这个零件超出公差零点二毫米。"], ["welding", "焊接", "The [[welding]] on this frame must be checked again.", "这个框架的焊接必须重新检查。"], ["load-bearing", "承重的", "Do not drill holes in the [[load-bearing]] wall.", "不要在承重墙上打孔。", ["load bearing"]], ["prototype", "样机", "We will test the [[prototype]] for two weeks before mass production.", "量产之前，我们会对样机测试两周。"], ["simulation", "仿真", "The [[simulation]] shows the beam can carry twice the load.", "仿真显示这根梁能承受两倍的载荷。"], ["durability", "耐久性", "Customers care a lot about the [[durability]] of the product.", "客户非常在意产品的耐久性。"], ["retrofit", "改造升级", "The old line needs a [[retrofit]] to meet the new safety rules.", "老产线需要改造升级才能符合新的安全规定。"]]}, {"name": "制造", "items": [["assembly line", "装配线", "The [[assembly line]] stopped for an hour this morning.", "今天早上装配线停了一个小时。"], ["yield", "良率", "The [[yield]] dropped to 92 percent because of a fixture problem.", "因为夹具问题，良率降到了百分之九十二。"], ["defect rate", "不良率", "Our goal is to keep the [[defect rate]] below one percent.", "我们的目标是把不良率控制在百分之一以下。"], ["fixture", "夹具", "We need a new [[fixture]] to hold the part during welding.", "我们需要一个新夹具，在焊接时固定零件。"], ["mold", "模具", "The [[mold]] is worn out and needs to be replaced.", "这套模具磨损了，需要更换。"], ["machining", "机加工", "The [[machining]] of this part takes about forty minutes.", "这个零件的机加工大约需要四十分钟。"], ["throughput", "产出量", "The new robot increased [[throughput]] by fifteen percent.", "新机器人让产出量提高了百分之十五。"], ["lean manufacturing", "精益生产", "[[Lean manufacturing]] helps us reduce waste on the shop floor.", "精益生产帮助我们减少车间里的浪费。"]]}, {"name": "汽车", "items": [["chassis", "底盘", "The [[chassis]] is welded before it goes to the paint shop.", "底盘在进入喷漆车间前先焊接好。"], ["powertrain", "动力总成", "The [[powertrain]] team is testing the new electric motor.", "动力总成团队正在测试新的电机。"], ["transmission", "变速箱", "The customer reported a noise from the [[transmission]].", "客户反馈变速箱有异响。"], ["OEM", "整车厂", "We supply brake parts to two major [[OEMs]].", "我们给两家大型整车厂供应刹车零件。", ["oem"]], ["Tier 1 supplier", "一级供应商", "As a [[Tier 1 supplier]], we deliver directly to the car maker.", "作为一级供应商，我们直接给整车厂供货。", ["tier 1 supplier|tier one supplier"]], ["battery pack", "电池包", "The [[battery pack]] must be checked every six months.", "电池包每六个月必须检查一次。"], ["recall", "召回", "The car maker announced a [[recall]] because of a faulty airbag.", "整车厂因为安全气囊有缺陷宣布了召回。"], ["homologation", "型式认证", "The new model is still waiting for [[homologation]] in Europe.", "新车型还在等欧洲的型式认证。"]]}, {"name": "电子信息", "items": [["semiconductor", "半导体", "There is a global shortage of [[semiconductors]] this year.", "今年全球半导体短缺。", ["semiconductor"]], ["wafer", "晶圆", "Each [[wafer]] is inspected under a microscope.", "每片晶圆都要在显微镜下检查。"], ["PCB", "印刷电路板", "The [[PCB]] was damaged during shipping.", "印刷电路板在运输中损坏了。", ["pcb|printed circuit board"]], ["soldering", "焊接（电子）", "Poor [[soldering]] caused the connection to fail.", "焊接不良导致连接失效。"], ["firmware", "固件", "Please update the [[firmware]] before you start the test.", "开始测试前请先更新固件。"], ["connector", "连接器", "The [[connector]] was loose, so the signal kept dropping.", "连接器松了，所以信号一直断。"], ["SMT", "表面贴装", "Our [[SMT]] line can place thousands of components an hour.", "我们的表面贴装线每小时能贴装几千个元器件。", ["smt"]], ["embedded system", "嵌入式系统", "The machine is controlled by an [[embedded system]].", "这台机器由一个嵌入式系统控制。"]]}, {"name": "物流", "items": [["freight", "货运", "Air [[freight]] is fast but very expensive.", "空运很快，但非常贵。"], ["warehouse", "仓库", "The spare parts are stored in our Shanghai [[warehouse]].", "备件存放在我们上海的仓库里。"], ["consignment", "托运货物", "The [[consignment]] arrived at the port yesterday.", "这批货昨天到港了。"], ["customs clearance", "清关", "[[Customs clearance]] usually takes two to three days.", "清关通常需要两到三天。"], ["bill of lading", "提单", "Please send me a copy of the [[bill of lading]].", "请给我发一份提单的副本。"], ["container", "集装箱", "We need one forty-foot [[container]] for this order.", "这个订单我们需要一个四十尺集装箱。"], ["freight forwarder", "货代", "Our [[freight forwarder]] will arrange the pickup on Monday.", "我们的货代会安排周一提货。"], ["pallet", "托盘", "Each [[pallet]] can hold up to one ton.", "每个托盘最多能放一吨货。"]]}, {"name": "供应链", "items": [["inventory", "库存", "We keep two weeks of [[inventory]] for key parts.", "关键零件我们保留两周的库存。"], ["forecast", "需求预测", "The sales [[forecast]] for next quarter is much higher.", "下季度的销售预测高很多。"], ["bottleneck", "瓶颈", "The paint shop is the [[bottleneck]] in our production.", "喷漆车间是我们生产的瓶颈。"], ["safety stock", "安全库存", "Increase the [[safety stock]] before the holiday.", "假期前把安全库存加大。"], ["shortage", "短缺", "A chip [[shortage]] stopped the line for three days.", "芯片短缺让产线停了三天。"], ["traceability", "可追溯性", "[[Traceability]] lets us find which batch had the problem.", "可追溯性让我们能查到是哪一批出了问题。"], ["just-in-time", "准时制", "With [[just-in-time]] delivery, parts arrive only when we need them.", "采用准时制供货，零件只在需要时才到。", ["just in time|jit"]], ["backlog", "积压订单", "We have a large [[backlog]] of orders this month.", "这个月我们积压了大量订单。"]]}, {"name": "采购", "items": [["quotation", "报价", "Please send us a [[quotation]] by Friday.", "请在周五前给我们报价。", ["quotation|quote"]], ["RFQ", "询价单", "We sent the [[RFQ]] to three suppliers.", "我们把询价单发给了三家供应商。", ["rfq|request for quotation"]], ["tender", "招标", "Our company won the [[tender]] for the new hospital.", "我们公司中标了新医院的项目。"], ["purchase order", "采购订单", "We will issue the [[purchase order]] once the price is confirmed.", "价格确认后，我们就下采购订单。", ["purchase order|po"]], ["vendor", "供应商", "We are looking for a new [[vendor]] for packaging materials.", "我们在找新的包装材料供应商。"], ["payment terms", "付款条件", "Our standard [[payment terms]] are thirty days.", "我们的标准付款条件是三十天。"], ["invoice", "发票", "The [[invoice]] will be sent after delivery.", "交货后会寄出发票。"], ["procurement", "采购", "[[Procurement]] needs three quotes before buying anything.", "采购部门买任何东西之前都需要三份报价。"]]}, {"name": "项目管理", "items": [["deliverable", "交付物", "The final report is the last [[deliverable]] of this project.", "最终报告是这个项目的最后一个交付物。"], ["Gantt chart", "甘特图", "I updated the [[Gantt chart]] with the new dates.", "我用新日期更新了甘特图。"], ["baseline", "基线", "We compare actual progress with the [[baseline]] every week.", "我们每周把实际进度和基线做对比。"], ["change request", "变更请求", "The customer submitted a [[change request]] for the control panel.", "客户针对控制面板提交了一个变更请求。"], ["risk log", "风险清单", "Please add this issue to the [[risk log]].", "请把这个问题加到风险清单里。"], ["WBS", "工作分解结构", "We broke the project down into small tasks in the [[WBS]].", "我们在 WBS 里把项目拆成了小任务。", ["wbs|work breakdown structure"]], ["KPI", "关键绩效指标", "On-time delivery is our most important [[KPI]].", "准时交付是我们最重要的关键绩效指标。", ["kpi"]], ["agile", "敏捷（开发）", "The software team works in an [[agile]] way with two-week sprints.", "软件团队用敏捷方式工作，每两周一个冲刺。"]]}], "stories": [{"title": "项目推进", "scene": "周会上向经理汇报项目进展", "sentences": [["We [[kicked off the project]] in early March and [[set clear milestones]] for each month.", "我们三月初启动了项目，并为每个月设定了明确的里程碑。"], ["Last month we [[fell behind schedule]] because the customer kept adding new requests.", "上个月我们进度落后了，因为客户不断提出新要求。"], ["This [[scope creep]] made it hard to [[meet a tight deadline]] for the first delivery.", "这种需求范围蔓延，让我们很难赶上第一次交付的紧迫期限。"], ["To [[get back on track]], we [[allocated more resources]] to the [[critical-path tasks]].", "为了回到正轨，我们给关键路径任务分配了更多资源。"], ["We also [[identified potential risks]] and [[drew up a contingency plan]] with the supplier.", "我们还识别了潜在风险，并和供应商一起制定了应急预案。"], ["If the customer [[signs off on the design]] next week, we can [[hand over the project]] in June.", "如果客户下周签字确认设计，我们六月就能移交项目。"]]}, {"title": "沟通协调", "scene": "给同事发邮件，同步一个客户的情况", "sentences": [["Hi Tom, I'd like to [[give you a quick status update]] on the Wilson account.", "嗨 Tom，我想跟你简单汇报一下 Wilson 这个客户的进展。"], ["They had some concerns about the delivery date, so we [[touched base with]] them on Tuesday.", "他们对交货日期有些顾虑，所以我们周二和他们碰了个头。"], ["After a long call, we [[reached a compromise]] and [[set expectations]] for the next two months.", "通了很久的电话后，我们达成了妥协，并讲清楚了接下来两个月的预期。"], ["I have [[circulated the meeting minutes]] and will [[follow up on]] each [[action item]].", "我已经分发了会议纪要，会跟进每一个待办事项。"], ["If they [[put the project on hold]] again, I'll [[escalate the issue]] to management.", "如果他们再次暂停项目，我会把问题上报给管理层。"], ["Could you [[bring Lisa up to speed]] and keep the sales team [[in the loop]]?", "你能让 Lisa 了解一下最新情况，并让销售团队随时知情吗？"]]}, {"title": "现场与故障", "scene": "讲一次现场排查故障的经历（面试也能用）", "sentences": [["Last Tuesday, a customer's packaging line stopped twice, and they lost half a day to [[unplanned downtime]].", "上周二，一个客户的包装线停了两次，计划外停机让他们损失了半天。"], ["Our engineer [[carried out a site survey]] and spent three hours [[troubleshooting the fault]].", "我们的工程师做了现场勘察，花了三个小时排查故障。"], ["It was [[an intermittent fault]], so it took time to [[pinpoint the root cause]].", "这是个间歇性故障，所以花了些时间才找准根本原因。"], ["A sensor had drifted, and it [[tripped the circuit breaker]] whenever the line ran at full speed.", "一个传感器漂移了，产线一全速运行，它就让断路器跳闸。"], ["He [[calibrated the sensor]], [[ran a diagnostic test]] and set up [[a temporary workaround]].", "他校准了传感器，运行了诊断测试，并设置了一个临时解决办法。"], ["By Thursday we had [[restored normal operation]], and we agreed to [[perform preventive maintenance]] every quarter.", "到周四我们恢复了正常运行，并约定每个季度做一次预防性维护。"]]}, {"title": "质量与交付", "scene": "处理一批不合格零件", "sentences": [["Last month, a batch of valves from our supplier didn't [[meet the specifications]].", "上个月，供应商的一批阀门不符合规格。"], ["Two machines [[failed the acceptance test]], so our quality team [[issued a non-conformance report]].", "两台机器验收测试没通过，所以我们的质量团队开了不合格报告。"], ["The supplier agreed to [[take corrective action]] and [[tighten quality control]] on their line.", "供应商同意采取纠正措施，并加强他们产线的质量控制。"], ["Because of [[a supply chain disruption]], the normal [[lead time]] of six weeks became ten weeks.", "由于供应链中断，正常六周的交货周期变成了十周。"], ["We asked them to [[expedite the delivery]], and they agreed to [[bear the extra cost]].", "我们要求他们加急交货，他们同意承担额外费用。"], ["We will also [[conduct a quality audit]] at their plant in May.", "五月我们还会去他们工厂做一次质量审核。"], ["Next year, we plan to [[source parts locally]] so that we can [[stay within budget]].", "明年我们计划在本地采购零件，以便控制在预算内。"]]}, {"title": "客户与售后", "scene": "介绍你们的售后服务流程", "sentences": [["When a customer [[logs a service request]], our team [[responds within 24 hours]].", "客户登记服务请求后，我们团队会在 24 小时内响应。"], ["If the problem is simple, we [[provide remote support]] by video call.", "如果问题简单，我们会通过视频通话提供远程支持。"], ["If not, we [[dispatch an engineer]] to the site the next day.", "如果不行，我们第二天就派工程师到现场。"], ["Last week, a customer [[filed a complaint]] about a leaking pump.", "上周，一位客户就一台漏水的泵提出了投诉。"], ["The pump was still [[covered under warranty]], so we replaced it [[free of charge]].", "那台泵还在保修范围内，所以我们免费更换了。"], ["The engineer [[wrote up a service report]], and the customer said we had [[exceeded their expectations]].", "工程师写了服务报告，客户说我们超出了他们的预期。"], ["[[Handling complaints]] well is the best way to [[build a long-term relationship]].", "处理好投诉是建立长期合作关系的最好方法。"]]}], "sentences": [["因为供应链中断，项目进度落后了两周，我们需要尽快制定一个应急预案。", "Because of a supply chain disruption, the project has fallen behind schedule by two weeks, so we need to draw up a contingency plan as soon as possible."], ["我们下周一启动项目，并在第一次会议上设定明确的里程碑。", "We'll kick off the project next Monday and set clear milestones at the first meeting."], ["在设计签字确认之前，请让所有相关方随时了解情况。", "Please keep all stakeholders in the loop before we sign off on the design."], ["如果这周还解决不了，我会把问题上报给管理层。", "If we can't solve it this week, I'll escalate the issue to management."], ["工程师花了三个小时排查故障，最后找准了根本原因：一个传感器没有校准好。", "The engineer spent three hours troubleshooting the fault and finally pinpointed the root cause: a sensor that hadn't been calibrated properly."], ["这是一个间歇性故障，所以我们先给客户一个临时解决办法。", "This is an intermittent fault, so we'll give the customer a temporary workaround first."], ["我们运行了诊断测试，现在设备已经恢复正常运行。", "We ran a diagnostic test, and the equipment has now been restored to normal operation."], ["这台设备还在保修范围内，所以我们会免费更换控制板。", "The equipment is still covered under warranty, so we'll replace the control board free of charge."], ["客户登记服务请求后，我们会在 24 小时内响应，必要时派工程师到现场。", "Once a customer logs a service request, we respond within 24 hours and dispatch an engineer to the site if necessary."], ["这批零件不符合规格，质量部门已经开了不合格报告。", "This batch of parts doesn't meet the specifications, and the quality department has already issued a non-conformance report."], ["我们已经采取了纠正措施，并会加强质量控制，避免同样的问题再次发生。", "We've taken corrective action and will tighten quality control to make sure the same problem doesn't happen again."], ["为了赶上这个紧迫的截止日期，我们需要重新分配资源。", "To meet this tight deadline, we need to reallocate resources."], ["正常交货周期是六周；如果要加急交货，客户需要承担额外费用。", "The standard lead time is six weeks. If you want us to expedite the delivery, you'll need to bear the extra cost."], ["我们正在考虑本地采购零件，这样可以缩短交货周期，也能控制在预算内。", "We're considering sourcing parts locally, which would shorten the lead time and help us stay within budget."], ["我们明天能不能碰个头，对齐一下下个月的优先级？", "Can we touch base tomorrow to align on priorities for next month?"], ["会议结束后，请分发会议纪要，并跟进每一个待办事项。", "After the meeting, please circulate the meeting minutes and follow up on every action item."], ["新同事下周加入，你能帮他了解一下项目的最新情况吗？", "A new colleague is joining next week. Could you bring them up to speed on the project?"], ["由于预算问题，客户决定暂停项目，直到明年一季度。", "Due to budget issues, the customer has decided to put the project on hold until Q1 next year."], ["安装之前，我们需要先做现场勘察，确认电源和空间都满足要求。", "Before the installation, we need to carry out a site survey to make sure the power supply and the space meet the requirements."], ["我们不仅解决了问题，还提供了远程支持，超出了客户的预期。", "We not only solved the problem but also provided remote support, which exceeded the customer's expectations."], ["这次计划外停机让客户损失了大约十个小时的产量。", "This unplanned downtime cost the customer about ten hours of production."], ["每次维修后，工程师都要写服务报告，并请客户签字确认。", "After every repair, the engineer has to write up a service report and ask the customer to sign it."], ["客户对延期提出了投诉，我们需要在今天下班前回应他们的顾虑。", "The customer has filed a complaint about the delay, and we need to address their concerns before the end of the day."], ["项目验收测试没通过，所以我们还不能把项目移交给客户。", "The project failed the acceptance test, so we can't hand it over to the customer yet."]]};
 
 // ---- items ----
-const ITEMS = { phrases: [], industry: [], sentences: [] };
+// "[[...]]" marks the phrase inside a sentence: shown highlighted, and required when checking.
+function parseMarked(m) {
+  const parts = m.split(/(\[\[.+?\]\])/).filter(Boolean).map((t) => /^\[\[.+\]\]$/.test(t) ? { t: t.slice(2, -2), hl: true } : { t, hl: false });
+  return { parts, plain: parts.map((p) => p.t).join(""), keys: parts.filter((p) => p.hl).map((p) => p.t) };
+}
+const ITEMS = { phrases: [], industry: [], stories: [], sentences: [] };
 let n = 0;
-DATA.phrases.forEach((g) => g.items.forEach(([en, zh]) => { n++; ITEMS.phrases.push({ id: "p" + n, n, en, zh, group: g.name, groupEn: g.en }); }));
-DATA.industry.forEach((g, gi) => g.items.forEach(([en, zh], i) => ITEMS.industry.push({ id: "i" + gi + "-" + i, n: i + 1, en, zh, group: g.name })));
-DATA.sentences.forEach(([zh, en], i) => ITEMS.sentences.push({ id: "s" + (i + 1), n: i + 1, en, zh, group: "中译英" }));
+DATA.phrases.forEach((g) => g.items.forEach(([en, zh, exEn, exZh, keys]) => {
+  n++; const ex = parseMarked(exEn);
+  ITEMS.phrases.push({ id: "p" + n, n, en, zh, group: g.name, groupEn: g.en, ex: { parts: ex.parts, zh: exZh }, target: ex.plain, keys: keys || ex.keys });
+}));
+DATA.industry.forEach((g, gi) => g.items.forEach(([en, zh, exEn, exZh, keys], i) => {
+  const ex = parseMarked(exEn);
+  ITEMS.industry.push({ id: "i" + gi + "-" + i, n: i + 1, en, zh, group: g.name, ex: { parts: ex.parts, zh: exZh }, target: ex.plain, keys: keys || ex.keys });
+}));
+const STORIES = DATA.stories.map((st, gi) => {
+  const sents = st.sentences.map(([m, zh], i) => { const x = parseMarked(m); return { id: "t" + gi + "-" + i, n: i + 1, en: x.plain, zh, group: st.title, parts: x.parts, target: x.plain, keys: x.keys, story: gi }; });
+  ITEMS.stories.push(...sents);
+  return { ...st, gi, sents };
+});
+DATA.sentences.forEach(([zh, en], i) => ITEMS.sentences.push({ id: "s" + (i + 1), n: i + 1, en, zh, group: "中译英", target: en, keys: [] }));
 const INDUSTRIES = DATA.industry.map((g) => g.name);
 
 // ---- state ----
@@ -283,7 +311,17 @@ function answers(en) {
   }
   return out;
 }
-function isCorrect(value, item) { return answers(item.en).has(norm(value)); }
+function isCorrect(value, item) { return answers(item.target).has(norm(value)); }
+// "ok": matches the reference; "near": every key phrase is right and the sentence is mostly there; "bad": otherwise.
+function verdictFor(value, item) {
+  if (isCorrect(value, item)) return "ok";
+  const v = norm(value);
+  if (item.keys.length && v.split(" ").length >= 0.6 * norm(item.target).split(" ").length) {
+    const padded = " " + v + " ";
+    if (item.keys.every((k) => k.split("|").some((a) => padded.includes(" " + norm(a))))) return "near";
+  }
+  return "bad";
+}
 // Words of the reference answer that the typed answer did not match (longest common subsequence on words).
 function same(ref, w) {
   return ref === w || (ref === "sb" && (w === "somebody" || w === "someone")) || (ref === "sth" && w === "something");
@@ -317,11 +355,11 @@ function moveFocus(fromId, dir) {
   if (next) { next.focus({ preventScroll: true }); next.scrollIntoView({ block: "center", behavior: "smooth" }); }
 }
 function checkTyped(item, value) {
-  const ok = isCorrect(value, item);
-  typed[item.id] = { value, result: ok ? "ok" : "bad" };
+  const result = verdictFor(value, item);
+  typed[item.id] = { value, result };
   sticky.add(item.id);
   state.revealed.add(item.id);
-  setMark(item.id, ok ? "k" : "u");
+  setMark(item.id, result === "bad" ? "u" : "k");
 }
 // Grow the answer box with its text so a long sentence stays fully visible.
 function fitBox(box) { box.style.height = "auto"; box.style.height = box.scrollHeight + 2 + "px"; }
@@ -329,8 +367,8 @@ function typer(item) {
   const box = el("div", "typer");
   const t = typed[item.id] || { value: "", result: null };
   const inp = el("textarea", "type-in" + (t.result ? " " + t.result : ""));
-  inp.rows = item.id[0] === "s" ? 2 : 1; inp.id = "type-" + item.id; inp.dataset.id = item.id; inp.value = t.value;
-  inp.placeholder = "输入英文，回车检查";
+  inp.rows = 2; inp.id = "type-" + item.id; inp.dataset.id = item.id; inp.value = t.value;
+  inp.placeholder = item.ex ? "看中文例句，默写整句英文，回车检查" : "看中文，写出整句英文，回车检查";
   inp.setAttribute("aria-label", "输入英文：" + item.zh);
   for (const [k, v] of [["autocomplete", "off"], ["autocapitalize", "off"], ["autocorrect", "off"], ["spellcheck", "false"], ["lang", "en"], ["enterkeyhint", "next"]]) inp.setAttribute(k, v);
   inp.addEventListener("keydown", (e) => {
@@ -348,38 +386,58 @@ function typer(item) {
   inp.addEventListener("input", () => {
     fitBox(inp);
     typed[item.id] = { value: inp.value, result: null };
-    inp.classList.remove("ok", "bad");
+    inp.classList.remove("ok", "near", "bad");
     const v = box.querySelector(".verdict"); if (v) v.remove();
   });
   box.append(inp);
-  if (t.result === "ok") box.append(el("div", "verdict ok", "✓ 正确"));
+  const reference = () => {
+    const ans = el("span", "ans");
+    missedWords(t.value, item.target).forEach(([w, okw], i) => { if (i) ans.append(" "); ans.append(okw ? document.createTextNode(w) : el("span", "miss", w)); });
+    return ans;
+  };
+  if (t.result === "ok") box.append(el("div", "verdict ok", "✓ 完全正确"));
+  if (t.result === "near") {
+    const v = el("div", "verdict near");
+    v.append(el("b", null, "✓ 词组用对了"), "，句子和参考答案略有不同：");
+    v.append(reference());
+    box.append(v);
+  }
   if (t.result === "bad") {
     const v = el("div", "verdict bad");
     v.append(el("span", "tag", t.value.trim() ? "✗ 不对" : "✗ 没填"));
-    v.append("正确答案：");
-    const ans = el("span", "ans");
-    missedWords(t.value, item.en).forEach(([w, okw], i) => { if (i) ans.append(" "); ans.append(okw ? document.createTextNode(w) : el("span", "miss", w)); });
-    v.append(ans);
+    v.append("参考答案：", reference());
+    if (item.keys.length) v.append(el("div", "need", "要用到：" + item.keys.map((k) => k.split("|")[0]).join(" / ")));
     box.append(v);
   }
   return box;
 }
 
-function card(item, sentence) {
+function marked(parts, cls) {
+  const d = el("div", cls);
+  for (const p of parts) d.append(p.hl ? el("span", "hl", p.t) : document.createTextNode(p.t));
+  return d;
+}
+function speakText(item) { return item.ex ? item.en + ". " + item.target : item.en; }
+const SPEAKER_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+
+function card(item) {
   const m = state.marks[item.id];
+  const sentence = !item.ex;
   const c = el("div", "card" + (sentence ? " sent" : "") + (m === "k" ? " known" : m === "u" ? " unknown" : ""));
   const face = el("div", "face");
   face.tabIndex = 0;
   face.setAttribute("role", "button");
   const shown = state.revealed.has(item.id);
-  const first = sentence ? ["zh", item.zh] : ["en", item.en];
-  const second = sentence ? ["en", item.en] : ["zh", item.zh];
-  for (const [kind, text] of [first, second]) {
-    const line = el("div", kind);
-    if (kind === first[0]) { line.append(el("span", "num", String(item.n))); }
-    line.append(document.createTextNode(text));
-    if (state.cover === kind && !shown) line.classList.add("covered");
-    face.append(line);
+  const cover = (node, kind) => { if (state.cover === kind && !shown) node.classList.add("covered"); return node; };
+  if (item.ex) {
+    const en = el("div", "en"); en.append(el("span", "num", String(item.n)), item.en);
+    face.append(cover(en, "en"), cover(el("div", "zh", item.zh), "zh"));
+    const ex = el("div", "ex");
+    ex.append(cover(marked(item.ex.parts, "ex-en"), "en"), cover(el("div", "ex-zh", item.ex.zh), "zh"));
+    face.append(ex);
+  } else {
+    const zh = el("div", "zh"); zh.append(el("span", "num", String(item.n)), item.zh);
+    face.append(cover(zh, "zh"), cover(item.parts ? marked(item.parts, "en") : el("div", "en", item.en), "en"));
   }
   face.setAttribute("aria-label", state.cover === "none" ? "卡片" : (shown ? "点击重新遮住" : "点击显示"));
   const toggle = () => { if (state.cover === "none") return; shown ? state.revealed.delete(item.id) : state.revealed.add(item.id); render(); };
@@ -394,10 +452,10 @@ function card(item, sentence) {
   }
   if (canSpeak) {
     const say = el("button", "say");
-    say.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+    say.innerHTML = SPEAKER_ICON;
     say.append(document.createTextNode("发音"));
     say.setAttribute("aria-label", "播放发音：" + item.en);
-    say.addEventListener("click", () => speak(item.en, say));
+    say.addEventListener("click", () => speak(speakText(item), say));
     marks.append(say);
   }
   const ask = el("button", "ask");
@@ -409,6 +467,33 @@ function card(item, sentence) {
   c.append(face, marks);
   if (typingOn()) c.append(typer(item));
   return c;
+}
+
+// The whole passage above its sentence cards: read it, listen to it, then write it sentence by sentence.
+function storyBlock(st) {
+  const box = el("div", "story");
+  const top = el("div", "story-top");
+  top.append(el("span", null, "场景：" + st.scene));
+  if (canSpeak) {
+    const say = el("button", "say");
+    say.innerHTML = SPEAKER_ICON;
+    say.append(document.createTextNode("播放全文"));
+    say.addEventListener("click", () => speak(st.sents.map((x) => x.target).join(" "), say));
+    top.append(say);
+  }
+  box.append(top);
+  const key = "story-" + st.gi;
+  const shown = state.revealed.has(key);
+  const toggle = () => { if (state.cover === "none") return; shown ? state.revealed.delete(key) : state.revealed.add(key); render(); };
+  const en = el("div", "story-en");
+  st.sents.forEach((x, i) => { if (i) en.append(" "); for (const p of x.parts) en.append(p.hl ? el("span", "hl", p.t) : document.createTextNode(p.t)); });
+  const zh = el("div", "story-zh", st.sents.map((x) => x.zh).join(""));
+  for (const [node, kind] of [[en, "en"], [zh, "zh"]]) {
+    if (state.cover === kind && !shown) node.classList.add("covered");
+    node.addEventListener("click", toggle);
+    box.append(node);
+  }
+  return box;
 }
 
 function render() {
@@ -433,7 +518,7 @@ function renderView() {
   if (typingOn()) {
     const ids = new Set(ITEMS[tab].map((i) => i.id));
     const res = Object.entries(typed).filter(([id, t]) => ids.has(id) && t.result);
-    tl.textContent = "本轮打字 对 " + res.filter(([, t]) => t.result === "ok").length + " / " + res.length;
+    tl.textContent = "本轮打字 对 " + res.filter(([, t]) => t.result !== "bad").length + " / " + res.length;
   }
   for (const b of document.querySelectorAll("[data-speed]")) b.setAttribute("aria-pressed", String(Number(b.dataset.speed) === (state.speed || 0.95)));
 
@@ -479,8 +564,8 @@ function renderView() {
   if (state.shuffle) {
     const sec = el("section", "group");
     const h = el("h2", null, "打乱顺序"); h.append(el("span", "cnt", shown.length + " 条"));
-    const grid = el("div", "grid" + (tab === "sentences" ? " wide" : ""));
-    shuffled(shown, tab + state.industries.join()).forEach((i) => grid.append(card(i, tab === "sentences")));
+    const grid = el("div", "grid wide");
+    shuffled(shown, tab + state.industries.join()).forEach((i) => grid.append(card(i)));
     sec.append(h, grid); list.append(sec);
     return;
   }
@@ -491,9 +576,11 @@ function renderView() {
     const h = el("h2", null, g);
     if (items[0].groupEn) h.append(el("small", null, items[0].groupEn));
     h.append(el("span", "cnt", items.length + " 条"));
-    const grid = el("div", "grid" + (tab === "sentences" ? " wide" : ""));
-    items.forEach((i) => grid.append(card(i, tab === "sentences")));
-    sec.append(h, grid); list.append(sec);
+    sec.append(h);
+    if (tab === "stories") sec.append(storyBlock(STORIES[items[0].story]));
+    const grid = el("div", "grid wide");
+    items.forEach((i) => grid.append(card(i)));
+    sec.append(grid); list.append(sec);
   }
 }
 
@@ -535,8 +622,9 @@ const explainCache = {};    // id -> turns
 let cur = null;             // { item, turns, ctl, opener }
 let lastError = "";
 
-const KIND = { phrases: "职场词组", industry: "行业词汇", sentences: "句子" };
+const KIND = { phrases: "职场词组", industry: "行业词汇", stories: "句子", sentences: "句子" };
 function kindOf(item) { return item.id[0] === "p" ? "phrases" : item.id[0] === "i" ? "industry" : "sentences"; }
+function exampleLine(item) { return item.ex ? "\n课本例句：" + item.target + "（" + item.ex.zh + "）" : ""; }
 const LEARNER = "学习者：中文母语，英语大约雅思 5 分，目标是能在项目经理、项目协调、现场售后工作中开口说英语（行业可能是医疗、电气、制造、汽车、电子、物流、采购）。";
 function promptFor(item) {
   const k = kindOf(item);
@@ -544,7 +632,7 @@ function promptFor(item) {
     return "你是职场英语老师。" + LEARNER + "\n请用中文讲解下面这个句子，英文部分保持英文。\n中文：" + item.zh + "\n参考英文：" + item.en +
       "\n\n按下面的结构输出，每部分 2-4 行，简洁，不要开场白和结束语：\n### 句子结构\n### 关键词组\n### 更口语的说法\n### 更正式的说法（写邮件用）\n### 中国人常见错误";
   }
-  return "你是职场英语老师。" + LEARNER + "\n请用中文讲解下面这个" + KIND[k] + "，英文例句保持英文。\n条目：" + item.en + "（" + item.zh + "）" +
+  return "你是职场英语老师。" + LEARNER + "\n请用中文讲解下面这个" + KIND[k] + "，英文例句保持英文。\n条目：" + item.en + "（" + item.zh + "）" + exampleLine(item) +
     "\n\n按下面的结构输出，简洁，不要开场白和结束语：\n### 意思和用法\n### 常见搭配（3-5 个）\n### 工作例句（3 句，项目或现场售后场景，每句后面附中文）\n### 中国人常见错误（1-2 条）\n### 近义说法（如果有）";
 }
 function copyPromptFor(item) {
@@ -728,7 +816,7 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && cur) clo
 // ---- controls ----
 for (const b of document.querySelectorAll("[data-tab]")) b.addEventListener("click", () => {
   state.tab = b.dataset.tab; state.revealed.clear(); sticky.clear();
-  if (state.tab === "sentences" && state.cover === "zh") state.cover = "en";
+  if ((state.tab === "sentences" || state.tab === "stories") && state.cover === "zh") state.cover = "en";
   savePrefs(); render(); window.scrollTo({ top: 0 });
 });
 for (const b of document.querySelectorAll("[data-cover]")) b.addEventListener("click", () => { state.cover = b.dataset.cover; state.revealed.clear(); sticky.clear(); savePrefs(); render(); });
