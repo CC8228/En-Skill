@@ -5,7 +5,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
   /* Layout: same system as the English course (sticky control bar, grouped card grids); violet accent marks the German course, der/die/das carry their own colors. */
-  /* Touch screens (iPad, phone): finger-sized controls, inputs at 17px so iOS does not zoom, practice settings fold behind one button so the sticky bar stays short; iPad also gets larger reading text. Mouse layouts are unchanged. */
+  /* MacBook and other mouse screens 1024px+: controls in a left sidebar, cards fill the right. Answers are compared word by word after Enter; mistakes go to the 错题本 tab.
+     Touch screens (iPad, phone): finger-sized controls, inputs at 17px so iOS does not zoom, practice settings fold behind one button so the sticky bar stays short; iPad also gets larger reading text. Mouse layouts are unchanged. */
   :root {
     --bg: #f4f3f8;
     --surface: #ffffff;
@@ -19,6 +20,8 @@
     --unknown: #c2352b;
     --unknown-soft: #fcebea;
     --cover: #cdc9da;
+    --warn: #a86410;
+    --warn-soft: #fbf0e0;
     --der: #1f5fbf;
     --die: #c02f63;
     --das: #0f7f6c;
@@ -30,14 +33,14 @@
     :root:not([data-theme="light"]) {
       --bg: #13121b; --surface: #1c1b27; --ink: #ebe9f4; --muted: #a3a1b8; --line: #2e2c3d;
       --accent: #b9a5f0; --accent-soft: #2a2442; --known: #5cc690; --known-soft: #16302a;
-      --unknown: #f0786d; --unknown-soft: #3a1d1d; --cover: #3d3a50;
+      --unknown: #f0786d; --unknown-soft: #3a1d1d; --cover: #3d3a50; --warn: #e9a654; --warn-soft: #3a2c17;
       --der: #8fb4ff; --die: #ff8fb5; --das: #5fd3bd; color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
     --bg: #13121b; --surface: #1c1b27; --ink: #ebe9f4; --muted: #a3a1b8; --line: #2e2c3d;
     --accent: #b9a5f0; --accent-soft: #2a2442; --known: #5cc690; --known-soft: #16302a;
-    --unknown: #f0786d; --unknown-soft: #3a1d1d; --cover: #3d3a50;
+    --unknown: #f0786d; --unknown-soft: #3a1d1d; --cover: #3d3a50; --warn: #e9a654; --warn-soft: #3a2c17;
     --der: #8fb4ff; --die: #ff8fb5; --das: #5fd3bd; color-scheme: dark;
   }
   * { box-sizing: border-box; }
@@ -190,6 +193,75 @@
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   @media (max-width: 640px) { .stats { margin-left: 0; } .bar { position: static; } }
   @media (prefers-reduced-motion: no-preference) { .card { transition: background .15s, border-color .15s; } }
+  /* ---------- Mistakes: the answer compared word by word, and the 错题本 ---------- */
+  .diff { font: 400 15px/1.8 var(--font-de); color: var(--ink); overflow-wrap: anywhere; margin-top: 2px; }
+  .diff del, .d-legend del { color: var(--unknown); text-decoration: line-through; text-decoration-thickness: 1.5px; margin-right: 3px; }
+  .diff ins, .d-legend ins { text-decoration: none; font-weight: 600; color: var(--known); background: var(--known-soft); border-radius: 3px; padding: 1px 3px; }
+  .diff .ch, .m-fix .ch { color: var(--surface); background: var(--known); border-radius: 2px; padding: 0 1px; }
+  .diff ins.d-miss, .d-legend ins.d-miss { color: var(--warn); background: var(--warn-soft); }
+  .diff ins.d-moved, .d-legend ins.d-moved { color: var(--accent); background: var(--accent-soft); }
+  .diff del.d-moved { color: var(--accent); }
+  .d-lead { color: var(--muted); }
+  .d-legend { display: flex; flex-wrap: wrap; gap: 4px 10px; font: 400 12px/1.6 var(--font-zh); color: var(--muted); margin-top: 2px; }
+  .saved-note { font: 400 12.5px/1.5 var(--font-zh); color: var(--warn); margin-top: 2px; }
+  .prev-miss { font: 400 13px/1.6 var(--font-zh); color: var(--warn); background: var(--warn-soft); border-radius: 6px; padding: 4px 8px; overflow-wrap: anywhere; }
+  .prev-miss s { font-family: var(--font-de); color: var(--ink); text-decoration-color: var(--unknown); }
+  .nb-intro { margin: 0 0 12px; color: var(--muted); font: 400 13.5px/1.65 var(--font-zh); max-width: 82ch; }
+  .nb-chips { margin-bottom: 12px; }
+  .card.mcard { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .mcard .marks { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .mcard .zh { font-size: 13.5px; }
+  .m-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font: 400 12.5px/1.4 var(--font-zh); color: var(--muted); }
+  .m-type { font: 600 12px/1 var(--font-zh); border-radius: 4px; padding: 4px 7px; color: var(--unknown); background: var(--unknown-soft); }
+  .m-type.t-miss { color: var(--warn); background: var(--warn-soft); }
+  .m-type.t-order { color: var(--accent); background: var(--accent-soft); }
+  .m-type.t-case { color: var(--muted); background: var(--line); }
+  .m-state { margin-left: auto; }
+  .mcard.known .m-state { color: var(--known); font-weight: 600; }
+  .m-was { font: 400 14px/1.6 var(--font-zh); }
+  .m-was s { font: 500 15.5px/1.6 var(--font-de); text-decoration-color: var(--unknown); text-decoration-thickness: 1.5px; margin-left: 4px; }
+  .m-was b { font-family: var(--font-de); margin-left: 4px; }
+  .m-ctx { font: 400 15.5px/1.75 var(--font-de); overflow-wrap: anywhere; }
+  .m-blank { display: inline-block; min-width: 4.5em; border-bottom: 2px solid var(--accent); }
+  .m-fix ins { text-decoration: none; font-weight: 600; color: var(--known); }
+  .m-fix { font: 400 15px/1.6 var(--font-de); }
+  details.hint > summary { cursor: pointer; width: fit-content; font: 600 13px/1.5 var(--font-zh); color: var(--accent); list-style: none; }
+  details.hint > summary::-webkit-details-marker { display: none; }
+  details.hint > summary::before { content: "▸ "; }
+  details.hint[open] > summary::before { content: "▾ "; }
+  details.hint p { margin: 6px 0 0; }
+  .side { display: contents; }
+
+  /* ---------- MacBook (mouse or trackpad, 1024px and wider; a 13-inch Air shows about 1470 x 850 in a browser) ----------
+     Controls move into a left sidebar that scrolls on its own, so the whole height on the right is for cards. */
+  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+    .wrap { max-width: 1480px; display: grid; grid-template-columns: 296px minmax(0, 1fr); column-gap: 32px; align-items: start; padding-block: 0 48px; }
+    .side { display: flex; flex-direction: column; gap: 14px; position: sticky; top: env(safe-area-inset-top, 0px); max-height: 100vh; overflow-y: auto; padding-block: 22px 24px; padding-right: 4px; scrollbar-width: thin; }
+    header.top { padding: 0; display: grid; gap: 6px; }
+    header.top h1 { font-size: 21px; }
+    header.top p { font-size: 12.5px; line-height: 1.55; }
+    .bar { position: static; padding: 0; border: 0; background: none; gap: 12px; }
+    .bar > .row:first-child { flex-direction: column; align-items: stretch; gap: 10px; }
+    .tabs { display: grid; grid-template-columns: minmax(0, 1fr); padding: 4px; gap: 2px; }
+    .tabs button { text-align: left; padding: 10px 12px; font-size: 14px; }
+    .stats { margin-left: 0; flex-wrap: wrap; gap: 6px 12px; font-size: 12.5px; }
+    .opts .row { gap: 8px; }
+    .opts .row > .ctl, .opts .row > #reset-wrap, .opts .row > .sync, .opts .row > .voice-note { flex: 1 1 100%; }
+    .opts .row > .tool { flex: 1 1 calc(50% - 4px); }
+    #reset-wrap .tool { width: 100%; }
+    .ctl { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: center; }
+    .ctl .seg { display: grid; grid-template-columns: repeat(auto-fit, minmax(58px, 1fr)); }
+    .ctl .seg button { padding: 8px 4px; }
+    .hint { font-size: 12.5px; }
+    main { min-width: 0; padding-top: 22px; }
+    main > section.group:first-child { margin-top: 0; }
+    .de { font-size: 16px; }
+    .ex-de { font-size: 15.5px; }
+    .story-de { font-size: 16px; }
+    .type-in { font-size: 15.5px; }
+    .drawer { width: min(500px, 100%); }
+  }
+
   /* ---------- Touch screens (iPad, phone) ---------- */
   .opts { display: grid; gap: 8px; }
   .opts-toggle { display: none; }
@@ -254,6 +326,7 @@
 </style>
 
 <div class="wrap">
+  <div class="side" id="side">
   <header class="top">
     <h1>职场德语 · 第 1 课</h1>
     <p>项目协调与现场售后 · 难度 B1–C1（目标职场 C1）· 60 个职业词组（各 2 个例句：口语 + 书面）· 112 个行业词汇（各 1 个例句）· 6 篇情景短文 · 24 句中译德 · 26 个德英易混</p>
@@ -268,6 +341,7 @@
         <button id="tab-stories" data-tab="stories" aria-pressed="false">情景短文</button>
         <button id="tab-sentences" data-tab="sentences" aria-pressed="false">中译德</button>
         <button id="tab-friends" data-tab="friends" aria-pressed="false">德英易混</button>
+        <button id="tab-mistakes" data-tab="mistakes" aria-pressed="false">错题本</button>
       </div>
       <div class="stats" aria-live="polite"><span class="tally" id="tally" hidden></span><span class="k" id="st-k">会 0</span><span class="u" id="st-u">不会 0</span><span class="n" id="st-n">未标 0</span></div>
       <button class="tool opts-toggle" id="opts-toggle" type="button" aria-expanded="false" aria-controls="opts">设置</button>
@@ -287,6 +361,7 @@
           <button id="flt-all" data-filter="all" aria-pressed="true">全部</button>
           <button id="flt-review" data-filter="review" aria-pressed="false">待复习</button>
           <button id="flt-unknown" data-filter="unknown" aria-pressed="false">只看不会</button>
+          <button id="flt-mistakes" data-filter="mistakes" aria-pressed="false">有错题</button>
         </span>
       </span>
       <span class="ctl" id="speed-ctl"><span class="label">发音</span>
@@ -311,7 +386,8 @@
     <div class="chips" id="chips" hidden></div>
   </div>
 
-  <p class="hint" id="hint">每个词组有两个例句：一句<b>口语</b>（开会、打电话、现场沟通，同事之间多用 du），一句<b>书面</b>（邮件、报告、合同，用 Sie）；口语里常用的词组配两句口语，邮件固定用语配两句书面。先看例句理解词组：读一遍、点“发音”听一遍、跟读一遍。再选<b>遮德语</b>，看中文<b>默写整句德语</b>，<b>回车</b>检查：整句对，或者句子略有不同但词组用对了，都算对；词组没用对显示参考答案。词组卡片有两个例句，<b>两句都写对</b>才自动标“会”，有一句不对就标“不会”。<b>Tab</b> 跳到下一句，Shift+Tab 回上一句。大小写和变音符号打错不扣分（ae / oe / ue / ss 也行），但会提醒（德语名词首字母大写）。名词卡片上的冠词颜色：<span class="art der">der</span> 阳性 · <span class="art die">die</span> 阴性 · <span class="art das">das</span> 中性。“中译德”和“德英易混”的练法不变。</p>
+  <details class="hint" id="hint"><summary>怎么练</summary><p>每个词组有两个例句：一句<b>口语</b>（开会、打电话、现场沟通，同事之间多用 du），一句<b>书面</b>（邮件、报告、合同，用 Sie）；口语里常用的词组配两句口语，邮件固定用语配两句书面。先看例句理解词组：读一遍、点“发音”听一遍、跟读一遍。再选<b>遮德语</b>，看中文<b>默写整句德语</b>，<b>回车</b>检查：整句对，或者句子略有不同但词组用对了，都算对；词组没用对显示参考答案。词组卡片有两个例句，<b>两句都写对</b>才自动标“会”，有一句不对就标“不会”。<b>Tab</b> 跳到下一句，Shift+Tab 回上一句。大小写和变音符号打错不扣分（ae / oe / ue / ss 也行），但会提醒（德语名词首字母大写）。名词卡片上的冠词颜色：<span class="art der">der</span> 阳性 · <span class="art die">die</span> 阴性 · <span class="art das">das</span> 中性。“中译德”和“德英易混”的练法不变。</p><p>回车检查后，写错的地方会逐词标出来：<del>划掉的</del>是你写的，绿色是正确写法，黄色是漏写的词，蓝紫色是放错位置的词；拼写错误会标到具体字母。这些错误会自动记进<b>错题本</b>：先看自己写错的样子，再填出正确的词；同一个错误要在两个不同的日子写对才算掌握。卡片上会提示“上次错在哪”，“显示”里的<b>有错题</b>只看还没改对的卡片。</p></details>
+  </div>
   <main id="list"></main>
 </div>
 <div class="scrim" id="scrim" hidden></div>
@@ -369,7 +445,7 @@ const sticky = new Set();  // items answered this round stay on screen even if t
 function readLocal(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
 function writeLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
 Object.assign(state, readLocal(prefsKey) || {});
-if (!ITEMS[state.tab]) state.tab = "phrases";
+if (!ITEMS[state.tab] && state.tab !== "mistakes") state.tab = "phrases";
 state.revealed = new Set();
 state.marks = readLocal(marksKey) || {};
 let order = {};
@@ -385,6 +461,7 @@ function visible(item) {
   const m = state.marks[item.id];
   if (state.filter === "review") return m !== "k";
   if (state.filter === "unknown") return m === "u";
+  if (state.filter === "mistakes") return hasMistake(item.id);
   return true;
 }
 function shuffled(list, key) {
@@ -467,6 +544,7 @@ function moveFocus(fromId, dir) {
 function checkTyped(item, value) {
   const form = match(value, item);
   typed[item.id] = { value, result: form ? "ok" : "bad", form };
+  noteMistakes(item, item.id, item.de, item.zh, value, typed[item.id].result);
   sticky.add(item.id);
   state.revealed.add(item.id);
   setMark(item.id, form ? "k" : "u");
@@ -489,6 +567,7 @@ function checkSentence(item, idx, value) {
   const x = item.ex ? item.ex[idx] : item.sent;
   const key = item.ex ? item.id + ":" + idx : item.id;
   typed[key] = { value, result: verdictFor(value, x) };
+  noteMistakes(item, key, x.plain, x.zh, value, typed[key].result);
   sticky.add(item.id);
   state.revealed.add(item.id);
   const results = item.ex ? item.ex.map((_, k) => (typed[item.id + ":" + k] || {}).result) : [typed[key].result];
@@ -524,6 +603,7 @@ function sentenceTyper(item, idx) {
     inp.classList.remove("ok", "near", "bad");
     const v = box.querySelector(".verdict"); if (v) v.remove();
   });
+  if (!t.result) { const pm = prevMissLine(key); if (pm) box.append(pm); }
   box.append(inp);
   if (t.result === "ok") {
     const v = el("div", "verdict ok", "✓ 完全正确");
@@ -533,16 +613,17 @@ function sentenceTyper(item, idx) {
       fix.append(el("span", "ans", x.plain));
       v.append(fix);
     }
+    const sn = savedNote(analyse(t.value, x.plain, "ok").stored); if (sn) v.append(sn);
     box.append(v);
   }
   if (t.result === "near") {
     const v = el("div", "verdict near");
-    v.append(el("b", null, "✓ 词组用对了"), "，句子和参考答案略有不同：", answerSpan(t.value, x.plain));
+    v.append(el("b", null, "✓ 词组用对了"), "，句子和参考答案略有不同。", correction(t.value, x.plain, "near"));
     box.append(v);
   }
   if (t.result === "bad") {
     const v = el("div", "verdict bad");
-    v.append(el("span", "tag", t.value.trim() ? "✗ 不对" : "✗ 没填"), "参考答案：", answerSpan(t.value, x.plain));
+    v.append(el("span", "tag", t.value.trim() ? "✗ 不对" : "✗ 没填"), correction(t.value, x.plain, "bad"));
     if (x.keys.length) v.append(el("div", "need", "要用到：" + x.keys.join(" … ")));
     box.append(v);
   }
@@ -614,6 +695,7 @@ function typer(item) {
     inp.classList.remove("ok", "bad");
     const v = box.querySelector(".verdict"); if (v) v.remove();
   });
+  if (!t.result) { const pm = prevMissLine(item.id); if (pm) box.append(pm); }
   box.append(inp);
   if (t.result === "ok") {
     const v = el("div", "verdict ok", "✓ 正确");
@@ -623,14 +705,15 @@ function typer(item) {
       fix.append(el("span", "ans", t.form));
       v.append(fix);
     }
+    const sn = savedNote(analyse(t.value, item.de, "ok").stored); if (sn) v.append(sn);
     box.append(v);
   }
   if (t.result === "bad") {
     const v = el("div", "verdict bad");
     const ai = t.value.trim() ? articleIssue(t.value, item) : null;
     v.append(el("span", "tag", !t.value.trim() ? "✗ 没填" : ai ? (ai.kind === "missing" ? "✗ 缺冠词" : "✗ 冠词不对") : "✗ 不对"));
-    v.append(ai ? "要连冠词一起记，是 " + ai.art + "（" + GENDER[ai.art] + "）：" : "正确答案：");
-    v.append(answerSpan(t.value, item.de));
+    if (ai) v.append("要连冠词一起记，是 " + ai.art + "（" + GENDER[ai.art] + "）。");
+    v.append(correction(t.value, item.de, "bad"));
     box.append(v);
   }
   return box;
@@ -741,8 +824,8 @@ function renderView() {
   $("show-en").setAttribute("aria-pressed", String(state.showEn));
   $("show-en").hidden = tab === "friends" || tab === "stories";
   $("uml-row").hidden = !typingOn();
-  const tl = $("tally"); tl.hidden = !typingOn();
-  if (typingOn()) {
+  const tl = $("tally"); tl.hidden = !typingOn() || tab === "mistakes";
+  if (!tl.hidden) {
     const ids = new Set(ITEMS[tab].map((i) => i.id));
     const res = Object.entries(typed).filter(([id, t]) => ids.has(id.split(":")[0]) && t.result);
     tl.textContent = "本轮打字 对 " + res.filter(([, t]) => t.result !== "bad").length + " / " + res.length;
@@ -772,6 +855,11 @@ function renderView() {
     }
   }
 
+  const nOpen = mistakes.filter((m) => !m.done).length;
+  $("tab-mistakes").textContent = "错题本" + (nOpen ? " " + nOpen : "");
+  $("reset-wrap").hidden = tab === "mistakes";
+  if (tab === "mistakes") { renderNotebook(); return; }
+
   let pool = ITEMS[tab];
   if (tab === "industry" && state.industries.length) pool = pool.filter((i) => state.industries.includes(i.group));
 
@@ -786,7 +874,7 @@ function renderView() {
   list.replaceChildren();
   const shown = pool.filter(visible);
   if (!shown.length) {
-    const msg = state.filter === "unknown" ? "这一页没有标成“不会”的条目。" : "这一页的条目都已经标成“会”了。切到“全部”可以重新看。";
+    const msg = state.filter === "unknown" ? "这一页没有标成“不会”的条目。" : state.filter === "mistakes" ? "这一页没有待改的错题。" : "这一页的条目都已经标成“会”了。切到“全部”可以重新看。";
     list.append(el("div", "empty", msg));
     return;
   }
@@ -832,6 +920,357 @@ for (const ch of ["ä", "ö", "ü", "ß", "Ä", "Ö", "Ü"]) {
     inp.dispatchEvent(new Event("input", { bubbles: true }));
   });
   $("uml").append(b);
+}
+
+// ---- mistakes: compare an answer word by word, show what went wrong, keep it in the 错题本 ----
+const KEY = fold;            // comparison key of one word: lower case, no punctuation, ae/oe/ue/ss = ä/ö/ü/ß
+const CASE_MATTERS = true;   // German capitals are checked (nouns)
+const FOREIGN = "de";
+const MKEY = "de-lesson1-mistakes";
+function MISSED(value, target) { const d = el("div"); d.append("参考答案：", answerSpan(value, target)); return d; }
+const MTYPES = { spell: "拼写", word: "用词", miss: "漏词", extra: "多写", order: "词序", case: "大小写", whole: "整句" };
+const TAB_OF = { p: "phrases", i: "industry", t: "stories", s: "sentences", f: "friends" };
+let mistakes = (() => { const v = readLocal(MKEY); return Array.isArray(v) ? v : []; })();
+let mRemote = null, mTimer = null;
+function dayStr() { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function splitPunct(tok) { const m = tok.match(/^([^\p{L}\p{N}]*)(.*?)([^\p{L}\p{N}]*)$/u); return m ? [m[1], m[2], m[3]] : ["", tok, ""]; }
+const clean = (tok) => splitPunct(tok)[1];
+function caseDiff(a, b) { const up = (s) => !!s && s[0] !== s[0].toLowerCase(); return up(a) !== up(b); }
+function lev(a, b) {
+  if (!a.length) return b.length; if (!b.length) return a.length;
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[b.length];
+}
+// Letters of the right word that the typed word got wrong or left out.
+function charMarks(ref, typed) {
+  const a = ref.toLowerCase(), b = typed.toLowerCase(), m = a.length, n = b.length;
+  const D = Array.from({ length: m + 1 }, (_, i) => Array.from({ length: n + 1 }, (_, j) => (i ? (j ? 0 : i) : j)));
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+    D[i][j] = Math.min(D[i - 1][j] + 1, D[i][j - 1] + 1, D[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  const rm = new Array(m).fill(false);
+  for (let i = m, j = n; i > 0 || j > 0;) {
+    if (i > 0 && j > 0 && D[i][j] === D[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)) { if (a[i - 1] !== b[j - 1]) rm[i - 1] = true; i--; j--; }
+    else if (i > 0 && D[i][j] === D[i - 1][j] + 1) { rm[i - 1] = true; i--; }
+    else j--;
+  }
+  return rm;
+}
+// Comparison units: one per word of the key (a contraction or a hyphenated word can give two), each remembering its original word.
+function unitsOf(s) {
+  const out = [];
+  s.split(/\s+/).filter(Boolean).forEach((tok, ti) => KEY(tok).split(" ").filter(Boolean).forEach((key) => out.push({ key, tok, ti })));
+  return out;
+}
+// Cost of putting reference unit a against typed unit b: same word 0, a misspelling < 1, a different word 1.6 (cheaper than missing + extra).
+function sim(a, b) {
+  if (a === b) return 0;
+  const d = lev(a, b), m = Math.max(a.length, b.length);
+  return d <= Math.max(1, Math.round(m * 0.4)) ? 0.5 + d / m : 1.6;
+}
+function diffAnswer(value, ref) {
+  const R = unitsOf(ref), T = unitsOf(value), m = R.length, n = T.length;
+  const C = Array.from({ length: m + 1 }, (_, i) => Array.from({ length: n + 1 }, (_, j) => (i ? (j ? 0 : i) : j)));
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+    C[i][j] = Math.min(C[i - 1][j] + 1, C[i][j - 1] + 1, C[i - 1][j - 1] + sim(R[i - 1].key, T[j - 1].key));
+  const ops = [];
+  for (let i = m, j = n; i > 0 || j > 0;) {
+    if (i > 0 && j > 0 && Math.abs(C[i][j] - C[i - 1][j - 1] - sim(R[i - 1].key, T[j - 1].key)) < 1e-9) { ops.push({ r: R[i - 1], t: T[j - 1] }); i--; j--; }
+    else if (i > 0 && Math.abs(C[i][j] - C[i - 1][j] - 1) < 1e-9) { ops.push({ r: R[i - 1], t: null }); i--; }
+    else { ops.push({ r: null, t: T[j - 1] }); j--; }
+  }
+  ops.reverse();
+  for (const o of ops) {
+    if (o.r && o.t) { const s = sim(o.r.key, o.t.key); o.op = s === 0 ? (CASE_MATTERS && caseDiff(clean(o.r.tok), clean(o.t.tok)) ? "case" : "eq") : s < 1.6 ? "spell" : "word"; }
+    else o.op = o.r ? "miss" : "extra";
+  }
+  // A word missing in one place and extra in another was put in the wrong position.
+  for (const o of ops) if (o.op === "miss") {
+    const x = ops.find((p) => p.op === "extra" && p.t.key === o.r.key);
+    if (x) { o.op = "order"; x.op = "moved"; }
+  }
+  const toks = ref.split(/\s+/).filter(Boolean);
+  const info = toks.map(() => ({ op: "eq", typed: [] }));
+  const RANK = { eq: 0, case: 1, spell: 2, word: 3, miss: 3, order: 3 };
+  const extras = {};  // index of the reference word they follow (-1 = before the first) -> typed words
+  let last = -1;
+  for (const o of ops) {
+    if (o.r) { const f = info[o.r.ti]; if (RANK[o.op] > RANK[f.op]) f.op = o.op; if (o.t && !f.typed.includes(o.t.tok)) f.typed.push(o.t.tok); last = o.r.ti; }
+    else { const xs = extras[last] = extras[last] || []; if (!xs.length || xs[xs.length - 1].tok !== o.t.tok) xs.push({ tok: o.t.tok, op: o.op }); }
+  }
+  const errors = [];
+  info.forEach((f, ti) => {
+    if (f.op === "eq") return;
+    errors.push({ type: f.op, ref: clean(toks[ti]), typed: f.op === "miss" || f.op === "order" ? "" : clean(f.typed.join(" ")), ti });
+  });
+  for (const k in extras) for (const x of extras[k]) if (x.op === "extra") errors.push({ type: "extra", ref: "", typed: clean(x.tok), ti: Number(k) });
+  return { toks, info, extras, errors };
+}
+// The right word, with the letters that were wrong or missing highlighted (punctuation stays outside).
+function fixedWord(tok, typedW, cls) {
+  const [pre, w, post] = splitPunct(tok);
+  const ins = el("ins", cls || null);
+  const marks = cls === "d-case" ? [...w].map((_, i) => i === 0) : typedW != null ? charMarks(w, typedW) : null;
+  if (cls === "d-spell-case") marks[0] = true;   // misspelt and also wrong capital
+  if (marks) {
+    let run = "", on = false;
+    const flush = () => { if (run) ins.append(on ? el("span", "ch", run) : document.createTextNode(run)); run = ""; };
+    [...w].forEach((ch, i) => { if (marks[i] !== on) { flush(); on = marks[i]; } run += ch; });
+    flush();
+  } else ins.append(w);
+  const f = document.createDocumentFragment(); f.append(pre, ins, post); return f;
+}
+// The reference sentence in track-changes style: what you wrote is struck through, the fix follows it.
+function diffView(d) {
+  const box = el("div", "diff"); box.lang = FOREIGN;
+  const extra = (k) => (d.extras[k] || []).forEach((x) => {
+    box.append(" ");
+    const s = el("del", x.op === "moved" ? "d-moved" : null, clean(x.tok)); s.title = x.op === "moved" ? "这个词放错了位置" : "多写的词"; box.append(s);
+  });
+  extra(-1);
+  d.toks.forEach((tok, ti) => {
+    const f = d.info[ti], typedW = clean(f.typed.join(" "));
+    if (ti || (d.extras[-1] || []).length) box.append(" ");
+    if (f.op === "eq") box.append(tok);
+    else if (f.op === "spell") { box.append(el("del", null, typedW)); box.append(fixedWord(tok, typedW, CASE_MATTERS && caseDiff(clean(tok), typedW) ? "d-spell-case" : null)); }
+    else if (f.op === "word") { box.append(el("del", null, typedW)); box.append(fixedWord(tok)); }
+    else if (f.op === "case") { const w = fixedWord(tok, typedW, "d-case"); w.querySelector("ins").title = "大小写：你写成 " + typedW; box.append(w); }
+    else if (f.op === "miss") { const w = fixedWord(tok, null, "d-miss"); w.querySelector("ins").title = "漏写的词"; box.append(w); }
+    else { const w = fixedWord(tok, null, "d-moved"); w.querySelector("ins").title = "这个词应该在这里"; box.append(w); }
+    extra(ti);
+  });
+  return box;
+}
+function legend() {
+  const d = el("div", "d-legend");
+  d.append(el("del", null, "你写的"), el("ins", null, "正确写法"), el("ins", "d-miss", "漏写"), el("ins", "d-moved", "位置不对"));
+  return d;
+}
+// What one checked answer shows and what it keeps: a "bad" answer keeps every mistake (or one "整句" entry when most of it is wrong);
+// a "near" answer (key phrase right, wording differs) keeps only spelling and capitals.
+function analyse(value, target, verdict) {
+  const d = diffAnswer(value, target);
+  const real = d.errors.filter((e) => e.type !== "case");
+  const whole = verdict === "bad" && (!value.trim() || real.length > Math.max(3, Math.ceil(d.toks.length / 2)));
+  const stored = whole ? [{ type: "whole", ref: target, typed: "", ti: -1 }]
+    : verdict === "bad" ? d.errors : d.errors.filter((e) => e.type === "spell" || e.type === "case");
+  return { d, whole, stored };
+}
+function savedNote(stored) {
+  if (!stored.length) return null;
+  const c = {}; stored.forEach((e) => { c[e.type] = (c[e.type] || 0) + 1; });
+  return el("div", "saved-note", "已记入错题本：" + Object.entries(c).map(([k, v]) => MTYPES[k] + (v > 1 ? " " + v : "")).join(" · "));
+}
+function correction(value, target, verdict) {
+  const a = analyse(value, target, verdict);
+  const f = document.createDocumentFragment();
+  if (a.whole) f.append(MISSED(value, target));
+  else if (a.d.errors.length) { f.append(el("div", "d-lead", verdict === "near" ? "和参考答案对比：" : "对照改正：")); f.append(diffView(a.d), legend()); }
+  const n = savedNote(a.stored); if (n) f.append(n);
+  return f;
+}
+const midOf = (key, e) => key + "|" + e.type + "|" + KEY(e.ref || e.typed);
+// Mastered after being written right on two different days.
+function credit(m, today) {
+  m.days = m.days || [];
+  if (!m.days.includes(today)) m.days.push(today);
+  if (m.days.length >= 2) { m.done = true; m.doneOn = today; }
+}
+// After each check: add or bump what went wrong, and credit earlier mistakes of this sentence that were not repeated.
+function noteMistakes(item, key, target, zh, value, verdict) {
+  const a = analyse(value, target, verdict), today = dayStr();
+  const now = new Set((a.whole ? a.stored : a.d.errors).map((e) => midOf(key, e)));
+  for (const e of a.stored) {
+    const mid = midOf(key, e);
+    let m = mistakes.find((z) => z.mid === mid);
+    if (!m) { m = { mid, key, item: item.id, type: e.type, ref: e.ref, n: 0, first: today }; mistakes.push(m); }
+    Object.assign(m, { typed: e.typed, ti: e.ti, ctx: target, zh, n: m.n + 1, last: today, days: [], done: false });
+  }
+  if (!a.whole) for (const m of mistakes) {
+    if (m.key !== key || m.done || now.has(m.mid) || (m.type === "whole" && verdict === "bad")) continue;
+    credit(m, today);
+  }
+  saveMistakes();
+}
+function saveMistakes() {
+  writeLocal(MKEY, mistakes);
+  if (!mRemote) return;
+  clearTimeout(mTimer);
+  mTimer = setTimeout(() => { mRemote.set({ list: mistakes, updatedAt: Date.now() }).catch(() => {}); }, 800);
+}
+async function initMistakes(db, uid) {
+  try {
+    mRemote = db.doc("data/users/" + uid + "/mistakes");
+    const snap = await mRemote.get();
+    const saved = snap.exists && Array.isArray(snap.data().list) ? snap.data().list : [];
+    const byMid = new Map(saved.map((m) => [m.mid, m]));
+    const newer = (a, b) => (a.last || "") > (b.last || "") || ((a.last || "") === (b.last || "") && (a.n > b.n || (a.n === b.n && (a.days || []).length > (b.days || []).length)));
+    for (const m of mistakes) { const o = byMid.get(m.mid); if (!o || newer(m, o)) byMid.set(m.mid, m); }
+    const merged = [...byMid.values()];
+    const changed = JSON.stringify(merged) !== JSON.stringify(saved);
+    mistakes = merged; writeLocal(MKEY, mistakes);
+    if (changed) saveMistakes();
+    render();
+  } catch { mRemote = null; }
+}
+function hasMistake(id) { return mistakes.some((m) => !m.done && m.item === id); }
+// Above an answer box: where you went wrong last time, without giving the answer away.
+function prevMissLine(key) {
+  const ms = mistakes.filter((m) => !m.done && m.key === key);
+  if (!ms.length) return null;
+  const d = el("div", "prev-miss");
+  d.append(el("b", null, "上次错在："));
+  ms.forEach((m, i) => {
+    if (i) d.append(" · ");
+    if (m.type === "miss") d.append("漏了一个词");
+    else if (m.type === "order") d.append("词序");
+    else if (m.type === "whole") d.append("整句没写出来");
+    else { const s = el("s", null, m.typed || "?"); s.lang = FOREIGN; d.append(s); if (m.type === "case") d.append("（大小写）"); if (m.type === "extra") d.append("（多写）"); }
+  });
+  return d;
+}
+
+// ---- 错题本 ----
+let nbType = "all", nbShowDone = false, nbOrder = null;
+const cloze = {};          // mistake id -> { value, result: "ok" | "case" | "bad" | null }
+const nbOpen = new Set();  // mistakes whose answer is shown
+const CLOZE = new Set(["spell", "word", "case", "miss"]);
+function itemById(id) { for (const list of Object.values(ITEMS)) { const it = list.find((i) => i.id === id); if (it) return it; } return null; }
+function sortedMistakes() {
+  if (!nbOrder) nbOrder = [...mistakes].sort((a, b) => (a.done - b.done) || (b.n - a.n) || ((b.last || "") > (a.last || "") ? 1 : (b.last || "") < (a.last || "") ? -1 : 0)).map((m) => m.mid);
+  const pos = new Map(nbOrder.map((id, i) => [id, i]));
+  return [...mistakes].sort((a, b) => (pos.has(a.mid) ? pos.get(a.mid) : -1) - (pos.has(b.mid) ? pos.get(b.mid) : -1));
+}
+function renderNotebook() {
+  const list = $("list");
+  list.replaceChildren();
+  const active = mistakes.filter((m) => !m.done), done = mistakes.length - active.length;
+  $("st-k").textContent = "已掌握 " + done; $("st-u").textContent = "待改 " + active.length; $("st-n").textContent = "";
+  $("m-k").style.width = (mistakes.length ? (done / mistakes.length) * 100 : 0) + "%";
+  $("m-u").style.width = (mistakes.length ? (active.length / mistakes.length) * 100 : 0) + "%";
+  const sec = el("section", "group");
+  const h = el("h2", null, "错题本"); h.append(el("span", "cnt", "待改 " + active.length + " · 已掌握 " + done));
+  sec.append(h, el("p", "nb-intro", "默写时写错的地方会自动记到这里。先看自己上次写错的样子，再在空格里写出正确的词，回车检查；同一个错误要在两个不同的日子写对才算掌握。词序和整句的错误，点“去练整句”回到原来的卡片重写。"));
+  const counts = {}; active.forEach((m) => { counts[m.type] = (counts[m.type] || 0) + 1; });
+  const chips = el("div", "chips nb-chips");
+  for (const [k, label] of [["all", "全部 " + active.length], ...Object.keys(MTYPES).filter((k) => counts[k]).map((k) => [k, MTYPES[k] + " " + counts[k]])]) {
+    const b = el("button", "chip", label);
+    b.setAttribute("aria-pressed", String(nbType === k));
+    b.addEventListener("click", () => { nbType = k; nbOrder = null; render(); });
+    chips.append(b);
+  }
+  if (done) {
+    const b = el("button", "chip", "显示已掌握 " + done);
+    b.setAttribute("aria-pressed", String(nbShowDone));
+    b.addEventListener("click", () => { nbShowDone = !nbShowDone; render(); });
+    chips.append(b);
+  }
+  sec.append(chips);
+  const shown = sortedMistakes().filter((m) => (nbShowDone || !m.done) && (nbType === "all" || m.type === nbType));
+  if (!shown.length) {
+    sec.append(el("div", "empty", mistakes.length ? "这一类没有待改的错题。" : "还没有错题。在练习里默写句子，按回车检查后，写错的地方会自动记到这里。"));
+  } else {
+    const grid = el("div", "grid wide");
+    shown.forEach((m) => grid.append(mistakeCard(m)));
+    sec.append(grid);
+  }
+  list.append(sec);
+}
+// The sentence with the word to recall left blank (or highlighted once answered).
+function clozeLine(m, blank) {
+  const d = el("div", "m-ctx"); d.lang = FOREIGN;
+  m.ctx.split(/\s+/).forEach((tok, i) => {
+    if (i) d.append(" ");
+    if (i !== m.ti || m.type === "extra") { d.append(tok); return; }
+    const [pre, w, post] = splitPunct(tok);
+    d.append(pre, blank ? el("span", "m-blank", " ") : el("span", "hl", w), post);
+  });
+  return d;
+}
+function checkCloze(m, value) {
+  const today = dayStr(), same = KEY(value) === KEY(m.ref);
+  const caseWrong = same && CASE_MATTERS && caseDiff(m.ref, clean(value.trim()));
+  const ok = same && !(caseWrong && m.type === "case");
+  cloze[m.mid] = { value, result: !same ? "bad" : caseWrong ? "case" : "ok" };
+  if (ok) credit(m, today);
+  else { m.n += 1; m.last = today; m.typed = clean(value.trim()) || m.typed; m.days = []; }
+  saveMistakes();
+  const order = [...document.querySelectorAll(".cloze-in")].map((x) => x.dataset.id), at = order.indexOf("m:" + m.mid);
+  render();
+  if (!document.querySelector('.type-in[data-id="m:' + m.mid + '"]')) {
+    for (const id of order.slice(at + 1)) { const nx = document.querySelector('.type-in[data-id="' + id + '"]'); if (nx) { nx.focus({ preventScroll: true }); break; } }
+  }
+}
+function clozeInput(m, cs) {
+  const box = el("div", "typer");
+  const inp = el("textarea", "type-in cloze-in" + (cs.result ? " " + (cs.result === "bad" ? "bad" : "ok") : ""));
+  inp.rows = 1; inp.dataset.id = "m:" + m.mid; inp.id = "cloze-" + mistakes.indexOf(m); inp.value = cs.value;
+  inp.placeholder = m.type === "miss" ? "写出漏掉的词，回车检查" : "写出空格里的词，回车检查";
+  inp.setAttribute("aria-label", "填空：" + m.zh);
+  for (const [k, v] of [["autocomplete", "off"], ["autocapitalize", "off"], ["autocorrect", "off"], ["spellcheck", "false"], ["lang", FOREIGN], ["enterkeyhint", "next"]]) inp.setAttribute(k, v);
+  inp.addEventListener("keydown", (e) => {
+    if (e.isComposing) return;
+    if (e.key === "Enter") { e.preventDefault(); const c = cloze[m.mid]; if (c && c.result && c.value === inp.value) moveFocus(inp.dataset.id, 1); else checkCloze(m, inp.value); }
+    else if (e.key === "Tab") { e.preventDefault(); moveFocus(inp.dataset.id, e.shiftKey ? -1 : 1); }
+  });
+  inp.addEventListener("input", () => { fitBox(inp); cloze[m.mid] = { value: inp.value, result: null }; inp.classList.remove("ok", "bad"); const v = box.querySelector(".verdict"); if (v) v.remove(); });
+  box.append(inp);
+  if (cs.result) {
+    const v = el("div", "verdict " + (cs.result === "bad" ? "bad" : "ok"));
+    if (cs.result === "ok") v.append(m.done ? "✓ 对了，已掌握" : "✓ 对了，换一天再写对一次就掌握");
+    else if (cs.result === "case") { v.append("✓ 拼写对了，注意大小写：", fixedWord(m.ref, clean(cs.value.trim()), "d-case")); }
+    else { v.append(el("span", "tag", "✗ 还不对"), el("del", null, clean(cs.value.trim()) || "（空）"), " → "); const fx = el("span", "m-fix"); fx.append(fixedWord(m.ref, clean(cs.value.trim()))); v.append(fx); }
+    box.append(v);
+  }
+  return box;
+}
+function practiseAgain(m) {
+  const item = itemById(m.item);
+  if (!item) return;
+  state.tab = TAB_OF[m.item[0]]; state.filter = "all"; state.shuffle = false; nbOrder = null;
+  if (state.industries.length && !state.industries.includes(item.group)) state.industries = [];
+  state.cover = FOREIGN; state.typing = true; state.revealed.clear(); sticky.clear();
+  delete typed[m.key];
+  savePrefs(); render();
+  const inp = document.querySelector('.type-in[data-id="' + m.key + '"]');
+  if (inp) { inp.scrollIntoView({ block: "center" }); inp.focus({ preventScroll: true }); }
+}
+function mistakeCard(m) {
+  const c = el("div", "card mcard" + (m.done ? " known" : ""));
+  const top = el("div", "m-top");
+  top.append(el("span", "m-type t-" + m.type, MTYPES[m.type]), el("span", null, "错 " + m.n + " 次 · 最近 " + (m.last || "").slice(5)));
+  top.append(el("span", "m-state", m.done ? "已掌握" : (m.days || []).length ? "已写对 1 天，换一天再写对就掌握" : "待改"));
+  c.append(top);
+  const was = el("div", "m-was");
+  if (m.type === "miss") was.append("上次漏写了一个词");
+  else if (m.type === "order") was.append("上次这个词放错了位置：", el("b", null, m.ref));
+  else if (m.type === "whole") was.append("上次整句没写出来");
+  else if (m.type === "extra") was.append("上次多写了：", el("s", null, m.typed));
+  else was.append(m.type === "case" ? "大小写写错：" : "你写成：", el("s", null, m.typed));
+  c.append(was);
+  const cs = cloze[m.mid] || { value: "", result: null };
+  const open = m.done || nbOpen.has(m.mid) || !!cs.result;
+  const canCloze = CLOZE.has(m.type) && m.ti >= 0 && !m.done;
+  if (canCloze || open) c.append(clozeLine(m, canCloze && !open));
+  c.append(el("div", "zh", m.zh));
+  if (canCloze) c.append(clozeInput(m, cs));
+  const acts = el("div", "marks");
+  if (!open) { const b = el("button", "mk-btn", "看答案"); b.addEventListener("click", () => { nbOpen.add(m.mid); render(); }); acts.append(b); }
+  if (canSpeak) {
+    const say = el("button", "say"); say.innerHTML = SPEAKER_ICON; say.append(document.createTextNode("发音"));
+    say.addEventListener("click", () => speak(m.ctx, say)); acts.append(say);
+  }
+  if (itemById(m.item)) { const go = el("button", "mk-btn", "去练整句"); go.addEventListener("click", () => practiseAgain(m)); acts.append(go); }
+  const del = el("button", "mk-btn", "删除");
+  del.title = "判错了或不想再练，就从错题本删掉";
+  del.addEventListener("click", () => { mistakes = mistakes.filter((z) => z !== m); saveMistakes(); render(); });
+  acts.append(del);
+  c.append(acts);
+  return c;
 }
 
 // ---- pronunciation (the browser's built-in German voice) ----
@@ -1073,7 +1512,7 @@ document.addEventListener("keydown", (e) => { if (e.key === "Escape" && cur) clo
 
 // ---- controls ----
 for (const b of document.querySelectorAll("[data-tab]")) b.addEventListener("click", () => {
-  state.tab = b.dataset.tab; state.revealed.clear(); sticky.clear();
+  state.tab = b.dataset.tab; state.revealed.clear(); sticky.clear(); nbOrder = null;
   if ((state.tab === "sentences" || state.tab === "stories") && state.cover === "zh") state.cover = "de";
   savePrefs(); render(); window.scrollTo({ top: 0 });
 });
@@ -1141,6 +1580,7 @@ async function initRemote() {
     const uid = await user.id();
     if (!uid) return;
     dbRef = db; userId = uid;
+    initMistakes(db, uid);
     remote = db.doc("data/users/" + uid + "/progress-c1");
     const snap = await remote.get();
     if (snap.exists) {
