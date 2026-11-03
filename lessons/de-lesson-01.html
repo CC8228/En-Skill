@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
   /* Layout: same system as the English course (sticky control bar, grouped card grids); violet accent marks the German course, der/die/das carry their own colors. */
+  /* Touch screens (iPad, phone): finger-sized controls, inputs at 17px so iOS does not zoom, practice settings fold behind one button so the sticky bar stays short; iPad also gets larger reading text. Mouse layouts are unchanged. */
   :root {
     --bg: #f4f3f8;
     --surface: #ffffff;
@@ -189,6 +190,67 @@
   button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   @media (max-width: 640px) { .stats { margin-left: 0; } .bar { position: static; } }
   @media (prefers-reduced-motion: no-preference) { .card { transition: background .15s, border-color .15s; } }
+  /* ---------- Touch screens (iPad, phone) ---------- */
+  .opts { display: grid; gap: 8px; }
+  .opts-toggle { display: none; }
+  @media (hover: none) and (pointer: coarse) {
+    html { -webkit-text-size-adjust: 100%; }
+    body { -webkit-tap-highlight-color: transparent; }
+    button, .face, .story-de, .story-zh { touch-action: manipulation; }
+    .tabs { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; min-width: 0; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar, .chips::-webkit-scrollbar { display: none; }
+    .tabs button, .seg button { min-height: 44px; padding: 0 14px; font-size: 14.5px; }
+    .tool { min-height: 44px; padding: 0 14px; font-size: 14.5px; border-radius: 9px; }
+    .opts-toggle { display: inline-flex; align-items: center; gap: 6px; }
+    .opts-toggle::after { content: "▾"; font-size: 12px; }
+    .opts-toggle[aria-expanded="true"]::after { content: "▴"; }
+    .bar:not(.open) .opts { display: none; }
+    .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+    .chip { flex: none; min-height: 40px; padding: 0 14px; font-size: 14px; }
+    .card { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .card > .marks { order: 2; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .marks .mk-btn.u + * { margin-left: auto; }
+    .mk-btn, .say, .ask { min-height: 44px; padding: 0 14px; font-size: 14.5px; border-radius: 9px; }
+    .mk-btn { min-width: 64px; }
+    .say svg, .ask svg { width: 17px; height: 17px; }
+    .type-in { font-size: 17px; padding: 10px 12px; }
+    .type-in::placeholder { font-size: 14.5px; }
+    .ask-in { font-size: 17px; min-height: 44px; }
+    .dr-btn, .dr-close { min-height: 44px; padding: 0 16px; font-size: 14.5px; }
+    .verdict { font-size: 14.5px; }
+    .uml button { min-width: 48px; min-height: 44px; font-size: 18px; border-radius: 9px; }
+  }
+  /* ---------- iPad: touch and at least 640px wide (iPad Air 5 is 820 portrait, 1180 landscape) ---------- */
+  @media (hover: none) and (pointer: coarse) and (min-width: 640px) {
+    body { font-size: 16px; }
+    .wrap { padding-left: max(28px, env(safe-area-inset-left, 0px)); padding-right: max(28px, env(safe-area-inset-right, 0px)); }
+    header.top { padding-block: 28px 12px; }
+    header.top h1 { font-size: 26px; }
+    header.top p, .hint { font-size: 14.5px; }
+    .bar { padding-block: 12px; gap: 10px; }
+    .stats { font-size: 14.5px; }
+    section.group { margin-top: 28px; }
+    section.group h2 { font-size: 18px; margin-bottom: 12px; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+    .grid.wide { grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); }
+    .card { padding: 14px 16px; border-radius: 10px; }
+    .de { font-size: 18px; }
+    .zh { font-size: 15.5px; }
+    .sent .zh { font-size: 17px; }
+    .sent .de { font-size: 16.5px; }
+    .ex-de { font-size: 16.5px; line-height: 1.55; }
+    .ex-zh { font-size: 15px; }
+    .ex-tag { font-size: 12.5px; padding: 4px 8px; }
+    .story { padding: 16px 18px; border-radius: 10px; }
+    .story-de { font-size: 17.5px; line-height: 1.8; }
+    .story-zh { font-size: 16px; line-height: 1.8; }
+    .drawer { width: min(520px, 100%); }
+    .dr-head .t-de { font-size: 20px; }
+    .dr-body { font-size: 16px; }
+    .en-ref { font-size: 14.5px; }
+    .note, .note .pl { font-size: 14px; }
+    .trap { font-size: 15px; }
+  }
 </style>
 
 <div class="wrap">
@@ -207,9 +269,11 @@
         <button id="tab-sentences" data-tab="sentences" aria-pressed="false">中译德</button>
         <button id="tab-friends" data-tab="friends" aria-pressed="false">德英易混</button>
       </div>
-      <div class="stats" aria-live="polite"><span class="k" id="st-k">会 0</span><span class="u" id="st-u">不会 0</span><span class="n" id="st-n">未标 0</span></div>
+      <div class="stats" aria-live="polite"><span class="tally" id="tally" hidden></span><span class="k" id="st-k">会 0</span><span class="u" id="st-u">不会 0</span><span class="n" id="st-n">未标 0</span></div>
+      <button class="tool opts-toggle" id="opts-toggle" type="button" aria-expanded="false" aria-controls="opts">设置</button>
     </div>
     <div class="meter" aria-hidden="true"><i class="mk" id="m-k"></i><i class="mu" id="m-u"></i></div>
+    <div class="opts" id="opts">
     <div class="row">
       <span class="ctl"><span class="label">遮盖</span>
         <span class="seg" role="group" aria-label="遮盖">
@@ -233,7 +297,6 @@
       </span>
       <button class="tool" id="typing" aria-pressed="true">打字练习</button>
       <button class="tool" id="show-en" aria-pressed="true">英语对照</button>
-      <span class="tally" id="tally" hidden></span>
       <button class="tool" id="shuffle" aria-pressed="false">打乱顺序</button>
       <span id="reset-wrap"><button class="tool danger" id="reset">清除本页标记</button></span>
       <span class="sync" id="sync">标记保存在本浏览器</span>
@@ -243,6 +306,7 @@
       <span class="label">德语字母</span>
       <span class="uml" id="uml" role="group" aria-label="插入德语字母"></span>
       <span class="label">没有德语键盘也可以打 ae / oe / ue / ss；手机键盘长按 a、o、u、s 也能打出来</span>
+    </div>
     </div>
     <div class="chips" id="chips" hidden></div>
   </div>
@@ -684,6 +748,8 @@ function renderView() {
     tl.textContent = "本轮打字 对 " + res.filter(([, t]) => t.result !== "bad").length + " / " + res.length;
   }
   for (const b of document.querySelectorAll("[data-speed]")) b.setAttribute("aria-pressed", String(Number(b.dataset.speed) === (state.speed || 0.95)));
+  const pressed = (sel) => (document.querySelector(sel + '[aria-pressed="true"]') || {}).textContent || "";
+  $("opts-toggle").textContent = ["设置", pressed("[data-cover]"), state.filter !== "all" ? pressed("[data-filter]") : "", typingOn() ? "打字" : ""].filter(Boolean).join(" · ");
 
   // industry chips
   const chips = $("chips");
@@ -1023,6 +1089,12 @@ $("show-en").addEventListener("click", () => { state.showEn = !state.showEn; sav
 for (const b of document.querySelectorAll("[data-speed]")) b.addEventListener("click", () => { state.speed = Number(b.dataset.speed); savePrefs(); render(); });
 if (!canSpeak) $("speed-ctl").hidden = true;
 $("shuffle").addEventListener("click", () => { state.shuffle = !state.shuffle; order = {}; savePrefs(); render(); });
+// On touch screens the practice settings fold behind this button so the sticky bar stays one row.
+$("opts-toggle").addEventListener("click", () => {
+  const open = !$("bar").classList.contains("open");
+  $("bar").classList.toggle("open", open);
+  $("opts-toggle").setAttribute("aria-expanded", String(open));
+});
 
 function rebuildReset() {
   const wrap = $("reset-wrap");
