@@ -231,6 +231,22 @@
   .m-was b { font-family: var(--font-de); margin-left: 4px; }
   .m-ctx { font: 400 15.5px/1.75 var(--font-de); overflow-wrap: anywhere; }
   .m-blank { display: inline-block; min-width: 4.5em; border-bottom: 2px solid var(--accent); }
+  .m-blank .m-num { margin-left: 2px; }
+  .m-num { font: 600 13px/1 var(--font-zh); color: var(--accent); }
+  .m-tab { font: 600 11.5px/1 var(--font-zh); color: var(--accent); background: var(--accent-soft); border-radius: 4px; padding: 4px 7px; }
+  .m-title { font: 600 15px/1.4 var(--font-de); color: var(--ink); overflow-wrap: anywhere; }
+  .m-title-zh { font: 400 13px/1.4 var(--font-zh); color: var(--muted); margin-left: 8px; }
+  .m-title > .m-title-zh:first-child { margin-left: 0; }
+  .m-sent { display: grid; gap: 8px; padding-top: 10px; border-top: 1px dashed var(--line); }
+  .m-sent .ex-tag { justify-self: start; }
+  .m-slot { display: grid; gap: 6px; }
+  .m-slot .m-was { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+  .m-slot .m-was s { margin-left: 0; }
+  .m-meta { font: 400 12.5px/1.4 var(--font-zh); color: var(--muted); }
+  .m-slot .m-state { font: 400 12.5px/1.4 var(--font-zh); color: var(--muted); }
+  .m-slot.done .m-state { color: var(--known); font-weight: 600; }
+  .m-del { font: 500 12px/1 var(--font-zh); color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 5px 8px; cursor: pointer; }
+  .m-del:hover { color: var(--unknown); border-color: var(--unknown); }
   .m-fix ins { text-decoration: none; font-weight: 600; color: var(--known); }
   .m-fix { font: 400 15px/1.6 var(--font-de); }
   details.hint > summary { cursor: pointer; width: fit-content; font: 600 13px/1.5 var(--font-zh); color: var(--accent); list-style: none; }
@@ -307,6 +323,7 @@
     .type-in { font-size: 17px; padding: 10px 12px; }
     .submit-btn { min-height: 44px; padding: 0 16px; font-size: 14.5px; border-radius: 9px; }
     .submit-btn.done { padding: 6px 14px; }
+    .m-del { min-height: 36px; padding: 0 12px; }
     .type-in::placeholder { font-size: 14.5px; }
     .ask-in { font-size: 17px; min-height: 44px; }
     .dr-btn, .dr-close { min-height: 44px; padding: 0 16px; font-size: 14.5px; }
@@ -648,7 +665,6 @@ function sentenceTyper(item, idx) {
       fix.append(el("span", "ans", x.plain));
       v.append(fix);
     }
-    const pc = caseChips(t.value, x.plain, { item, key, target: x.plain, zh: x.zh }); if (pc) v.append(pc);
     box.append(v);
   }
   if (t.result === "near") {
@@ -738,7 +754,6 @@ function typer(item) {
       fix.append(el("span", "ans", t.form));
       v.append(fix);
     }
-    const pc = caseChips(t.value, item.de, { item, key: item.id, target: item.de, zh: item.zh }); if (pc) v.append(pc);
     box.append(v);
   }
   if (t.result === "bad") {
@@ -895,7 +910,7 @@ function renderView() {
     }
   }
 
-  const nOpen = mistakes.filter((m) => !m.done).length;
+  const nOpen = places(mistakes.filter((m) => !m.done));
   $("tab-mistakes").textContent = "错题本" + (nOpen ? " " + nOpen : "");
   $("reset-wrap").hidden = tab === "mistakes";
   if (tab === "mistakes") { renderNotebook(); return; }
@@ -970,7 +985,14 @@ const MKEY = "de-lesson2-mistakes";
 function MISSED(value, target) { const d = el("div"); d.append("参考答案：", answerSpan(value, target)); return d; }
 const MTYPES = { spell: "拼写", word: "用词", miss: "漏词", extra: "多写", order: "词序", case: "大小写", whole: "整句" };
 const TAB_OF = { p: "phrases", i: "industry", t: "stories", s: "sentences", f: "friends" };
-let mistakes = (() => { const v = readLocal(MKEY); return Array.isArray(v) ? v : []; })();
+// Capitals are no longer collected: entries from before are dropped.
+let mistakes = (() => {
+  const v = readLocal(MKEY);
+  if (!Array.isArray(v)) return [];
+  const list = v.filter((m) => m && m.type !== "case");
+  if (list.length !== v.length) writeLocal(MKEY, list);
+  return list;
+})();
 let mRemote = null, mTimer = null;
 function dayStr() { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
 function splitPunct(tok) { const m = tok.match(/^([^\p{L}\p{N}]*)(.*?)([^\p{L}\p{N}]*)$/u); return m ? [m[1], m[2], m[3]] : ["", tok, ""]; }
@@ -1086,7 +1108,7 @@ function diffView(d, ctx) {
     else if (f.op === "case") { w = fixedWord(tok, typedW, "d-case"); w.querySelector("ins").title = "大小写：你写成 " + typedW; }
     else if (f.op === "miss") { w = fixedWord(tok, null, "d-miss"); w.querySelector("ins").title = "漏写的词"; }
     else { w = fixedWord(tok, null, "d-moved"); w.querySelector("ins").title = "这个词应该在这里"; }
-    const e = errOf(f.op, ti); if (e) pickable(w.querySelector("ins"), ctx, e);
+    const e = f.op !== "case" && errOf(f.op, ti); if (e) pickable(w.querySelector("ins"), ctx, e);
     box.append(w);
     extra(ti);
   });
@@ -1103,7 +1125,7 @@ function analyse(value, target, verdict) {
   const d = diffAnswer(value, target);
   const real = d.errors.filter((e) => e.type !== "case");
   const whole = verdict === "bad" && (!value.trim() || real.length > Math.max(3, Math.ceil(d.toks.length / 2)));
-  const picks = whole ? [{ type: "whole", ref: target, typed: "", ti: -1 }] : d.errors;
+  const picks = whole ? [{ type: "whole", ref: target, typed: "", ti: -1 }] : real;   // capitals are pointed out, not collected
   return { d, whole, picks };
 }
 const isPicked = (ctx, e) => mistakes.some((m) => m.mid === midOf(ctx.key, e) && !m.done);
@@ -1140,15 +1162,6 @@ function wholeButton(ctx, e) {
   b.type = "button";
   b.addEventListener("click", () => togglePick(ctx, e));
   return b;
-}
-// A right answer with wrong capitals: the capitals can still go into the 错题本 with a click.
-function caseChips(value, target, ctx) {
-  const cs = analyse(value, target, "ok").picks.filter((e) => e.type === "case");
-  if (!cs.length) return null;
-  const d = el("div", "pick-note" + (cs.some((e) => isPicked(ctx, e)) ? " on" : ""));
-  d.append("点单词可以把大小写加入错题本：");
-  cs.forEach((e) => { d.append(" "); const w = fixedWord(e.ref, e.typed, "d-case"); pickable(w.querySelector("ins"), ctx, e); d.append(w); });
-  return d;
 }
 function correction(value, target, verdict, ctx) {
   const a = analyse(value, target, verdict);
@@ -1193,7 +1206,7 @@ async function initMistakes(db, uid) {
     const byMid = new Map(saved.map((m) => [m.mid, m]));
     const newer = (a, b) => (a.last || "") > (b.last || "") || ((a.last || "") === (b.last || "") && (a.n > b.n || (a.n === b.n && (a.days || []).length > (b.days || []).length)));
     for (const m of mistakes) { const o = byMid.get(m.mid); if (!o || newer(m, o)) byMid.set(m.mid, m); }
-    const merged = [...byMid.values()];
+    const merged = [...byMid.values()].filter((m) => m.type !== "case");
     const changed = JSON.stringify(merged) !== JSON.stringify(saved);
     mistakes = merged; writeLocal(MKEY, mistakes);
     if (changed) saveMistakes();
@@ -1297,28 +1310,49 @@ function answerRow(inp, checked, submit, undo) {
 
 // ---- 错题本 ----
 let nbType = "all", nbShowDone = false, nbOrder = null;
-const cloze = {};          // mistake id -> { value, result: "ok" | "case" | "bad" | null }
-const nbOpen = new Set();  // mistakes whose answer is shown
-const CLOZE = new Set(["spell", "word", "case", "miss"]);
+const cloze = {};          // blank id (sentence key # word index) -> { value, result: "ok" | "case" | "bad" | null }
+const nbOpen = new Set();  // sentences whose answers are shown
+const CLOZE = new Set(["spell", "word", "miss"]);
 function itemById(id) { for (const list of Object.values(ITEMS)) { const it = list.find((i) => i.id === id); if (it) return it; } return null; }
-function sortedMistakes() {
-  if (!nbOrder) nbOrder = [...mistakes].sort((a, b) => (a.done - b.done) || (b.n - a.n) || ((b.last || "") > (a.last || "") ? 1 : (b.last || "") < (a.last || "") ? -1 : 0)).map((m) => m.mid);
+const circled = (i) => (i < 20 ? String.fromCharCode(0x2460 + i) : "(" + (i + 1) + ")");
+const slotId = (m) => m.key + "#" + m.ti;
+// Mistakes on the same word of a sentence share a blank, so they count as one place.
+const places = (ms) => new Set(ms.map((m) => (CLOZE.has(m.type) && m.ti >= 0 ? slotId(m) : m.mid))).size;
+// One card per phrase (word, sentence card): its sentences one under another. In a sentence, every word that went
+// wrong is a numbered blank; mistakes on the same word share one blank.
+function notebookGroups(list) {
+  const groups = new Map();
+  for (const m of list) {
+    let g = groups.get(m.item);
+    if (!g) groups.set(m.item, (g = { id: m.item, blocks: new Map(), ms: [] }));
+    g.ms.push(m);
+    const bk = m.key + "\u0001" + m.ctx;
+    let b = g.blocks.get(bk);
+    if (!b) g.blocks.set(bk, (b = { key: m.key, ctx: m.ctx, zh: m.zh, ms: [] }));
+    b.ms.push(m);
+  }
+  const idx = (key) => (key.includes(":") ? Number(key.split(":")[1]) : 0);
+  const arr = [...groups.values()].map((g) => ({
+    ...g, blocks: [...g.blocks.values()].sort((a, b) => idx(a.key) - idx(b.key)),
+    open: g.ms.some((m) => !m.done), n: Math.max(...g.ms.map((m) => m.n)), last: g.ms.map((m) => m.last || "").sort().pop(),
+  }));
+  if (!nbOrder) nbOrder = [...arr].sort((a, b) => (b.open - a.open) || (b.n - a.n) || (b.last > a.last ? 1 : b.last < a.last ? -1 : 0)).map((g) => g.id);
   const pos = new Map(nbOrder.map((id, i) => [id, i]));
-  return [...mistakes].sort((a, b) => (pos.has(a.mid) ? pos.get(a.mid) : -1) - (pos.has(b.mid) ? pos.get(b.mid) : -1));
+  return arr.sort((a, b) => (pos.has(a.id) ? pos.get(a.id) : -1) - (pos.has(b.id) ? pos.get(b.id) : -1));
 }
 function renderNotebook() {
   const list = $("list");
   list.replaceChildren();
-  const active = mistakes.filter((m) => !m.done), done = mistakes.length - active.length;
-  $("st-k").textContent = "已掌握 " + done; $("st-u").textContent = "待改 " + active.length; $("st-n").textContent = "";
-  $("m-k").style.width = (mistakes.length ? (done / mistakes.length) * 100 : 0) + "%";
-  $("m-u").style.width = (mistakes.length ? (active.length / mistakes.length) * 100 : 0) + "%";
+  const activeMs = mistakes.filter((m) => !m.done), left = places(activeMs), all = places(mistakes), done = Math.max(0, all - left);
+  $("st-k").textContent = "已掌握 " + done; $("st-u").textContent = "待改 " + left; $("st-n").textContent = "";
+  $("m-k").style.width = (all ? (done / all) * 100 : 0) + "%";
+  $("m-u").style.width = (all ? (left / all) * 100 : 0) + "%";
   const sec = el("section", "group");
-  const h = el("h2", null, "错题本"); h.append(el("span", "cnt", "待改 " + active.length + " · 已掌握 " + done));
-  sec.append(h, el("p", "nb-intro", "默写检查后，点绿色的正确写法，就会把那一处加到这里。先看自己上次写错的样子，再在空格里写出正确的词，点“提交”检查；同一个错误要在两个不同的日子写对才算掌握。词序和整句的错误，点“去练整句”回到原来的卡片重写。"));
-  const counts = {}; active.forEach((m) => { counts[m.type] = (counts[m.type] || 0) + 1; });
+  const h = el("h2", null, "错题本"); h.append(el("span", "cnt", "待改 " + left + " 处 · 已掌握 " + done));
+  sec.append(h, el("p", "nb-intro", "默写检查后，点绿色的正确写法，就会把那一处加到这里。同一个词组的错题合在一张卡片里，同一句的几处错误是句子里带编号的空格：先看自己上次写错的样子，再在对应编号的框里写出正确的词，点“提交”检查；同一个错误要在两个不同的日子写对才算掌握。大小写错误只在检查时提醒，不放进错题本。词序和整句的错误，点“去练整句”回到原来的卡片重写。"));
+  const counts = {}; for (const k of Object.keys(MTYPES)) { const n = places(activeMs.filter((m) => m.type === k)); if (n) counts[k] = n; }
   const chips = el("div", "chips nb-chips");
-  for (const [k, label] of [["all", "全部 " + active.length], ...Object.keys(MTYPES).filter((k) => counts[k]).map((k) => [k, MTYPES[k] + " " + counts[k]])]) {
+  for (const [k, label] of [["all", "全部 " + left], ...Object.keys(MTYPES).filter((k) => counts[k]).map((k) => [k, MTYPES[k] + " " + counts[k]])]) {
     const b = el("button", "chip", label);
     b.setAttribute("aria-pressed", String(nbType === k));
     b.addEventListener("click", () => { nbType = k; nbOrder = null; render(); });
@@ -1331,112 +1365,180 @@ function renderNotebook() {
     chips.append(b);
   }
   sec.append(chips);
-  const shown = sortedMistakes().filter((m) => (nbShowDone || !m.done) && (nbType === "all" || m.type === nbType));
+  // A blank checked in this visit stays on screen (with its result) even once it is mastered.
+  const shown = mistakes.filter((m) => (nbShowDone || !m.done || (cloze[slotId(m)] || {}).result) && (nbType === "all" || m.type === nbType));
   if (!shown.length) {
     sec.append(el("div", "empty", mistakes.length ? "这一类没有待改的错题。" : "还没有错题。默写句子点“提交”检查后，点绿色的正确写法，就能把它加进来。"));
   } else {
     const grid = el("div", "grid wide");
-    shown.forEach((m) => grid.append(mistakeCard(m)));
+    notebookGroups(shown).forEach((g) => grid.append(mistakeCard(g)));
     sec.append(grid);
   }
   list.append(sec);
 }
-// The sentence with the word to recall left blank (or highlighted once answered).
-function clozeLine(m, blank) {
+// The sentence with its blanks: a numbered gap, or the word itself once answered or shown.
+function clozeLine(ctx, slots) {
   const d = el("div", "m-ctx"); d.lang = FOREIGN;
-  m.ctx.split(/\s+/).forEach((tok, i) => {
+  const at = new Map(slots.map((s) => [s.ti, s]));
+  ctx.split(/\s+/).forEach((tok, i) => {
     if (i) d.append(" ");
-    if (i !== m.ti || m.type === "extra") { d.append(tok); return; }
+    const s = at.get(i);
+    if (!s) { d.append(tok); return; }
     const [pre, w, post] = splitPunct(tok);
-    d.append(pre, blank ? el("span", "m-blank", " ") : el("span", "hl", w), post);
+    if (s.shown) d.append(pre, el("span", "hl", w), post);
+    else { const b = el("span", "m-blank"); b.append(el("span", "m-num", s.num)); d.append(pre, b, post); }
   });
   return d;
 }
-function undoCloze(m, value) {
-  cloze[m.mid] = { value, result: null };
-  restoreSnap("m:" + m.mid, []);
+function undoCloze(s, value) {
+  cloze[s.id] = { value, result: null };
+  restoreSnap("m:" + s.id, []);
   render();
 }
-function checkCloze(m, value) {
-  snapBefore("m:" + m.mid, null, null, (x) => x.mid === m.mid);
-  const today = dayStr(), same = KEY(value) === KEY(m.ref);
-  const caseWrong = same && CASE_MATTERS && caseDiff(m.ref, clean(value.trim()));
-  const ok = same && !(caseWrong && m.type === "case");
-  cloze[m.mid] = { value, result: !same ? "bad" : caseWrong ? "case" : "ok" };
-  if (ok) credit(m, today);
-  else { m.n += 1; m.last = today; m.typed = clean(value.trim()) || m.typed; m.days = []; }
-  saveMistakes();
-  const order = [...document.querySelectorAll(".cloze-in")].map((x) => x.dataset.id), at = order.indexOf("m:" + m.mid);
-  render();
-  if (!document.querySelector('.type-in[data-id="m:' + m.mid + '"]')) {
-    for (const id of order.slice(at + 1)) { const nx = document.querySelector('.type-in[data-id="' + id + '"]'); if (nx) { nx.focus({ preventScroll: true }); break; } }
+function checkCloze(s, value) {
+  const mids = s.ms.map((m) => m.mid);
+  snapBefore("m:" + s.id, null, null, (x) => mids.includes(x.mid));
+  const today = dayStr(), same = KEY(value) === KEY(s.ref);
+  const caseWrong = same && CASE_MATTERS && caseDiff(s.ref, clean(value.trim()));
+  cloze[s.id] = { value, result: !same ? "bad" : caseWrong ? "case" : "ok" };
+  for (const m of s.ms) {
+    if (m.done) continue;
+    if (same) credit(m, today);
+    else { m.n += 1; m.last = today; m.typed = clean(value.trim()) || m.typed; m.days = []; }
   }
+  saveMistakes();
+  render();
 }
-function clozeInput(m, cs) {
+function clozeInput(s, cs) {
   const box = el("div", "typer");
   const inp = el("textarea", "type-in cloze-in" + (cs.result ? " " + (cs.result === "bad" ? "bad" : "ok") : ""));
-  inp.rows = 1; inp.dataset.id = "m:" + m.mid; inp.id = "cloze-" + mistakes.indexOf(m); inp.value = cs.value;
-  inp.placeholder = m.type === "miss" ? "写出漏掉的词，写完点提交" : "写出空格里的词，写完点提交";
-  inp.setAttribute("aria-label", "填空：" + m.zh);
+  inp.rows = 1; inp.dataset.id = "m:" + s.id; inp.id = "cloze-" + s.id.replace(/[^\w-]/g, "-"); inp.value = cs.value;
+  inp.placeholder = s.num + " " + (s.ms.every((m) => m.type === "miss") ? "写出漏掉的词，写完点提交" : "写出这个空格里的词，写完点提交");
+  inp.setAttribute("aria-label", "填空 " + s.num);
   for (const [k, v] of [["autocomplete", "off"], ["autocapitalize", "off"], ["autocorrect", "off"], ["spellcheck", "false"], ["lang", FOREIGN]]) inp.setAttribute(k, v);
   inp.addEventListener("keydown", (e) => {
     if (e.isComposing) return;
     if (e.key === "Enter") e.preventDefault();   // submitted with the 提交 button
     else if (e.key === "Tab") { e.preventDefault(); moveFocus(inp.dataset.id, e.shiftKey ? -1 : 1); }
   });
-  inp.addEventListener("input", () => { fitBox(inp); const c0 = cloze[m.mid]; if (c0 && c0.result && c0.value === inp.value) return; cloze[m.mid] = { value: inp.value, result: null }; inp.classList.remove("ok", "bad"); const v = box.querySelector(".verdict"); if (v) v.remove(); });
-  box.append(answerRow(inp, !!cs.result, (v) => checkCloze(m, v), (v) => undoCloze(m, v)));
+  inp.addEventListener("input", () => { fitBox(inp); const c0 = cloze[s.id]; if (c0 && c0.result && c0.value === inp.value) return; cloze[s.id] = { value: inp.value, result: null }; inp.classList.remove("ok", "bad"); const v = box.querySelector(".verdict"); if (v) v.remove(); });
+  box.append(answerRow(inp, !!cs.result, (v) => checkCloze(s, v), (v) => undoCloze(s, v)));
   if (cs.result) {
     const v = el("div", "verdict " + (cs.result === "bad" ? "bad" : "ok"));
-    if (cs.result === "ok") v.append(m.done ? "✓ 对了，已掌握" : "✓ 对了，换一天再写对一次就掌握");
-    else if (cs.result === "case") { v.append("✓ 拼写对了，注意大小写：", fixedWord(m.ref, clean(cs.value.trim()), "d-case")); }
-    else { v.append(el("span", "tag", "✗ 还不对"), el("del", null, clean(cs.value.trim()) || "（空）"), " → "); const fx = el("span", "m-fix"); fx.append(fixedWord(m.ref, clean(cs.value.trim()))); v.append(fx); }
+    if (cs.result === "ok") v.append(s.done ? "✓ 对了，已掌握" : "✓ 对了，换一天再写对一次就掌握");
+    else if (cs.result === "case") { v.append("✓ 拼写对了，注意大小写：", fixedWord(s.ref, clean(cs.value.trim()), "d-case")); }
+    else { v.append(el("span", "tag", "✗ 还不对"), el("del", null, clean(cs.value.trim()) || "（空）"), " → "); const fx = el("span", "m-fix"); fx.append(fixedWord(s.ref, clean(cs.value.trim()))); v.append(fx); }
     box.append(v);
   }
   return box;
 }
-function practiseAgain(m) {
-  const item = itemById(m.item);
+function practiseAgain(itemId, key) {
+  const item = itemById(itemId);
   if (!item) return;
-  state.tab = TAB_OF[m.item[0]]; state.filter = "all"; state.shuffle = false; nbOrder = null;
+  state.tab = TAB_OF[itemId[0]]; state.filter = "all"; state.shuffle = false; nbOrder = null;
   if (state.industries.length && !state.industries.includes(item.group)) state.industries = [];
   state.cover = FOREIGN; state.typing = true; state.revealed.clear(); sticky.clear();
-  delete typed[m.key];
+  delete typed[key];
   savePrefs(); render();
-  const inp = document.querySelector('.type-in[data-id="' + m.key + '"]');
+  const inp = document.querySelector('.type-in[data-id="' + key + '"]');
   if (inp) { inp.scrollIntoView({ block: "center" }); inp.focus({ preventScroll: true }); }
 }
-function mistakeCard(m) {
-  const c = el("div", "card mcard" + (m.done ? " known" : ""));
-  const top = el("div", "m-top");
-  top.append(el("span", "m-type t-" + m.type, MTYPES[m.type]), el("span", null, "错 " + m.n + " 次 · 最近 " + (m.last || "").slice(5)));
-  top.append(el("span", "m-state", m.done ? "已掌握" : (m.days || []).length ? "已写对 1 天，换一天再写对就掌握" : "待改"));
-  c.append(top);
-  const was = el("div", "m-was");
-  if (m.type === "miss") was.append("上次漏写了一个词");
-  else if (m.type === "order") was.append("上次这个词放错了位置：", el("b", null, m.ref));
-  else if (m.type === "whole") was.append("上次整句没写出来");
-  else if (m.type === "extra") was.append("上次多写了：", el("s", null, m.typed));
-  else was.append(m.type === "case" ? "大小写写错：" : "你写成：", el("s", null, m.typed));
-  c.append(was);
-  const cs = cloze[m.mid] || { value: "", result: null };
-  const open = m.done || nbOpen.has(m.mid) || !!cs.result;
-  const canCloze = CLOZE.has(m.type) && m.ti >= 0 && !m.done;
-  if (canCloze || open) c.append(clozeLine(m, canCloze && !open));
-  c.append(el("div", "zh", m.zh));
-  if (canCloze) c.append(clozeInput(m, cs));
+function removeMistakes(ms) {
+  mistakes = mistakes.filter((z) => !ms.includes(z));
+  saveMistakes(); render();
+}
+function delButton(ms) {
+  const b = el("button", "m-del", "删除");
+  b.type = "button";
+  b.title = "判错了或不想再练，就从错题本删掉这一处";
+  b.addEventListener("click", () => removeMistakes(ms));
+  return b;
+}
+function stateText(ms) {
+  if (ms.every((m) => m.done)) return "已掌握";
+  return ms.filter((m) => !m.done).every((m) => (m.days || []).length) ? "已写对 1 天" : "待改";
+}
+// One numbered blank: how it went wrong, then the box to write the word again.
+function slotRow(s) {
+  const row = el("div", "m-slot" + (s.done ? " done" : ""));
+  const head = el("div", "m-was");
+  head.append(el("span", "m-num", s.num));
+  for (const t of new Set(s.ms.map((m) => m.type))) head.append(el("span", "m-type t-" + t, MTYPES[t]));
+  const typedWords = [...new Set(s.ms.map((m) => m.typed).filter(Boolean))];
+  if (!typedWords.length) head.append("上次漏写了这个词");
+  else { head.append("你写成："); typedWords.forEach((w, i) => { if (i) head.append("、"); const x = el("s", null, w); x.lang = FOREIGN; head.append(x); }); }
+  head.append(el("span", "m-meta", "错 " + s.ms.reduce((a, m) => a + m.n, 0) + " 次 · 最近 " + (s.ms.map((m) => m.last || "").sort().pop() || "").slice(5)));
+  const st = el("span", "m-state", stateText(s.ms)); st.title = "同一个错误在两个不同的日子写对就算掌握";
+  head.append(st, delButton(s.ms));
+  row.append(head);
+  const cs = cloze[s.id] || { value: "", result: null };
+  if (!s.done || cs.result) row.append(clozeInput(s, cs));
+  return row;
+}
+// Word order, an extra word or the whole sentence: practised by writing the sentence again.
+function noteRow(m) {
+  const row = el("div", "m-slot" + (m.done ? " done" : ""));
+  const head = el("div", "m-was");
+  head.append(el("span", "m-type t-" + m.type, MTYPES[m.type]));
+  if (m.type === "order") head.append("这个词放错了位置：", el("b", null, m.ref));
+  else if (m.type === "whole") head.append("上次整句没写出来");
+  else if (m.type === "extra") { head.append("上次多写了："); const x = el("s", null, m.typed); x.lang = FOREIGN; head.append(x); }
+  else { head.append("你写成："); const x = el("s", null, m.typed || "?"); x.lang = FOREIGN; head.append(x); }
+  head.append(el("span", "m-meta", "错 " + m.n + " 次 · 最近 " + (m.last || "").slice(5)), el("span", "m-state", stateText([m])), delButton([m]));
+  row.append(head);
+  return row;
+}
+function sentenceBlock(b, item, gid) {
+  const box = el("div", "m-sent");
+  const ex = item && item.ex && b.key.includes(":") ? item.ex[Number(b.key.split(":")[1])] : null;
+  if (ex && ex.tag) box.append(el("span", "ex-tag " + (ex.tag === "书面" ? "w" : "s"), ex.tag));
+  const open = nbOpen.has(b.key);
+  const byTi = new Map(), notes = [];
+  for (const m of b.ms) {
+    if (!CLOZE.has(m.type) || m.ti < 0) { notes.push(m); continue; }
+    let s = byTi.get(m.ti);
+    if (!s) byTi.set(m.ti, (s = { id: slotId(m), ti: m.ti, ref: m.ref, ms: [] }));
+    s.ms.push(m);
+  }
+  const slots = [...byTi.values()].sort((x, y) => x.ti - y.ti);
+  slots.forEach((s, i) => {
+    s.num = circled(i); s.done = s.ms.every((m) => m.done);
+    s.shown = open || s.done || !!(cloze[s.id] || {}).result;
+  });
+  if (slots.length || open) box.append(clozeLine(b.ctx, slots));
+  box.append(el("div", "zh", b.zh));
+  slots.forEach((s) => box.append(slotRow(s)));
+  notes.forEach((m) => box.append(noteRow(m)));
   const acts = el("div", "marks");
-  if (!open) { const b = el("button", "mk-btn", "看答案"); b.addEventListener("click", () => { nbOpen.add(m.mid); render(); }); acts.append(b); }
+  if (!open && (slots.some((s) => !s.shown) || !slots.length)) {
+    const a = el("button", "mk-btn", "看答案"); a.type = "button";
+    a.addEventListener("click", () => { nbOpen.add(b.key); render(); }); acts.append(a);
+  }
   if (canSpeak) {
     const say = el("button", "say"); say.innerHTML = SPEAKER_ICON; say.append(document.createTextNode("发音"));
-    say.addEventListener("click", () => speak(m.ctx, say)); acts.append(say);
+    say.addEventListener("click", () => speak(b.ctx, say)); acts.append(say);
   }
-  if (itemById(m.item)) { const go = el("button", "mk-btn", "去练整句"); go.addEventListener("click", () => practiseAgain(m)); acts.append(go); }
-  const del = el("button", "mk-btn", "删除");
-  del.title = "判错了或不想再练，就从错题本删掉";
-  del.addEventListener("click", () => { mistakes = mistakes.filter((z) => z !== m); saveMistakes(); render(); });
-  acts.append(del);
-  c.append(acts);
+  if (item) { const go = el("button", "mk-btn", "去练整句"); go.type = "button"; go.addEventListener("click", () => practiseAgain(gid, b.key)); acts.append(go); }
+  box.append(acts);
+  return box;
+}
+function mistakeCard(g) {
+  const item = itemById(g.id);
+  const c = el("div", "card mcard" + (g.open ? "" : " known"));
+  const top = el("div", "m-top");
+  const tab = $("tab-" + TAB_OF[g.id[0]]);
+  if (tab) top.append(el("span", "m-tab", tab.textContent));
+  if (item) {
+    const short = { p: 1, i: 1, f: 1 }[g.id[0]];
+    const t = el("span", "m-title");
+    if (short) { const w = el("span", null, item.de || item.en); w.lang = FOREIGN; t.append(w, el("span", "m-title-zh", item.zh)); }
+    else t.append(el("span", "m-title-zh", item.group));
+    top.append(t);
+  }
+  const left = places(g.ms.filter((m) => !m.done));
+  top.append(el("span", "m-state", left ? "待改 " + left + " 处" : "已掌握"));
+  c.append(top);
+  g.blocks.forEach((b) => c.append(sentenceBlock(b, item, g.id)));
   return c;
 }
 
