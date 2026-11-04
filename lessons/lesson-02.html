@@ -1,0 +1,1443 @@
+<title>职场英语第 2 课</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap">
+<style>
+  /* Layout: sticky control bar (mode · filter · progress), then grouped card grids; cards stack to one column on phones. */
+  /* MacBook and other mouse screens 1024px+: controls in a left sidebar, cards fill the right. Answers are compared word by word after Enter; mistakes go to the 错题本 tab.
+     Touch screens (iPad, phone): finger-sized controls, inputs at 17px so iOS does not zoom, practice settings fold behind one button so the sticky bar stays short; iPad also gets larger reading text. Mouse layouts are unchanged. */
+  :root {
+    --bg: #f3f5f8;
+    --surface: #ffffff;
+    --ink: #17202b;
+    --muted: #5d6877;
+    --line: #dde2ea;
+    --accent: #1f4fa3;
+    --accent-soft: #e6edf9;
+    --known: #1d7a4c;
+    --known-soft: #e5f4ec;
+    --unknown: #c2352b;
+    --unknown-soft: #fcebea;
+    --cover: #c9d1dd;
+    --warn: #a86410;
+    --warn-soft: #fbf0e0;
+    --font-en: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --font-zh: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-num: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #11161d; --surface: #19202a; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3442;
+      --accent: #7ea6f0; --accent-soft: #1d2a40; --known: #5cc690; --known-soft: #16302a;
+      --unknown: #f0786d; --unknown-soft: #3a1d1d; --cover: #3a4555; --warn: #e9a654; --warn-soft: #3a2c17; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #11161d; --surface: #19202a; --ink: #e8edf4; --muted: #9aa6b6; --line: #2a3442;
+    --accent: #7ea6f0; --accent-soft: #1d2a40; --known: #5cc690; --known-soft: #16302a;
+    --unknown: #f0786d; --unknown-soft: #3a1d1d; --cover: #3a4555; --warn: #e9a654; --warn-soft: #3a2c17; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-en), var(--font-zh); font-size: 15px; line-height: 1.45; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 0 48px; }
+
+  header.top { padding-block: 20px 8px; display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+  header.top h1 { margin: 0; font-family: var(--font-zh); font-size: 22px; font-weight: 700; letter-spacing: 0.01em; text-wrap: balance; }
+  header.top p { margin: 0; color: var(--muted); font-size: 13px; font-family: var(--font-zh); }
+
+  .bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 8px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+  .tabs, .seg { display: inline-flex; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 2px; }
+  .tabs button, .seg button {
+    font: 600 13px/1 var(--font-zh); color: var(--muted); background: none; border: 0; border-radius: 6px; padding: 8px 11px; cursor: pointer; white-space: nowrap;
+  }
+  .tabs button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+  .seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .label { font: 500 12px/1 var(--font-zh); color: var(--muted); letter-spacing: 0.04em; }
+  .ctl { display: inline-flex; align-items: center; gap: 6px; }
+  .stats { margin-left: auto; display: inline-flex; gap: 12px; font: 500 13px/1 var(--font-num); font-variant-numeric: tabular-nums; }
+  .stats .k { color: var(--known); } .stats .u { color: var(--unknown); } .stats .n { color: var(--muted); }
+  .meter { height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; display: flex; }
+  .meter i { display: block; height: 100%; }
+  .meter .mk { background: var(--known); } .meter .mu { background: var(--unknown); }
+  .tool { font: 500 13px/1 var(--font-zh); color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 11px; cursor: pointer; }
+  .tool[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); }
+  .tool.danger { color: var(--unknown); }
+  .sync { font: 12px/1 var(--font-zh); color: var(--muted); }
+  .confirm { display: inline-flex; gap: 6px; align-items: center; font: 13px/1 var(--font-zh); }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font: 500 12.5px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 999px; padding: 6px 10px; cursor: pointer; }
+  .chip[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+
+  section.group { margin-top: 22px; }
+  section.group h2 { margin: 0 0 10px; display: flex; align-items: baseline; gap: 10px; font: 700 15px/1.2 var(--font-zh); }
+  section.group h2 small { font: 400 12px/1 var(--font-en); color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+  section.group h2 .cnt { margin-left: auto; font: 500 12px/1 var(--font-num); color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+  .grid.wide { grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); }
+  @media (max-width: 480px) { .grid, .grid.wide { grid-template-columns: 1fr; } }
+
+  .card {
+    position: relative; background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--line);
+    border-radius: 6px; padding: 9px 10px 9px 11px; display: grid; grid-template-columns: 1fr auto; gap: 4px 10px; align-items: start; min-width: 0;
+  }
+  .card.known { border-left-color: var(--known); }
+  .card.unknown { border-left-color: var(--unknown); background: var(--unknown-soft); }
+  .face { min-width: 0; cursor: pointer; display: grid; gap: 3px; border-radius: 4px; }
+  .face:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .en { font: 600 15px/1.35 var(--font-en); overflow-wrap: anywhere; }
+  .zh { font: 400 14px/1.45 var(--font-zh); color: var(--muted); overflow-wrap: anywhere; }
+  .sent .zh { color: var(--ink); font-size: 15px; }
+  .sent .en { font-weight: 400; font-size: 14.5px; color: var(--muted); }
+  .num { font: 500 11px/1 var(--font-num); color: var(--muted); margin-right: 6px; }
+  .covered * { color: transparent !important; border-color: transparent !important; }
+  .ex { margin-top: 6px; padding-top: 6px; border-top: 1px dashed var(--line); display: grid; gap: 8px; }
+  .ex-item { display: grid; gap: 2px; justify-items: start; }
+  .ex-item > div { justify-self: stretch; }
+  .ex-tag { font: 600 11px/1 var(--font-zh); border-radius: 3px; padding: 3px 6px; }
+  .ex-tag.s { color: var(--accent); background: var(--accent-soft); }
+  .ex-tag.w { color: var(--ink); background: var(--line); }
+  .typers { grid-column: 1 / -1; display: grid; gap: 8px; }
+  .ex-en { font: 400 14.5px/1.5 var(--font-en); overflow-wrap: anywhere; }
+  .ex-zh { font: 400 13.5px/1.5 var(--font-zh); color: var(--muted); overflow-wrap: anywhere; }
+  .hl { font-weight: 700; color: var(--accent); }
+  .story { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; margin-bottom: 10px; display: grid; gap: 8px; }
+  .story-top { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; color: var(--muted); font: 13px/1.4 var(--font-zh); }
+  .story-en { font: 400 15px/1.75 var(--font-en); cursor: pointer; border-radius: 4px; overflow-wrap: anywhere; }
+  .story-zh { font: 400 14px/1.75 var(--font-zh); color: var(--muted); cursor: pointer; border-radius: 4px; }
+  .verdict.near { color: var(--known); }
+  .verdict .need { color: var(--muted); }
+  .covered { color: transparent !important; background: repeating-linear-gradient(135deg, var(--cover) 0 6px, transparent 6px 10px); border-radius: 3px; user-select: none; }
+  .covered .num { color: transparent; }
+  .marks { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
+  .say, .ask { display: inline-flex; align-items: center; justify-content: center; gap: 4px; font: 600 12px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--accent); border-radius: 6px; padding: 6px 8px; cursor: pointer; }
+  .say svg, .ask svg { width: 14px; height: 14px; fill: currentColor; }
+  .say.playing { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .mk-btn { font: 600 12px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--muted); border-radius: 6px; padding: 7px 8px; cursor: pointer; min-width: 40px; }
+  .mk-btn.k[aria-pressed="true"] { background: var(--known); border-color: var(--known); color: #fff; }
+  .mk-btn.u[aria-pressed="true"] { background: var(--unknown); border-color: var(--unknown); color: #fff; }
+  .card.unknown .mk-btn { background: var(--surface); }
+  .card.unknown .mk-btn.u[aria-pressed="true"] { background: var(--unknown); }
+
+  .typer { grid-column: 1 / -1; display: grid; gap: 5px; margin-top: 2px; }
+  .type-in { display: block; width: 100%; min-width: 0; resize: none; overflow: hidden; font: 500 15px/1.45 var(--font-en); color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 6px; padding: 8px 10px; }
+  .type-in::placeholder { color: var(--muted); font-family: var(--font-zh); font-size: 13px; }
+  .type-in:focus { outline: none; border-color: var(--accent); background: var(--surface); }
+  .type-in.ok { border-color: var(--known); background: var(--known-soft); }
+  .type-in.bad { border-color: var(--unknown); background: var(--surface); }
+  .verdict { font: 13px/1.5 var(--font-zh); overflow-wrap: anywhere; }
+  .verdict.ok { color: var(--known); font-weight: 600; }
+  .verdict.bad { color: var(--ink); }
+  .verdict .tag { color: var(--unknown); font-weight: 600; margin-right: 6px; }
+  .verdict .ans { font-family: var(--font-en); }
+  .verdict .miss { color: var(--unknown); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+  .tally { font: 500 13px/1 var(--font-num); color: var(--accent); font-variant-numeric: tabular-nums; }
+  /* explanation drawer */
+  .scrim { position: fixed; inset: 0; background: rgba(10, 16, 24, 0.35); z-index: 20; }
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0; width: min(460px, 100%); z-index: 21;
+    background: var(--surface); border-left: 1px solid var(--line); box-shadow: -12px 0 32px rgba(10, 16, 24, 0.18);
+    display: grid; grid-template-rows: auto 1fr auto; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (max-width: 560px) { .drawer { top: auto; height: 86%; width: 100%; border-left: 0; border-top: 1px solid var(--line); border-radius: 12px 12px 0 0; } }
+  .dr-head { padding: 14px 16px 12px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; align-items: start; }
+  .dr-head .t-en { font: 700 18px/1.3 var(--font-en); overflow-wrap: anywhere; }
+  .dr-head .t-zh { font: 14px/1.4 var(--font-zh); color: var(--muted); }
+  .dr-close { font: 600 13px/1 var(--font-zh); border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 6px; padding: 8px 10px; cursor: pointer; }
+  .dr-body { overflow-y: auto; padding: 14px 16px 18px; font: 14.5px/1.65 var(--font-zh); min-width: 0; }
+  .dr-body h4 { margin: 14px 0 4px; font: 700 14px/1.4 var(--font-zh); color: var(--accent); }
+  .dr-body h4:first-child { margin-top: 0; }
+  .dr-body p { margin: 4px 0; }
+  .dr-body ul, .dr-body ol { margin: 4px 0; padding-left: 20px; }
+  .dr-body li { margin: 2px 0; }
+  .dr-body .q-you { margin: 16px 0 6px; padding: 8px 10px; border-radius: 6px; background: var(--accent-soft); color: var(--ink); font-weight: 500; }
+  .dr-body .thinking { color: var(--muted); }
+  .dr-body .err { color: var(--unknown); }
+  .dr-foot { border-top: 1px solid var(--line); padding: 10px 16px 12px; display: grid; gap: 8px; }
+  .ask-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+  .ask-in { min-width: 0; font: 14px/1.3 var(--font-zh); color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 6px; padding: 9px 10px; }
+  .ask-in:focus { outline: none; border-color: var(--accent); }
+  .dr-btn { font: 600 13px/1 var(--font-zh); border: 1px solid var(--accent); background: var(--accent); color: #fff; border-radius: 6px; padding: 9px 12px; cursor: pointer; white-space: nowrap; }
+  .dr-btn.ghost { background: var(--surface); color: var(--accent); }
+  .dr-btn[disabled] { opacity: 0.5; cursor: default; }
+  .dr-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font: 12px/1.4 var(--font-zh); color: var(--muted); }
+  .copybox { width: 100%; font: 13px/1.5 var(--font-zh); color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px; resize: vertical; }
+  .empty { margin-top: 28px; padding: 22px; border: 1px dashed var(--line); border-radius: 8px; color: var(--muted); font-family: var(--font-zh); text-align: center; }
+  .hint { margin-top: 10px; color: var(--muted); font: 13px/1.5 var(--font-zh); }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 640px) { .stats { margin-left: 0; } }
+  @media (prefers-reduced-motion: no-preference) { .card { transition: background .15s, border-color .15s; } }
+  /* ---------- Mistakes: the answer compared word by word, and the 错题本 ---------- */
+  .diff { font: 400 15px/1.8 var(--font-en); color: var(--ink); overflow-wrap: anywhere; margin-top: 2px; }
+  .diff del, .d-legend del { color: var(--unknown); text-decoration: line-through; text-decoration-thickness: 1.5px; margin-right: 3px; }
+  .diff ins, .d-legend ins { text-decoration: none; font-weight: 600; color: var(--known); background: var(--known-soft); border-radius: 3px; padding: 1px 3px; }
+  .diff .ch, .m-fix .ch { color: var(--surface); background: var(--known); border-radius: 2px; padding: 0 1px; }
+  .diff ins.d-miss, .d-legend ins.d-miss { color: var(--warn); background: var(--warn-soft); }
+  .diff ins.d-moved, .d-legend ins.d-moved { color: var(--accent); background: var(--accent-soft); }
+  .diff del.d-moved { color: var(--accent); }
+  .d-lead { color: var(--muted); }
+  .d-legend { display: flex; flex-wrap: wrap; gap: 4px 10px; font: 400 12px/1.6 var(--font-zh); color: var(--muted); margin-top: 2px; }
+  .saved-note { font: 400 12.5px/1.5 var(--font-zh); color: var(--warn); margin-top: 2px; }
+  .prev-miss { font: 400 13px/1.6 var(--font-zh); color: var(--warn); background: var(--warn-soft); border-radius: 6px; padding: 4px 8px; overflow-wrap: anywhere; }
+  .prev-miss s { font-family: var(--font-en); color: var(--ink); text-decoration-color: var(--unknown); }
+  .nb-intro { margin: 0 0 12px; color: var(--muted); font: 400 13.5px/1.65 var(--font-zh); max-width: 82ch; }
+  .nb-chips { margin-bottom: 12px; }
+  .card.mcard { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+  .mcard .marks { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .mcard .zh { font-size: 13.5px; }
+  .m-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font: 400 12.5px/1.4 var(--font-zh); color: var(--muted); }
+  .m-type { font: 600 12px/1 var(--font-zh); border-radius: 4px; padding: 4px 7px; color: var(--unknown); background: var(--unknown-soft); }
+  .m-type.t-miss { color: var(--warn); background: var(--warn-soft); }
+  .m-type.t-order { color: var(--accent); background: var(--accent-soft); }
+  .m-type.t-case { color: var(--muted); background: var(--line); }
+  .m-state { margin-left: auto; }
+  .mcard.known .m-state { color: var(--known); font-weight: 600; }
+  .m-was { font: 400 14px/1.6 var(--font-zh); }
+  .m-was s { font: 500 15.5px/1.6 var(--font-en); text-decoration-color: var(--unknown); text-decoration-thickness: 1.5px; margin-left: 4px; }
+  .m-was b { font-family: var(--font-en); margin-left: 4px; }
+  .m-ctx { font: 400 15.5px/1.75 var(--font-en); overflow-wrap: anywhere; }
+  .m-blank { display: inline-block; min-width: 4.5em; border-bottom: 2px solid var(--accent); }
+  .m-fix ins { text-decoration: none; font-weight: 600; color: var(--known); }
+  .m-fix { font: 400 15px/1.6 var(--font-en); }
+  details.hint > summary { cursor: pointer; width: fit-content; font: 600 13px/1.5 var(--font-zh); color: var(--accent); list-style: none; }
+  details.hint > summary::-webkit-details-marker { display: none; }
+  details.hint > summary::before { content: "▸ "; }
+  details.hint[open] > summary::before { content: "▾ "; }
+  details.hint p { margin: 6px 0 0; }
+  .side { display: contents; }
+  .face { cursor: auto; }
+  .rv { cursor: pointer; border-radius: 3px; }
+  .rv:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  /* ---------- MacBook (mouse or trackpad, 1024px and wider; a 13-inch Air shows about 1470 x 850 in a browser) ----------
+     Controls move into a left sidebar that scrolls on its own, so the whole height on the right is for cards. */
+  @media (min-width: 1024px) and (hover: hover) and (pointer: fine) {
+    .wrap { max-width: 1480px; display: grid; grid-template-columns: 296px minmax(0, 1fr); column-gap: 32px; align-items: start; padding-block: 0 48px; }
+    .side { display: flex; flex-direction: column; gap: 14px; position: sticky; top: env(safe-area-inset-top, 0px); max-height: 100vh; overflow-y: auto; padding-block: 22px 24px; padding-right: 4px; scrollbar-width: thin; }
+    header.top { padding: 0; display: grid; gap: 6px; }
+    header.top h1 { font-size: 21px; }
+    header.top p { font-size: 12.5px; line-height: 1.55; }
+    .bar { position: static; padding: 0; border: 0; background: none; gap: 12px; }
+    .bar > .row:first-child { flex-direction: column; align-items: stretch; gap: 10px; }
+    .tabs { display: grid; grid-template-columns: minmax(0, 1fr); padding: 4px; gap: 2px; }
+    .tabs button { text-align: left; padding: 10px 12px; font-size: 14px; }
+    .stats { margin-left: 0; flex-wrap: wrap; gap: 6px 12px; font-size: 12.5px; }
+    .opts .row { gap: 8px; }
+    .opts .row > .ctl, .opts .row > #reset-wrap, .opts .row > .sync, .opts .row > .voice-note { flex: 1 1 100%; }
+    .opts .row > .tool { flex: 1 1 calc(50% - 4px); }
+    #reset-wrap .tool { width: 100%; }
+    .ctl { display: grid; grid-template-columns: 34px minmax(0, 1fr); align-items: center; }
+    .ctl .seg { display: grid; grid-template-columns: repeat(auto-fit, minmax(58px, 1fr)); }
+    .ctl .seg button { padding: 8px 4px; }
+    .hint { font-size: 12.5px; }
+    main { min-width: 0; padding-top: 22px; }
+    main > section.group:first-child { margin-top: 0; }
+    .en { font-size: 16px; }
+    .ex-en { font-size: 15.5px; }
+    .story-en { font-size: 16px; }
+    .type-in { font-size: 15.5px; }
+    .drawer { width: min(500px, 100%); }
+  }
+
+  /* ---------- Touch screens (iPad, phone) ---------- */
+  .opts { display: grid; gap: 8px; }
+  .opts-toggle { display: none; }
+  @media (hover: none) and (pointer: coarse) {
+    html { -webkit-text-size-adjust: 100%; }
+    body { -webkit-tap-highlight-color: transparent; }
+    button, .face, .story-en, .story-zh { touch-action: manipulation; }
+    .tabs { flex-wrap: nowrap; overflow-x: auto; max-width: 100%; min-width: 0; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar, .chips::-webkit-scrollbar { display: none; }
+    .tabs button, .seg button { min-height: 44px; padding: 0 14px; font-size: 14.5px; }
+    .tool { min-height: 44px; padding: 0 14px; font-size: 14.5px; border-radius: 9px; }
+    .opts-toggle { display: inline-flex; align-items: center; gap: 6px; }
+    .opts-toggle::after { content: "▾"; font-size: 12px; }
+    .opts-toggle[aria-expanded="true"]::after { content: "▴"; }
+    .bar:not(.open) .opts { display: none; }
+    .chips { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+    .chip { flex: none; min-height: 40px; padding: 0 14px; font-size: 14px; }
+    .card { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+    .card > .marks { order: 2; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .marks .mk-btn.u + * { margin-left: auto; }
+    .mk-btn, .say, .ask { min-height: 44px; padding: 0 14px; font-size: 14.5px; border-radius: 9px; }
+    .mk-btn { min-width: 64px; }
+    .say svg, .ask svg { width: 17px; height: 17px; }
+    .type-in { font-size: 17px; padding: 10px 12px; }
+    .type-in::placeholder { font-size: 14.5px; }
+    .ask-in { font-size: 17px; min-height: 44px; }
+    .dr-btn, .dr-close { min-height: 44px; padding: 0 16px; font-size: 14.5px; }
+    .verdict { font-size: 14.5px; }
+  }
+  /* ---------- iPad: touch and at least 640px wide (iPad Air 5 is 820 portrait, 1180 landscape) ---------- */
+  @media (hover: none) and (pointer: coarse) and (min-width: 640px) {
+    body { font-size: 16px; }
+    .wrap { padding-left: max(28px, env(safe-area-inset-left, 0px)); padding-right: max(28px, env(safe-area-inset-right, 0px)); }
+    header.top { padding-block: 28px 12px; }
+    header.top h1 { font-size: 26px; }
+    header.top p, .hint { font-size: 14.5px; }
+    .bar { padding-block: 12px; gap: 10px; }
+    .stats { font-size: 14.5px; }
+    section.group { margin-top: 28px; }
+    section.group h2 { font-size: 18px; margin-bottom: 12px; }
+    .grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+    .grid.wide { grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); }
+    .card { padding: 14px 16px; border-radius: 10px; }
+    .en { font-size: 18px; }
+    .zh { font-size: 15.5px; }
+    .sent .zh { font-size: 17px; }
+    .sent .en { font-size: 16.5px; }
+    .ex-en { font-size: 16.5px; line-height: 1.55; }
+    .ex-zh { font-size: 15px; }
+    .ex-tag { font-size: 12.5px; padding: 4px 8px; }
+    .story { padding: 16px 18px; border-radius: 10px; }
+    .story-en { font-size: 17.5px; line-height: 1.8; }
+    .story-zh { font-size: 16px; line-height: 1.8; }
+    .drawer { width: min(520px, 100%); }
+    .dr-head .t-en { font-size: 20px; }
+    .dr-body { font-size: 16px; }
+  }
+</style>
+
+<div class="wrap">
+  <div class="side" id="side">
+  <header class="top">
+    <h1>职场英语 · 第 2 课</h1>
+    <p>生产质量、采购物流与工程现场 · 60 个职业词组（各 2 个例句：口语 + 书面） · 84 个行业词汇（14 个行业，各 1 个例句） · 6 篇情景短文 · 24 句中译英</p>
+  </header>
+
+  <div class="bar" id="bar">
+    <div class="row">
+      <div class="tabs" role="group" aria-label="内容">
+        <button id="tab-phrases" data-tab="phrases" aria-pressed="true">职业词组</button>
+        <button id="tab-industry" data-tab="industry" aria-pressed="false">行业词汇</button>
+        <button id="tab-stories" data-tab="stories" aria-pressed="false">情景短文</button>
+        <button id="tab-sentences" data-tab="sentences" aria-pressed="false">中译英</button>
+        <button id="tab-mistakes" data-tab="mistakes" aria-pressed="false">错题本</button>
+      </div>
+      <div class="stats" aria-live="polite"><span class="tally" id="tally" hidden></span><span class="k" id="st-k">会 0</span><span class="u" id="st-u">不会 0</span><span class="n" id="st-n">未标 0</span></div>
+      <button class="tool opts-toggle" id="opts-toggle" type="button" aria-expanded="false" aria-controls="opts">设置</button>
+    </div>
+    <div class="meter" aria-hidden="true"><i class="mk" id="m-k"></i><i class="mu" id="m-u"></i></div>
+    <div class="opts" id="opts">
+    <div class="row">
+      <span class="ctl"><span class="label">遮盖</span>
+        <span class="seg" role="group" aria-label="遮盖">
+          <button id="cov-none" data-cover="none" aria-pressed="false">不遮</button>
+          <button id="cov-en" data-cover="en" aria-pressed="true">遮英文</button>
+          <button id="cov-zh" data-cover="zh" aria-pressed="false">遮中文</button>
+        </span>
+      </span>
+      <span class="ctl"><span class="label">显示</span>
+        <span class="seg" role="group" aria-label="显示">
+          <button id="flt-all" data-filter="all" aria-pressed="true">全部</button>
+          <button id="flt-review" data-filter="review" aria-pressed="false">待复习</button>
+          <button id="flt-unknown" data-filter="unknown" aria-pressed="false">只看不会</button>
+          <button id="flt-mistakes" data-filter="mistakes" aria-pressed="false">有错题</button>
+        </span>
+      </span>
+      <span class="ctl" id="speed-ctl"><span class="label">发音</span>
+        <span class="seg" role="group" aria-label="语速">
+          <button id="spd-normal" data-speed="0.95" aria-pressed="true">正常</button>
+          <button id="spd-slow" data-speed="0.7" aria-pressed="false">慢速</button>
+        </span>
+      </span>
+      <button class="tool" id="typing" aria-pressed="true">打字练习</button>
+      <button class="tool" id="shuffle" aria-pressed="false">打乱顺序</button>
+      <span id="reset-wrap"><button class="tool danger" id="reset">清除本页标记</button></span>
+      <span class="sync" id="sync">标记保存在本浏览器</span>
+    </div>
+    </div>
+    <div class="chips" id="chips" hidden></div>
+  </div>
+
+  <details class="hint" id="hint"><summary>怎么练</summary><p>每个词组有两个例句：一句<b>口语</b>（开会、打电话、现场沟通），一句<b>书面</b>（邮件、报告）；口语里常用的词组配两句口语。先读例句、点“发音”听一遍、跟读。再选<b>遮英文</b>，看中文<b>默写整句英文</b>，<b>回车</b>检查：整句对，或者句子略有不同但词组用对了，都算对；词组没用对就显示参考答案。词组卡片<b>两句都写对</b>才自动标“会”，有一句不对就标“不会”。<b>Tab</b> 跳到下一句，Shift+Tab 回上一句；手机上检查后再按一次回车也会跳到下一句。点被遮住的哪一行，就只翻开哪一行，再点一次重新遮住。</p><p>点被遮住的哪一行，就只翻开哪一行；回车检查哪一句，也只翻开那一句，另一句仍然遮着。回车检查后，写错的地方会逐词标出来：<del>划掉的</del>是你写的，绿色是正确写法，黄色是漏写的词，蓝紫色是放错位置的词；拼写错误会标到具体字母。这些错误会自动记进<b>错题本</b>：先看自己写错的样子，再填出正确的词；同一个错误要在两个不同的日子写对才算掌握。卡片上会提示“上次错在哪”，“显示”里的<b>有错题</b>只看还没改对的卡片。</p></details>
+  </div>
+  <main id="list"></main>
+</div>
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dr-en" hidden>
+  <div class="dr-head">
+    <div><div class="t-en" id="dr-en"></div><div class="t-zh" id="dr-zh"></div></div>
+    <button class="dr-close" id="dr-close">关闭</button>
+  </div>
+  <div class="dr-body" id="dr-body" aria-live="polite"></div>
+  <div class="dr-foot">
+    <div class="ask-row" id="ask-row">
+      <input class="ask-in" id="ask-in" type="text" placeholder="继续问，比如：和 start the project 有什么区别？" autocomplete="off">
+      <button class="dr-btn" id="ask-send">发送</button>
+    </div>
+    <div class="dr-tools">
+      <button class="dr-btn ghost" id="dr-stop" hidden>停止</button>
+      <button class="dr-btn ghost" id="dr-regen">重新解释</button>
+      <button class="dr-btn ghost" id="dr-copy">复制问题</button>
+      <span id="dr-note"></span>
+    </div>
+  </div>
+</aside>
+
+<script>
+const DATA = {"phrases": [{"name": "生产制造", "en": "Production", "items": [["ramp up production", "提升产量（产能爬坡）", [["We need to [[ramp up production]] before the summer peak.", "夏季旺季到来前，我们得把产量提上去。", "口语"], ["[[Production]] will be [[ramped up]] to 2,000 units per week by the end of Q2.", "到二季度末，产量将提升至每周 2,000 台。", "书面"]]], ["run at full capacity", "满负荷运转", [["The line has been [[running at full capacity]] for three weeks now.", "这条线已经满负荷运转三个星期了。", "口语"], ["As the plant is currently [[running at full capacity]], no additional orders can be accepted.", "由于工厂目前满负荷运转，无法再接受额外订单。", "书面"]]], ["eliminate a bottleneck", "消除瓶颈", [["If we add a second test station, we can [[eliminate the bottleneck]] in final assembly.", "如果加一个测试工位，就能消除总装的瓶颈。", "口语"], ["[[The bottleneck]] in final assembly was [[eliminated]] by adding a second test station.", "通过增设第二个测试工位，总装的瓶颈已被消除。", "书面"]]], ["reduce cycle time", "缩短节拍时间", [["With the new fixture, we managed to [[reduce the cycle time]] by 15 seconds.", "用了新夹具，我们把节拍时间缩短了 15 秒。", "口语"], ["The aim of the project is to [[reduce cycle time]] by ten percent without additional staff.", "本项目的目标是在不增加人员的情况下，将节拍时间缩短 10%。", "书面"]]], ["schedule a production run", "安排一批生产（排产）", [["Can we [[schedule a production run]] for the new housings next week?", "下周能不能给新外壳排一批生产？", "口语"], ["[[A production run]] of 5,000 units is [[scheduled]] for calendar week 18.", "一批 5,000 台的生产已安排在第 18 周。", "书面"]]], ["minimize changeover time", "缩短换型时间", [["If we [[minimize changeover time]], we can run smaller batches.", "只要把换型时间缩短，我们就能做小批量。", "口语"], ["SMED workshops helped us [[minimize changeover time]] on the stamping presses.", "快速换模（SMED）研讨会帮助我们缩短了冲压机的换型时间。", "书面"]]], ["go into series production", "进入量产", [["The new model will [[go into series production]] in September.", "新型号九月进入量产。", "口语"], ["The product is scheduled to [[go into series production]] once the PPAP has been approved.", "生产件批准（PPAP）通过后，产品即按计划进入量产。", "书面"]]], ["scrap a batch", "报废一批", [["We had to [[scrap the whole batch]] because of the wrong material.", "因为用错了材料，我们只好把整批都报废了。", "口语"], ["[[The batch]] was [[scrapped]] as the hardness values were out of tolerance.", "由于硬度值超出公差，该批次已报废。", "书面"]]], ["streamline the process", "精简流程", [["Let's [[streamline the process]] and get rid of the double checks.", "咱们把流程精简一下，把重复检查去掉。", "口语"], ["We have [[streamlined the process]], reducing the number of manual steps from twelve to seven.", "我们已精简流程，手工步骤从十二个减少到七个。", "书面"]]], ["lock out the machine", "给机器断电上锁（挂牌上锁）", [["Always [[lock out the machine]] before you clean the rollers.", "清理滚筒之前，一定要先给机器断电上锁。", "口语"], ["Before maintenance work begins, [[the machine]] must be [[locked out]] and tagged.", "维修作业开始前，必须对机器断电上锁并挂牌。", "书面"]]]]}, {"name": "质量改进", "en": "Quality & improvement", "items": [["carry out a root cause analysis", "做根本原因分析", [["Let's [[carry out a root cause analysis]] before we change anything.", "改任何东西之前，咱们先做个根本原因分析。", "口语"], ["[[A root cause analysis]] was [[carried out]] using the 5-Why method.", "已使用 5-Why 方法进行了根本原因分析。", "书面"]]], ["contain the problem", "遏制问题（先把问题控制住）", [["First we need to [[contain the problem]], then we can look for the cause.", "我们得先把问题控制住，然后再找原因。", "口语"], ["To [[contain the problem]], all suspect parts in stock have been blocked.", "为遏制问题，库存中所有可疑零件均已冻结。", "书面"]]], ["quarantine suspect parts", "隔离可疑零件", [["Please [[quarantine]] all [[suspect parts]] in the red area.", "请把所有可疑零件隔离到红色区域。", "口语"], ["All [[suspect parts]] have been [[quarantined]] until sorting is completed.", "在挑选完成之前，所有可疑零件均已隔离。", "书面"]]], ["sort out defective parts", "挑出不良品", [["Can someone help us [[sort out the defective parts]] this afternoon?", "今天下午能来个人帮我们挑不良品吗？", "口语"], ["[[Defective parts]] were [[sorted out]] at the supplier's expense.", "不良品已由供应商承担费用挑出。", "书面"]]], ["write an 8D report", "写 8D 报告", [["The customer wants us to [[write an 8D report]] by Friday.", "客户要我们周五前写一份 8D 报告。", "口语"], ["Please submit [[an 8D report]] within ten working days.", "请在十个工作日内提交 8D 报告。", "书面"]]], ["implement countermeasures", "实施对策", [["We've already [[implemented]] two [[countermeasures]] on the line.", "我们已经在产线上实施了两项对策。", "口语"], ["[[The countermeasures]] will be [[implemented]] by the end of the month and verified in May.", "对策将于月底前实施，并于五月验证。", "书面"]]], ["verify the effectiveness", "验证有效性", [["We need three good batches to [[verify the effectiveness]] of the fix.", "我们需要三批合格品来验证这个改进是否有效。", "口语"], ["[[The effectiveness]] of the corrective actions was [[verified]] in an audit on 12 June.", "纠正措施的有效性已在 6 月 12 日的审核中得到验证。", "书面"]]], ["a recurring defect", "反复出现的缺陷", [["This is [[a recurring defect]], we saw it last year too.", "这是个老毛病，去年也出现过。", "口语"], ["[[The recurring defect]] has been traced back to a worn-out tool.", "该反复出现的缺陷已追溯到一副磨损的模具。", "书面", ["recurring defect"]]]], ["tighten the tolerance", "收紧公差", [["If we [[tighten the tolerance]], the scrap rate will go up.", "如果收紧公差，报废率就会上升。", "口语"], ["The customer has requested that we [[tighten the tolerance]] on the bore diameter.", "客户要求我们收紧孔径的公差。", "书面"]]], ["drive continuous improvement", "推动持续改进", [["We meet every Friday to [[drive continuous improvement]] on the shop floor.", "我们每周五开会，推动车间的持续改进。", "口语"], ["Regular kaizen workshops help [[drive continuous improvement]] across all production sites.", "定期的改善研讨会推动了所有生产基地的持续改进。", "书面"]]]]}, {"name": "采购与供应商", "en": "Procurement & suppliers", "items": [["send out an RFQ", "发出询价单", [["I'll [[send out the RFQ]] to four suppliers today.", "我今天把询价单发给四家供应商。", "口语", ["send out", "rfq|request for quotation"]], ["[[An RFQ]] was [[sent out]] to four pre-qualified suppliers on 2 May.", "5 月 2 日已向四家预审合格的供应商发出询价单。", "书面", ["rfq|request for quotation", "sent out"]]]], ["compare quotations", "比较报价（比价）", [["Let's [[compare the quotations]] before we decide.", "咱们先比比价再决定。", "口语"], ["After [[comparing all quotations]], we recommend awarding the contract to Supplier B.", "比较所有报价后，我们建议把合同授予供应商 B。", "书面"]]], ["negotiate a discount", "谈下折扣", [["Can we [[negotiate a discount]] if we order 10,000 pieces?", "如果我们订一万件，能谈点折扣吗？", "口语"], ["We were able to [[negotiate a discount]] of eight percent on the annual volume.", "我们就年采购量谈下了 8% 的折扣。", "书面"]]], ["place an order", "下单", [["We'll [[place the order]] as soon as the budget is approved.", "预算一批下来我们就下单。", "口语"], ["[[The order]] was [[placed]] on 14 March under PO number 451180.", "订单已于 3 月 14 日下达，采购订单号 451180。", "书面"]]], ["confirm the delivery date", "确认交货日期", [["Can you [[confirm the delivery date]] by tomorrow?", "你明天之前能确认交货日期吗？", "口语"], ["Please [[confirm the delivery date]] in writing within 48 hours.", "请在 48 小时内书面确认交货日期。", "书面"]]], ["the minimum order quantity", "最小起订量（MOQ）", [["Their [[minimum order quantity]] is 500 pieces, which is too much for us.", "他们的最小起订量是 500 件，对我们来说太多了。", "口语", ["minimum order quantity|moq"]], ["The [[minimum order quantity]] for this item is 1,000 units.", "该物料的最小起订量为 1,000 件。", "书面", ["minimum order quantity|moq"]]]], ["set up a second source", "开发第二供应商（双源采购）", [["We should [[set up a second source]] for this chip.", "这个芯片我们应该再开发一个供应商。", "口语"], ["To reduce supply risk, [[a second source]] will be [[set up]] for all critical components.", "为降低供应风险，所有关键零部件都将开发第二供应商。", "书面"]]], ["agree on payment terms", "商定付款条件", [["We still need to [[agree on payment terms]] before we sign.", "签约前我们还得把付款条件谈定。", "口语"], ["Both parties have [[agreed on payment terms]] of 60 days net.", "双方已商定付款条件为 60 天净付。", "书面"]]], ["evaluate supplier performance", "评估供应商绩效", [["Every quarter we [[evaluate supplier performance]] on quality and delivery.", "我们每季度按质量和交付评估供应商。", "口语"], ["[[Supplier performance]] is [[evaluated]] quarterly based on quality, delivery and cost.", "供应商绩效每季度根据质量、交付和成本进行评估。", "书面"]]], ["a single-source supplier", "独家供应商（唯一来源）", [["They're [[a single-source supplier]], so we can't just switch.", "他们是独家供应商，所以我们没法说换就换。", "口语"], ["As [[a single-source supplier]], the company represents a significant supply risk.", "作为独家供应商，该公司带来了较大的供应风险。", "书面"]]]]}, {"name": "物流与库存", "en": "Logistics & inventory", "items": [["arrange the shipment", "安排发货", [["I'll [[arrange the shipment]] for Thursday.", "我安排周四发货。", "口语"], ["[[The shipment]] will be [[arranged]] once the goods have passed final inspection.", "货物通过终检后即安排发运。", "书面"]]], ["track the shipment", "跟踪货物", [["Can you send me the number so I can [[track the shipment]]?", "你把单号发我一下，我好跟踪货物？", "口语"], ["You can [[track the shipment]] online using the tracking number below.", "您可以通过下方的运单号在线跟踪货物。", "书面"]]], ["clear customs", "清关", [["The parts are still waiting to [[clear customs]] in Hamburg.", "零件还在汉堡等着清关。", "口语"], ["The goods [[cleared customs]] on 6 May and will be delivered tomorrow.", "货物已于 5 月 6 日清关，明天送达。", "书面"]]], ["be damaged in transit", "运输途中损坏", [["Two boxes were [[damaged in transit]], so we refused them.", "有两箱在运输途中损坏了，我们拒收了。", "口语"], ["Please note that three units were [[damaged in transit]]; photos are attached.", "请注意，有三台设备在运输途中损坏，照片见附件。", "书面"]]], ["file a claim with the carrier", "向承运人索赔", [["We need to [[file a claim with the carrier]] within seven days.", "我们得在七天内向承运人索赔。", "口语"], ["[[A claim]] has been [[filed with the carrier]] for the damaged pallets.", "已就损坏的托盘向承运人提出索赔。", "书面"]]], ["a partial shipment", "分批发货", [["Can you send [[a partial shipment]] now and the rest next week?", "能不能先发一部分，剩下的下周再发？", "口语"], ["We agree to [[a partial shipment]] of 300 units, with the balance to follow in week 22.", "我们同意先分批发 300 台，余量在第 22 周发出。", "书面"]]], ["keep stock levels low", "保持低库存", [["We try to [[keep stock levels low]], but not too low.", "我们尽量保持低库存，但也不能太低。", "口语"], ["The aim is to [[keep stock levels low]] without risking production stoppages.", "目标是在不冒停产风险的前提下保持低库存。", "书面"]]], ["run out of stock", "断货", [["If the truck is late, we'll [[run out of stock]] on Monday.", "卡车要是晚到，我们周一就断货了。", "口语"], ["Item 4711 has [[run out of stock]]; the next delivery is expected on 15 July.", "物料 4711 已断货，下一批预计 7 月 15 日到货。", "书面"]]], ["the risk passes to the buyer", "风险转移给买方", [["Under FCA, [[the risk passes to the buyer]] when the truck is loaded.", "按 FCA 条款，货物装上卡车时风险就转给买方了。", "口语"], ["In accordance with the agreed Incoterms, [[the risk passes to the buyer]] upon delivery to the carrier.", "根据约定的国际贸易术语，货物交付承运人时风险转移给买方。", "书面"]]], ["send by air freight", "空运发货（加急）", [["Let's [[send it by air freight]], the line can't wait.", "空运吧，产线等不起。", "口语"], ["The spare parts will be [[sent by air freight]] at the supplier's expense.", "备件将空运发出，费用由供应商承担。", "书面", ["sent by air freight|shipped by air freight"]]]]]}, {"name": "测试与认证", "en": "Testing & certification", "items": [["comply with the standard", "符合标准", [["Does this cable [[comply with the standard]]?", "这根电缆符合标准吗？", "口语"], ["All components must [[comply with the applicable standards]].", "所有部件都必须符合适用的标准。", "书面", ["comply with", "standards"]]]], ["run a type test", "做型式试验", [["We'll [[run a type test]] on the first prototype next month.", "下个月我们对第一台样机做型式试验。", "口语"], ["[[A type test]] was [[carried out]] by an accredited test laboratory.", "型式试验已由一家经认可的检测实验室完成。", "书面"]]], ["pass the test", "通过测试", [["Good news, the sample [[passed the test]] this morning.", "好消息，样品今天上午通过了测试。", "口语"], ["The prototype [[passed the vibration test]] without any findings.", "样机顺利通过振动测试，无任何问题。", "书面"]]], ["obtain certification", "取得认证", [["We hope to [[obtain certification]] before the trade fair.", "我们希望在展会前拿到认证。", "口语"], ["The product [[obtained UL certification]] for the US market in January.", "该产品已于一月取得面向美国市场的 UL 认证。", "书面"]]], ["validate the design", "验证设计", [["Before we order the tools, we need to [[validate the design]].", "订模具之前，我们得先把设计验证好。", "口语"], ["[[The design]] was [[validated]] in a series of field tests under real operating conditions.", "该设计已在真实工况下通过一系列现场试验得到验证。", "书面"]]], ["approve a design change", "批准设计变更", [["Who needs to [[approve the design change]]?", "这个设计变更要谁批？", "口语"], ["[[The design change]] was [[approved]] by the change control board on 3 April.", "该设计变更已于 4 月 3 日获变更控制委员会批准。", "书面"]]], ["check the data sheet", "查规格书", [["Let me [[check the data sheet]], I think the limit is 60 degrees.", "我查一下规格书，我记得上限是 60 度。", "口语", ["check the data sheet|check the datasheet"]], ["According to [[the data sheet]], the maximum operating temperature is 60 °C.", "根据规格书，最高工作温度为 60 °C。", "书面", ["data sheet|datasheet"]]]], ["within the specified range", "在规定范围内", [["The voltage is still [[within the specified range]].", "电压还在规定范围内。", "口语"], ["All measured values were [[within the specified range]].", "所有测量值均在规定范围内。", "书面"]]], ["document the test results", "记录测试结果", [["Please [[document the test results]] with photos.", "请把测试结果连同照片记录下来。", "口语"], ["[[The test results]] are [[documented]] in the attached report.", "测试结果已记录在附件报告中。", "书面"]]], ["carry out a risk assessment", "做风险评估", [["We have to [[do a risk assessment]] before we change the setup.", "改装置之前，我们得先做风险评估。", "口语", ["risk assessment"]], ["[[A risk assessment]] must be [[carried out]] in accordance with ISO 14971.", "必须按照 ISO 14971 进行风险评估。", "书面"]]]]}, {"name": "能源与工地", "en": "Energy & construction site", "items": [["connect to the grid", "并网", [["When can we [[connect the system to the grid]]?", "系统什么时候能并网？", "口语", ["connect", "to the grid"]], ["The PV system will be [[connected to the grid]] once the grid operator has given approval.", "电网运营商批准后，光伏系统即可并网。", "书面"]]], ["size the battery", "选定电池容量", [["How do you [[size the battery]] for a family of four?", "四口之家的电池容量怎么选？", "口语"], ["[[The battery]] was [[sized]] to cover the building's evening consumption.", "电池容量是按覆盖楼宇晚间用电来选定的。", "书面"]]], ["reduce peak load", "削减峰值负荷", [["The storage system helps us [[reduce peak load]] in the afternoon.", "储能系统帮我们削减下午的峰值负荷。", "口语"], ["By shifting loads, the plant was able to [[reduce peak load]] by 20 percent.", "通过负荷转移，工厂把峰值负荷降低了 20%。", "书面"]]], ["meet the building code", "符合建筑规范", [["Does this railing [[meet the building code]]?", "这个栏杆符合建筑规范吗？", "口语"], ["All fire doors must [[meet the building code]] and be inspected annually.", "所有防火门必须符合建筑规范，并每年检查一次。", "书面"]]], ["obtain a building permit", "取得施工许可", [["We can't start until we [[get the building permit]].", "拿到施工许可之前我们没法开工。", "口语", ["building permit"]], ["[[The building permit]] was [[granted]] on 20 February.", "施工许可已于 2 月 20 日批下。", "书面"]]], ["carry out a site inspection", "做工地检查", [["The client wants to [[do a site inspection]] on Friday.", "业主周五要来工地检查。", "口语", ["site inspection"]], ["[[A site inspection]] will be [[carried out]] before the scaffolding is removed.", "拆除脚手架之前将进行一次工地检查。", "书面"]]], ["pour the foundation", "浇筑地基", [["If it doesn't rain, we'll [[pour the foundation]] on Monday.", "不下雨的话，我们周一浇地基。", "口语"], ["[[The foundation]] was [[poured]] on 12 March and has now cured.", "地基已于 3 月 12 日浇筑，现已养护完成。", "书面"]]], ["issue a change order", "开工程变更单", [["If they want extra sockets, we need to [[issue a change order]].", "他们要是想加插座，我们就得开变更单。", "口语"], ["[[A change order]] was [[issued]] for the additional cable trays.", "已就新增的电缆桥架开具变更单。", "书面"]]], ["wear personal protective equipment", "穿戴个人防护装备", [["You can't go on site without [[wearing PPE]].", "不穿戴防护装备不能进工地。", "口语", ["ppe|protective equipment"]], ["[[Personal protective equipment]] must be [[worn]] at all times on site.", "在工地上必须始终穿戴个人防护装备。", "书面", ["personal protective equipment|ppe", "worn"]]]], ["complete the punch list", "完成尾项清单", [["We just need to [[finish the punch list]] before handover.", "移交之前我们只差把尾项清单做完了。", "口语", ["punch list"]], ["All items on [[the punch list]] must be [[completed]] before final acceptance.", "最终验收前，尾项清单上的所有项目都必须完成。", "书面"]]]]}], "industry": [{"name": "医疗", "items": [["infusion pump", "输液泵", "The nurse set the [[infusion pump]] to 50 ml per hour.", "护士把输液泵设为每小时 50 毫升。"], ["patient monitor", "监护仪", "The [[patient monitor]] shows heart rate, blood pressure and oxygen levels.", "监护仪显示心率、血压和血氧。"], ["MRI scanner", "磁共振设备", "The hospital is installing a new [[MRI scanner]] in the basement.", "医院正在地下室安装一台新的磁共振设备。", ["mri scanner|mri"]], ["disposable", "一次性耗材", "These syringes are [[disposables]] and must not be reused.", "这些注射器是一次性耗材，不得重复使用。", ["disposable"]], ["notified body", "公告机构（欧盟认证机构）", "The device must be certified by a [[notified body]] before it can be sold in the EU.", "该器械必须经公告机构认证，才能在欧盟销售。"], ["adverse event", "不良事件", "Every serious [[adverse event]] must be reported to the authorities.", "每一起严重不良事件都必须上报主管部门。"]]}, {"name": "电气", "items": [["circuit breaker", "断路器", "The [[circuit breaker]] tripped again when we started the compressor.", "我们一启动压缩机，断路器又跳了。"], ["RCD", "漏电保护器", "Every socket in the bathroom must be protected by an [[RCD]].", "浴室里的每个插座都必须有漏电保护器。", ["rcd|residual current device"]], ["distribution board", "配电箱", "Please label each circuit clearly in the [[distribution board]].", "请把配电箱里的每个回路都标清楚。"], ["cable tray", "电缆桥架", "The cables run along a [[cable tray]] under the ceiling.", "电缆沿着天花板下的桥架走线。"], ["overload", "过载", "The motor stopped because of an [[overload]].", "电机因为过载停了。"], ["power outage", "停电", "A [[power outage]] shut down the whole site for two hours.", "一次停电让整个工地停工了两个小时。"]]}, {"name": "电子信息", "items": [["oscilloscope", "示波器", "Use the [[oscilloscope]] to check the signal on pin 3.", "用示波器查一下 3 号引脚上的信号。"], ["microcontroller", "微控制器（单片机）", "The [[microcontroller]] reads the sensor every 100 milliseconds.", "微控制器每 100 毫秒读取一次传感器。"], ["ESD", "静电放电", "Always wear a wrist strap to prevent [[ESD]] damage.", "一定要戴防静电手环，防止静电损坏。", ["esd|electrostatic discharge"]], ["end-of-life component", "停产元器件", "This chip is an [[end-of-life component]], so we need a replacement.", "这颗芯片已经停产，我们得找替代料。", ["end of life component|eol component"]], ["data logger", "数据记录仪", "The [[data logger]] records the temperature every minute.", "数据记录仪每分钟记录一次温度。"], ["cybersecurity", "网络安全", "[[Cybersecurity]] is now a key requirement for connected devices.", "网络安全现在是联网设备的一项关键要求。", ["cybersecurity|cyber security"]]]}, {"name": "能源", "items": [["PV module", "光伏组件", "Each [[PV module]] produces about 430 watts in full sun.", "每块光伏组件在满日照下大约发电 430 瓦。", ["pv module|solar module|solar panel"]], ["battery storage", "电池储能", "The [[battery storage]] system stores surplus energy for the evening.", "电池储能系统把多余的电存起来晚上用。"], ["grid operator", "电网运营商", "We need approval from the [[grid operator]] before we connect.", "并网之前需要电网运营商批准。"], ["feed-in tariff", "上网电价补贴", "The [[feed-in tariff]] has dropped a lot in recent years.", "上网电价补贴这几年降了很多。"], ["kilowatt-hour", "千瓦时（度）", "The house uses about 4,000 [[kilowatt-hours]] of electricity a year.", "这栋房子一年用电约 4,000 度。", ["kilowatt hours|kwh"]], ["heat pump", "热泵", "A [[heat pump]] is much more efficient than an oil boiler.", "热泵比燃油锅炉高效得多。"]]}, {"name": "现场工程师", "items": [["wiring diagram", "接线图", "Check the [[wiring diagram]] before you connect the motor.", "接电机之前先看接线图。"], ["multimeter", "万用表", "Measure the voltage with a [[multimeter]] first.", "先用万用表量一下电压。"], ["torque wrench", "扭力扳手", "Tighten the bolts to 40 Nm with a [[torque wrench]].", "用扭力扳手把螺栓拧到 40 牛米。"], ["commissioning report", "调试报告", "Please send the signed [[commissioning report]] to the project manager.", "请把签好字的调试报告发给项目经理。"], ["site acceptance test", "现场验收测试（SAT）", "The [[site acceptance test]] is scheduled for next Tuesday.", "现场验收测试安排在下周二。", ["site acceptance test|sat"]], ["as-built drawing", "竣工图", "After the changes, we must update the [[as-built drawings]].", "改完之后，我们必须更新竣工图。", ["as built drawings|as built drawing"]]]}, {"name": "售后工程师", "items": [["RMA number", "退货授权号", "Please write the [[RMA number]] on the parcel.", "请在包裹上写上退货授权号。", ["rma number|rma"]], ["error code", "故障代码", "The display shows [[error code]] E07.", "屏幕上显示故障代码 E07。"], ["troubleshooting guide", "故障排查指南", "Follow the [[troubleshooting guide]] step by step.", "按照故障排查指南一步一步来。"], ["replacement unit", "替换机", "We'll send you a [[replacement unit]] while yours is being repaired.", "您的设备维修期间，我们给您寄一台替换机。"], ["service interval", "保养周期", "The [[service interval]] for this pump is 2,000 operating hours.", "这台泵的保养周期是 2,000 个运行小时。"], ["remote diagnosis", "远程诊断", "With [[remote diagnosis]], we can often fix the problem without a site visit.", "有了远程诊断，很多问题不用上门就能解决。"]]}, {"name": "物流", "items": [["delivery note", "送货单", "Please sign the [[delivery note]] when the goods arrive.", "货到时请在送货单上签字。"], ["forklift", "叉车", "Only trained staff may drive the [[forklift]].", "只有受过培训的员工才能开叉车。"], ["loading dock", "装卸平台", "The truck is waiting at [[loading dock]] 3.", "卡车在 3 号装卸平台等着。"], ["shipping label", "运输标签", "Print the [[shipping label]] and stick it on the box.", "把运输标签打印出来贴在箱子上。"], ["dangerous goods", "危险品", "Lithium batteries are shipped as [[dangerous goods]].", "锂电池按危险品运输。"], ["tracking number", "运单号", "Here is the [[tracking number]] for your parcel.", "这是您包裹的运单号。"]]}, {"name": "供应链", "items": [["reorder point", "再订货点", "When stock falls below the [[reorder point]], the system creates an order.", "库存一低于再订货点，系统就自动下单。"], ["demand planning", "需求计划", "Good [[demand planning]] reduces both shortages and excess stock.", "做好需求计划，既能减少缺货，也能减少积压。"], ["allocation", "配额供货", "Because of the chip shortage, we are on [[allocation]] until June.", "因为芯片短缺，到六月之前我们都是按配额供货。"], ["supplier audit", "供应商审核", "The [[supplier audit]] revealed several weaknesses in their quality system.", "供应商审核发现他们的质量体系有几处薄弱环节。"], ["nearshoring", "近岸外包", "Many companies are looking at [[nearshoring]] to reduce supply risk.", "很多公司在考虑近岸外包来降低供应风险。"], ["stock turnover", "库存周转率", "A higher [[stock turnover]] means less capital is tied up.", "库存周转率越高，占用的资金就越少。"]]}, {"name": "汽车", "items": [["wiring harness", "线束", "The [[wiring harness]] connects all the electrical components in the car.", "线束把车里所有电气部件连接起来。"], ["ECU", "电子控制单元", "The [[ECU]] controls the engine and the transmission.", "电子控制单元控制发动机和变速箱。", ["ecu|electronic control unit"]], ["crash test", "碰撞测试", "The new model achieved five stars in the [[crash test]].", "新车型在碰撞测试中拿到了五星。"], ["start of production", "量产启动（SOP）", "[[Start of production]] for the new model is planned for March.", "新车型计划三月量产启动。", ["start of production|sop"]], ["PPAP", "生产件批准程序", "The customer won't release the part until the [[PPAP]] is approved.", "生产件批准通过之前，客户不会放行这个零件。", ["ppap"]], ["charging port", "充电口", "The [[charging port]] is on the left side of the car.", "充电口在车的左侧。"]]}, {"name": "制造业", "items": [["CNC machine", "数控机床", "The [[CNC machine]] runs in three shifts.", "这台数控机床三班运转。", ["cnc machine"]], ["injection molding", "注塑", "The housings are made by [[injection molding]].", "外壳是注塑出来的。", ["injection molding|injection moulding"]], ["work instruction", "作业指导书", "Every workstation has a laminated [[work instruction]].", "每个工位都有一份塑封的作业指导书。"], ["takt time", "节拍时间", "Our [[takt time]] is 58 seconds per unit.", "我们的节拍时间是每台 58 秒。"], ["OEE", "设备综合效率", "We improved [[OEE]] from 65 to 78 percent.", "我们把设备综合效率从 65% 提高到了 78%。", ["oee|overall equipment effectiveness"]], ["kanban", "看板", "Parts are replenished using [[kanban]] cards.", "零件通过看板卡补货。"]]}, {"name": "项目管理", "items": [["project charter", "项目章程", "The [[project charter]] defines the goals, the budget and the roles.", "项目章程规定了目标、预算和角色分工。"], ["critical path", "关键路径", "Any delay on the [[critical path]] delays the whole project.", "关键路径上任何延误都会拖慢整个项目。"], ["steering committee", "指导委员会", "The [[steering committee]] meets once a month.", "指导委员会每月开一次会。"], ["budget overrun", "预算超支", "We had a [[budget overrun]] of twelve percent.", "我们的预算超支了 12%。"], ["lessons learned", "经验教训总结", "At the end of the project, we held a [[lessons learned]] session.", "项目结束时，我们开了一次经验教训总结会。"], ["status report", "进度报告", "Please send the weekly [[status report]] by Friday noon.", "请在周五中午前发出每周进度报告。"]]}, {"name": "机械", "items": [["bearing", "轴承", "The noise comes from a worn [[bearing]].", "噪音来自一个磨损的轴承。"], ["gearbox", "齿轮箱（减速机）", "The [[gearbox]] reduces the motor speed.", "齿轮箱把电机转速降下来。"], ["hydraulic cylinder", "液压缸", "The [[hydraulic cylinder]] is leaking oil.", "液压缸在漏油。"], ["vibration", "振动", "High [[vibration]] is often a sign of misalignment.", "振动大往往说明对中不良。"], ["lubrication", "润滑", "Regular [[lubrication]] extends the life of the chain.", "定期润滑能延长链条的寿命。"], ["seal", "密封件", "The [[seal]] is cracked and needs to be replaced.", "密封件裂了，需要更换。"]]}, {"name": "建筑", "items": [["scaffolding", "脚手架", "The [[scaffolding]] must be checked before anyone goes up.", "任何人上去之前，脚手架都必须先检查。"], ["general contractor", "总承包商", "The [[general contractor]] coordinates all trades on site.", "总承包商协调工地上所有的工种。"], ["subcontractor", "分包商", "We hired a [[subcontractor]] for the electrical work.", "电气部分我们请了一家分包商。"], ["structural engineer", "结构工程师", "The [[structural engineer]] approved the new opening in the wall.", "结构工程师批准了墙上新开的洞口。"], ["bill of quantities", "工程量清单", "The prices are based on the [[bill of quantities]].", "报价以工程量清单为准。"], ["reinforced concrete", "钢筋混凝土", "The building has a frame of [[reinforced concrete]].", "这栋楼是钢筋混凝土框架结构。"]]}, {"name": "生物技术", "items": [["bioreactor", "生物反应器", "The [[bioreactor]] holds 2,000 liters of cell culture.", "这台生物反应器能装 2,000 升细胞培养液。"], ["cleanroom", "洁净室", "You must change clothes before entering the [[cleanroom]].", "进入洁净室之前必须更衣。", ["cleanroom|clean room"]], ["batch record", "批记录", "Every step is recorded in the [[batch record]].", "每一步都记录在批记录里。"], ["GMP", "药品生产质量管理规范", "The plant was inspected for [[GMP]] compliance last month.", "工厂上个月接受了 GMP 合规检查。", ["gmp|good manufacturing practice"]], ["deviation", "偏差", "Every [[deviation]] must be investigated and documented.", "每一个偏差都必须调查并记录。"], ["shelf life", "保质期（有效期）", "The [[shelf life]] of the product is 24 months.", "该产品的有效期为 24 个月。"]]}], "stories": [{"title": "生产制造", "scene": "周会上汇报新产品的量产准备", "sentences": [["The new controller will [[go into series production]] in September, so we need to [[ramp up production]] quickly.", "新控制器九月进入量产，所以我们得尽快提升产量。"], ["At the moment, the line is already [[running at full capacity]].", "目前，产线已经满负荷运转。"], ["Final testing is the slowest step, so we will add a second station to [[eliminate the bottleneck]].", "终检是最慢的环节，所以我们会再加一个工位来消除瓶颈。"], ["With a new fixture, we also want to [[reduce the cycle time]] by ten seconds.", "我们还想用一个新夹具把节拍时间缩短十秒。"], ["Last week we had to [[scrap a whole batch]] because the wrong screws were used.", "上周因为用错了螺丝，我们只好报废了一整批。"], ["To avoid that, we will [[streamline the process]] and add a scanner at the screw station.", "为了避免再出这种事，我们会精简流程，并在打螺丝工位加一个扫码枪。"]]}, {"title": "质量改进", "scene": "客户投诉之后的 8D 处理", "sentences": [["Last month a customer found cracks in our housings, and it turned out to be [[a recurring defect]].", "上个月客户在我们的外壳上发现了裂纹，结果发现这是个反复出现的缺陷。"], ["We immediately [[quarantined]] all [[suspect parts]] to [[contain the problem]].", "我们立即隔离了所有可疑零件，先把问题控制住。"], ["Then we [[carried out a root cause analysis]] and found a worn-out tool.", "接着我们做了根本原因分析，找到一副磨损的模具。"], ["We have [[implemented]] two [[countermeasures]]: a new tool and an extra visual check.", "我们实施了两项对策：换新模具，并增加一道目视检查。"], ["We also [[sorted out the defective parts]] at the customer's warehouse.", "我们还在客户仓库里挑出了不良品。"], ["Now we will [[write the 8D report]] and [[verify the effectiveness]] after three good batches.", "现在我们要写 8D 报告，并在连续三批合格后验证效果。"]]}, {"title": "采购与供应商", "scene": "向采购经理汇报一个新零件的采购情况", "sentences": [["Last week I [[sent out the RFQ]] to four suppliers.", "上周我把询价单发给了四家供应商。"], ["After [[comparing the quotations]], Supplier B was the cheapest, but their [[minimum order quantity]] was too high.", "比价之后，供应商 B 最便宜，但他们的最小起订量太高了。"], ["We managed to [[negotiate a discount]] and a lower MOQ.", "我们谈下了折扣，也把起订量降了下来。"], ["We also [[agreed on payment terms]] of 60 days.", "我们还商定了 60 天的付款条件。"], ["Supplier B is now [[a single-source supplier]] for this part, so we plan to [[set up a second source]] next year.", "供应商 B 现在是这个零件的独家供应商，所以我们计划明年再开发一个供应商。"], ["I will [[place the order]] today and ask them to [[confirm the delivery date]].", "我今天就下单，并请他们确认交货日期。"]]}, {"title": "物流与库存", "scene": "一批进口零件在运输中出了问题", "sentences": [["Our parts from Shanghai [[cleared customs]] on Monday, but two pallets were [[damaged in transit]].", "我们从上海来的零件周一清关了，但有两个托盘在运输途中损坏了。"], ["We have already [[filed a claim with the carrier]].", "我们已经向承运人提出了索赔。"], ["Under FCA, [[the risk passes to the buyer]] at loading, so the claim is our job.", "按 FCA 条款，装货时风险就转给了买方，所以索赔得我们自己来。"], ["Without those parts, we will [[run out of stock]] by Friday.", "没有这些零件，我们到周五就会断货。"], ["The supplier will send 300 pieces as [[a partial shipment]] [[by air freight]].", "供应商会先空运 300 件作为分批发货。"], ["I'm [[tracking the shipment]] every day and keeping the customer informed.", "我每天都在跟踪这批货，并随时告知客户。"], ["In future, we want to [[keep stock levels low]], but with a small buffer for problems like this.", "以后我们还是要保持低库存，但要留一点余量应付这类问题。"]]}, {"title": "测试与认证", "scene": "新款充电桩的认证进展", "sentences": [["Our new wallbox must [[comply with the applicable standards]] before we can sell it in Europe.", "我们的新款壁挂充电桩必须先符合适用标准，才能在欧洲销售。"], ["Last month we [[ran a type test]] at an accredited lab.", "上个月我们在一家经认可的实验室做了型式试验。"], ["The prototype [[passed the test]], but one temperature was close to the limit.", "样机通过了测试，但有一个温度很接近上限。"], ["According to [[the data sheet]], the relay can handle 60 °C, so we are still [[within the specified range]].", "根据规格书，继电器能承受 60 °C，所以我们还在规定范围内。"], ["To be on the safe side, we [[approved a design change]] and added a small fan.", "为了保险起见，我们批准了一项设计变更，加了一个小风扇。"], ["Now we will [[document the test results]] and hope to [[obtain certification]] in May.", "现在我们要把测试结果记录下来，希望五月能拿到认证。"]]}, {"title": "能源与工地", "scene": "一座新厂房的光伏和储能项目", "sentences": [["We [[obtained the building permit]] in February and [[poured the foundation]] in March.", "我们二月拿到了施工许可，三月浇了地基。"], ["Everyone on site must [[wear PPE]], and the client [[carries out a site inspection]] every Friday.", "工地上每个人都必须穿戴防护装备，业主每周五来检查工地。"], ["The roof has 600 PV modules, and we [[sized the battery]] for the evening shift.", "屋顶装了 600 块光伏组件，电池容量是按晚班的用电来选的。"], ["The storage system will help the plant [[reduce peak load]].", "储能系统会帮工厂削减峰值负荷。"], ["When the client asked for extra chargers, we had to [[issue a change order]].", "业主要求加装充电桩时，我们只好开了变更单。"], ["Once we [[finish the punch list]], we can [[connect the system to the grid]].", "等尾项清单做完，我们就能把系统并网了。"]]}], "sentences": [["为了赶上旺季，我们下个月要把产量提高 30%。", "To be ready for the peak season, we need to ramp up production by 30 percent next month."], ["这条线已经满负荷运转了，再接订单就得加一个班次。", "This line is already running at full capacity, so any additional orders would mean an extra shift."], ["终检是瓶颈，所以我们打算再加一个测试工位。", "Final testing is the bottleneck, so we plan to add another test station."], ["新夹具让节拍时间缩短了 12 秒。", "The new fixture has reduced the cycle time by 12 seconds."], ["这批货硬度不合格，只能报废。", "This batch failed the hardness test, so we have to scrap it."], ["在找到根本原因之前，请先把所有可疑零件隔离起来。", "Until we find the root cause, please quarantine all suspect parts."], ["客户要求我们两周内提交 8D 报告。", "The customer has asked us to submit an 8D report within two weeks."], ["同一个缺陷已经是第三次出现了，我们得找出真正的原因。", "This is the third time the same defect has occurred, so we need to find the real cause."], ["对策已经实施了，但我们还需要三批合格品来验证效果。", "The countermeasures have been implemented, but we still need three good batches to verify their effectiveness."], ["我们已经把询价单发给了四家供应商，下周比较报价。", "We have sent the RFQ to four suppliers and will compare the quotations next week."], ["如果我们一年订一万件，能不能给我们打个折？", "If we order 10,000 pieces a year, could you give us a discount?"], ["他们的最小起订量太高了，我们用不了那么多。", "Their minimum order quantity is too high; we can't use that many."], ["这款芯片只有一家供应商，风险太大，我们得开发第二个供应商。", "There is only one supplier for this chip, which is too risky, so we need to set up a second source."], ["请在明天之前书面确认交货日期。", "Please confirm the delivery date in writing by tomorrow."], ["货物昨天已经清关，应该周四送到。", "The goods cleared customs yesterday and should arrive on Thursday."], ["有两个托盘在运输途中损坏了，我们已经向承运人提出了索赔。", "Two pallets were damaged in transit, and we have already filed a claim with the carrier."], ["如果卡车今天不到，我们周一就会断货。", "If the truck doesn't arrive today, we will run out of stock on Monday."], ["能不能先分批发 300 件，剩下的下周再发？", "Could you send 300 pieces as a partial shipment now and the rest next week?"], ["这款充电桩必须先通过型式试验，才能取得认证。", "This charger has to pass a type test before it can be certified."], ["所有测量值都在规定范围内，测试结果已经记录在报告里了。", "All measured values are within the specified range, and the test results have been documented in the report."], ["任何设计变更都必须先经过变更控制委员会批准。", "Any design change must first be approved by the change control board."], ["电网运营商批准之后，光伏系统才能并网。", "The PV system can only be connected to the grid after the grid operator has approved it."], ["在工地上必须一直穿戴个人防护装备。", "Personal protective equipment must be worn on site at all times."], ["尾项清单上的问题全部完成之前，客户不会签字验收。", "The customer won't sign the acceptance until all items on the punch list have been completed."]]};
+
+// ---- items ----
+// "[[...]]" marks the phrase inside a sentence: shown highlighted, and required when checking.
+function parseMarked(m) {
+  const parts = m.split(/(\[\[.+?\]\])/).filter(Boolean).map((t) => /^\[\[.+\]\]$/.test(t) ? { t: t.slice(2, -2), hl: true } : { t, hl: false });
+  return { parts, plain: parts.map((p) => p.t).join(""), keys: parts.filter((p) => p.hl).map((p) => p.t) };
+}
+const ITEMS = { phrases: [], industry: [], stories: [], sentences: [] };
+let n = 0;
+// One example sentence: what is shown, what is checked, and whether it is spoken (口语) or written (书面).
+function exampleOf(m, zh, tag, keys) { const x = parseMarked(m); return { parts: x.parts, zh, tag, target: x.plain, keys: keys || x.keys }; }
+DATA.phrases.forEach((g) => g.items.forEach(([en, zh, exs]) => {
+  n++;
+  ITEMS.phrases.push({ id: "p" + n, n, en, zh, group: g.name, groupEn: g.en, ex: exs.map(([m, z, tag, keys]) => exampleOf(m, z, tag, keys)) });
+}));
+DATA.industry.forEach((g, gi) => g.items.forEach(([en, zh, exEn, exZh, keys], i) => {
+  ITEMS.industry.push({ id: "i" + gi + "-" + i, n: i + 1, en, zh, group: g.name, ex: [exampleOf(exEn, exZh, null, keys)] });
+}));
+const STORIES = DATA.stories.map((st, gi) => {
+  const sents = st.sentences.map(([m, zh], i) => { const x = parseMarked(m); return { id: "t" + gi + "-" + i, n: i + 1, en: x.plain, zh, group: st.title, parts: x.parts, target: x.plain, keys: x.keys, story: gi }; });
+  ITEMS.stories.push(...sents);
+  return { ...st, gi, sents };
+});
+DATA.sentences.forEach(([zh, en], i) => ITEMS.sentences.push({ id: "s" + (i + 1), n: i + 1, en, zh, group: "中译英", target: en, keys: [] }));
+const INDUSTRIES = DATA.industry.map((g) => g.name);
+
+// ---- state ----
+const prefsKey = "lesson2-prefs", marksKey = "lesson2-marks";
+const state = { tab: "phrases", cover: "en", filter: "all", shuffle: false, industries: [], speed: 0.95, typing: true, marks: {}, revealed: new Set() };
+const typed = {};          // id -> { value, result: "ok" | "bad" | null }
+const sticky = new Set();  // items answered this round stay on screen even if the filter would hide them
+function readLocal(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
+function writeLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+Object.assign(state, readLocal(prefsKey) || {});
+state.revealed = new Set();
+state.marks = readLocal(marksKey) || {};
+let order = {};
+
+function savePrefs() { const { tab, cover, filter, shuffle, industries, speed, typing } = state; writeLocal(prefsKey, { tab, cover, filter, shuffle, industries, speed, typing }); }
+
+// ---- rendering ----
+const $ = (id) => document.getElementById(id);
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+function visible(item) {
+  if (sticky.has(item.id)) return true;
+  const m = state.marks[item.id];
+  if (state.filter === "review") return m !== "k";
+  if (state.filter === "unknown") return m === "u";
+  if (state.filter === "mistakes") return hasMistake(item.id);
+  return true;
+}
+function shuffled(list, key) {
+  if (!state.shuffle) return list;
+  if (!order[key]) { order[key] = list.map((x) => x.id).sort(() => Math.random() - 0.5); }
+  const pos = new Map(order[key].map((id, i) => [id, i]));
+  return [...list].sort((a, b) => pos.get(a.id) - pos.get(b.id));
+}
+
+// ---- typing practice ----
+function norm(t) {
+  return t.toLowerCase()
+    .replace(/[‘’ʼ`]/g, "'")
+    .replace(/won't/g, "will not").replace(/can't|cannot/g, "can not").replace(/n't\b/g, " not")
+    .replace(/\bcant\b/g, "can not").replace(/\b(do|does|did|is|are|was|were|have|has|had|could|should|would)nt\b/g, "$1 not").replace(/'ll\b/g, " will").replace(/'re\b/g, " are").replace(/'ve\b/g, " have").replace(/'m\b/g, " am").replace(/'d\b/g, " would")
+    .replace(/[-–—_/]/g, " ")
+    .replace(/[^a-z0-9' ]+/g, " ")
+    .replace(/\s+/g, " ").trim();
+}
+function answers(en) {
+  let forms = [en];
+  if (en.includes(" / ")) forms = forms.concat(en.split(" / "));
+  const out = new Set();
+  for (const f of forms) {
+    for (const sb of ["sb.", "somebody", "someone"]) for (const sth of ["sth.", "something"]) {
+      out.add(norm(f.replace(/\bsb\./g, sb).replace(/\bsth\./g, sth)));
+    }
+  }
+  return out;
+}
+function isCorrect(value, item) { return answers(item.target).has(norm(value)); }
+// "ok": matches the reference; "near": every key phrase is right and the sentence is mostly there; "bad": otherwise.
+function verdictFor(value, item) {
+  if (isCorrect(value, item)) return "ok";
+  const v = norm(value);
+  if (item.keys.length && v.split(" ").length >= 0.6 * norm(item.target).split(" ").length) {
+    const padded = " " + v + " ";
+    if (item.keys.every((k) => k.split("|").some((a) => padded.includes(" " + norm(a))))) return "near";
+  }
+  return "bad";
+}
+// Words of the reference answer that the typed answer did not match (longest common subsequence on words).
+function same(ref, w) {
+  return ref === w || (ref === "sb" && (w === "somebody" || w === "someone")) || (ref === "sth" && w === "something");
+}
+function missedWords(value, en) {
+  const words = en.split(/\s+/);
+  const parts = [];  // [wordIndex, normalizedPart]
+  words.forEach((w, wi) => norm(w).split(" ").filter(Boolean).forEach((p) => parts.push([wi, p])));
+  const a = norm(value).split(" ").filter(Boolean);
+  const L = Array.from({ length: parts.length + 1 }, () => new Array(a.length + 1).fill(0));
+  for (let i = parts.length - 1; i >= 0; i--) for (let j = a.length - 1; j >= 0; j--)
+    L[i][j] = same(parts[i][1], a[j]) ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const hit = new Array(parts.length).fill(false);
+  for (let i = 0, j = 0; i < parts.length && j < a.length;) {
+    if (same(parts[i][1], a[j])) { hit[i] = true; i++; j++; } else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++;
+  }
+  const ok = words.map(() => true);
+  parts.forEach(([wi], k) => { if (!hit[k]) ok[wi] = false; });
+  return words.map((w, i) => [w, ok[i]]);
+}
+function typingOn() { return state.typing && state.cover === "en"; }
+function focusInput(id) {
+  const inp = document.querySelector('.type-in[data-id="' + id + '"]');
+  if (inp) { inp.focus({ preventScroll: true }); inp.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+  return !!inp;
+}
+function moveFocus(fromId, dir) {
+  const all = [...document.querySelectorAll(".type-in")];
+  const i = all.findIndex((x) => x.dataset.id === fromId);
+  const next = all[i + dir];
+  if (next) { next.focus({ preventScroll: true }); next.scrollIntoView({ block: "center", behavior: "smooth" }); }
+}
+// Cards with examples follow all their sentences: any wrong -> "不会"; all right -> "会".
+function checkTyped(item, idx, value) {
+  const x = item.ex ? item.ex[idx] : item;
+  const key = item.ex ? item.id + ":" + idx : item.id;
+  typed[key] = { value, result: verdictFor(value, x) };
+  noteMistakes(item, key, x.target, x.zh, value, typed[key].result);
+  sticky.add(item.id);
+  state.revealed.add(partKey(item, idx));
+  const results = item.ex ? item.ex.map((_, k) => (typed[item.id + ":" + k] || {}).result) : [typed[key].result];
+  if (results.includes("bad")) setMark(item.id, "u");
+  else if (results.every(Boolean)) setMark(item.id, "k");
+  else render();
+}
+// Grow the answer box with its text so a long sentence stays fully visible.
+function fitBox(box) { box.style.height = "auto"; box.style.height = box.scrollHeight + 2 + "px"; }
+function typer(item, idx) {
+  const x = item.ex ? item.ex[idx] : item;
+  const key = item.ex ? item.id + ":" + idx : item.id;
+  const box = el("div", "typer");
+  const t = typed[key] || { value: "", result: null };
+  const inp = el("textarea", "type-in" + (t.result ? " " + t.result : ""));
+  inp.rows = 2; inp.id = "type-" + key.replace(":", "-"); inp.dataset.id = key; inp.value = t.value;
+  inp.placeholder = x.tag ? "看中文，默写" + x.tag + "例句，回车检查" : item.ex ? "看中文例句，默写整句英文，回车检查" : "看中文，写出整句英文，回车检查";
+  inp.setAttribute("aria-label", "输入英文：" + x.zh);
+  for (const [k, v] of [["autocomplete", "off"], ["autocapitalize", "off"], ["autocorrect", "off"], ["spellcheck", "false"], ["lang", "en"], ["enterkeyhint", "next"]]) inp.setAttribute(k, v);
+  inp.addEventListener("keydown", (e) => {
+    if (e.isComposing) return;
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const cur = typed[key];
+      if (cur && cur.result && cur.value === inp.value) moveFocus(key, 1);
+      else checkTyped(item, idx, inp.value);
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      moveFocus(key, e.shiftKey ? -1 : 1);
+    }
+  });
+  inp.addEventListener("input", () => {
+    fitBox(inp);
+    typed[key] = { value: inp.value, result: null };
+    inp.classList.remove("ok", "near", "bad");
+    const v = box.querySelector(".verdict"); if (v) v.remove();
+  });
+  if (!t.result) { const pm = prevMissLine(key); if (pm) box.append(pm); }
+  box.append(inp);
+  if (t.result === "ok") box.append(el("div", "verdict ok", "✓ 完全正确"));
+  if (t.result === "near") {
+    const v = el("div", "verdict near");
+    v.append(el("b", null, "✓ 词组用对了"), "，句子和参考答案略有不同。", correction(t.value, x.target, "near"));
+    box.append(v);
+  }
+  if (t.result === "bad") {
+    const v = el("div", "verdict bad");
+    v.append(el("span", "tag", t.value.trim() ? "✗ 不对" : "✗ 没填"));
+    v.append(correction(t.value, x.target, "bad"));
+    if (x.keys.length) v.append(el("div", "need", "要用到：" + x.keys.map((k) => k.split("|")[0]).join(" / ")));
+    box.append(v);
+  }
+  return box;
+}
+
+function marked(parts, cls) {
+  const d = el("div", cls);
+  for (const p of parts) d.append(p.hl ? el("span", "hl", p.t) : document.createTextNode(p.t));
+  return d;
+}
+function speakText(item) { return item.ex ? [item.en, ...item.ex.map((x) => x.target)].join(". ") : item.en; }
+const SPEAKER_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>';
+
+// Each covered line opens on its own: the phrase line ("#h") and each example ("#e0", "#e1"); a second click covers it again.
+const partKey = (item, idx) => item.id + (idx == null ? "#h" : "#e" + idx);
+function coverable(node, kind, rkey) {
+  if (state.cover !== kind) return node;
+  const shown = state.revealed.has(rkey);
+  node.classList.add("rv");
+  if (shown) node.title = "点击重新遮住";
+  else { node.classList.add("covered"); node.setAttribute("aria-label", "点击显示这一行"); }
+  node.tabIndex = 0;
+  node.setAttribute("role", "button");
+  const toggle = (e) => { e.stopPropagation(); shown ? state.revealed.delete(rkey) : state.revealed.add(rkey); render(); };
+  node.addEventListener("click", toggle);
+  node.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(e); } });
+  return node;
+}
+
+function card(item) {
+  const m = state.marks[item.id];
+  const sentence = !item.ex;
+  const c = el("div", "card" + (sentence ? " sent" : "") + (m === "k" ? " known" : m === "u" ? " unknown" : ""));
+  const face = el("div", "face");
+  const h = partKey(item);
+  if (item.ex) {
+    const en = el("div", "en"); en.append(el("span", "num", String(item.n)), item.en);
+    face.append(coverable(en, "en", h), coverable(el("div", "zh", item.zh), "zh", h));
+    const ex = el("div", "ex");
+    item.ex.forEach((x, k) => {
+      const row = el("div", "ex-item"), ek = partKey(item, k);
+      if (x.tag) row.append(el("span", "ex-tag " + (x.tag === "书面" ? "w" : "s"), x.tag));
+      row.append(coverable(marked(x.parts, "ex-en"), "en", ek), coverable(el("div", "ex-zh", x.zh), "zh", ek));
+      ex.append(row);
+    });
+    face.append(ex);
+  } else {
+    const zh = el("div", "zh"); zh.append(el("span", "num", String(item.n)), item.zh);
+    face.append(coverable(zh, "zh", h), coverable(item.parts ? marked(item.parts, "en") : el("div", "en", item.en), "en", h));
+  }
+  const marks = el("div", "marks");
+  for (const [v, label] of [["k", "会"], ["u", "不会"]]) {
+    const b = el("button", "mk-btn " + v, label);
+    b.setAttribute("aria-pressed", String(m === v));
+    b.addEventListener("click", () => setMark(item.id, m === v ? null : v));
+    marks.append(b);
+  }
+  if (canSpeak) {
+    const say = el("button", "say");
+    say.innerHTML = SPEAKER_ICON;
+    say.append(document.createTextNode("发音"));
+    say.setAttribute("aria-label", "播放发音：" + item.en);
+    say.addEventListener("click", () => speak(speakText(item), say));
+    marks.append(say);
+  }
+  const ask = el("button", "ask");
+  ask.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 17h-2v-2h2v2zm2.1-7.7-.9.9c-.7.7-1.2 1.3-1.2 2.8h-2v-.5c0-1.1.5-2.1 1.2-2.8l1.2-1.3a2 2 0 1 0-3.4-1.4H8a4 4 0 1 1 7.1 2.3z"/></svg>';
+  ask.append(document.createTextNode("解释"));
+  ask.setAttribute("aria-label", "让 Claude 解释：" + item.en);
+  ask.addEventListener("click", () => openExplain(item, ask));
+  marks.append(ask);
+  c.append(face, marks);
+  if (typingOn()) {
+    if (item.ex) { const ts = el("div", "typers"); item.ex.forEach((_, k) => ts.append(typer(item, k))); c.append(ts); }
+    else c.append(typer(item, null));
+  }
+  return c;
+}
+
+// The whole passage above its sentence cards: read it, listen to it, then write it sentence by sentence.
+function storyBlock(st) {
+  const box = el("div", "story");
+  const top = el("div", "story-top");
+  top.append(el("span", null, "场景：" + st.scene));
+  if (canSpeak) {
+    const say = el("button", "say");
+    say.innerHTML = SPEAKER_ICON;
+    say.append(document.createTextNode("播放全文"));
+    say.addEventListener("click", () => speak(st.sents.map((x) => x.target).join(" "), say));
+    top.append(say);
+  }
+  box.append(top);
+  const key = "story-" + st.gi;
+  const shown = state.revealed.has(key);
+  const toggle = () => { if (state.cover === "none") return; shown ? state.revealed.delete(key) : state.revealed.add(key); render(); };
+  const en = el("div", "story-en");
+  st.sents.forEach((x, i) => { if (i) en.append(" "); for (const p of x.parts) en.append(p.hl ? el("span", "hl", p.t) : document.createTextNode(p.t)); });
+  const zh = el("div", "story-zh", st.sents.map((x) => x.zh).join(""));
+  for (const [node, kind] of [[en, "en"], [zh, "zh"]]) {
+    if (state.cover === kind && !shown) node.classList.add("covered");
+    node.addEventListener("click", toggle);
+    box.append(node);
+  }
+  return box;
+}
+
+function render() {
+  const act = document.activeElement;
+  const focusId = act && act.classList && act.classList.contains("type-in") ? act.dataset.id : null;
+  const caret = focusId ? act.selectionStart : null;
+  renderView();
+  document.querySelectorAll(".type-in").forEach(fitBox);
+  if (focusId) {
+    const inp = document.querySelector('.type-in[data-id="' + focusId + '"]');
+    if (inp) { inp.focus({ preventScroll: true }); try { inp.setSelectionRange(caret, caret); } catch {} }
+  }
+}
+function renderView() {
+  const tab = state.tab;
+  for (const b of document.querySelectorAll("[data-tab]")) b.setAttribute("aria-pressed", String(b.dataset.tab === tab));
+  for (const b of document.querySelectorAll("[data-cover]")) b.setAttribute("aria-pressed", String(b.dataset.cover === state.cover));
+  for (const b of document.querySelectorAll("[data-filter]")) b.setAttribute("aria-pressed", String(b.dataset.filter === state.filter));
+  $("shuffle").setAttribute("aria-pressed", String(state.shuffle));
+  $("typing").setAttribute("aria-pressed", String(state.typing));
+  const tl = $("tally"); tl.hidden = !typingOn() || tab === "mistakes";
+  if (!tl.hidden) {
+    const ids = new Set(ITEMS[tab].map((i) => i.id));
+    const res = Object.entries(typed).filter(([id, t]) => ids.has(id.split(":")[0]) && t.result);
+    tl.textContent = "本轮打字 对 " + res.filter(([, t]) => t.result !== "bad").length + " / " + res.length;
+  }
+  for (const b of document.querySelectorAll("[data-speed]")) b.setAttribute("aria-pressed", String(Number(b.dataset.speed) === (state.speed || 0.95)));
+  const pressed = (sel) => (document.querySelector(sel + '[aria-pressed="true"]') || {}).textContent || "";
+  $("opts-toggle").textContent = ["设置", pressed("[data-cover]"), state.filter !== "all" ? pressed("[data-filter]") : "", typingOn() ? "打字" : ""].filter(Boolean).join(" · ");
+
+  // industry chips
+  const chips = $("chips");
+  chips.hidden = tab !== "industry";
+  if (tab === "industry") {
+    chips.replaceChildren();
+    const all = el("button", "chip", "全部行业");
+    all.setAttribute("aria-pressed", String(state.industries.length === 0));
+    all.addEventListener("click", () => { state.industries = []; savePrefs(); render(); });
+    chips.append(all);
+    for (const name of INDUSTRIES) {
+      const b = el("button", "chip", name);
+      const on = state.industries.includes(name);
+      b.setAttribute("aria-pressed", String(on));
+      b.addEventListener("click", () => {
+        state.industries = on ? state.industries.filter((x) => x !== name) : [...state.industries, name];
+        savePrefs(); render();
+      });
+      chips.append(b);
+    }
+  }
+
+  const nOpen = mistakes.filter((m) => !m.done).length;
+  $("tab-mistakes").textContent = "错题本" + (nOpen ? " " + nOpen : "");
+  $("reset-wrap").hidden = tab === "mistakes";
+  if (tab === "mistakes") { renderNotebook(); return; }
+
+  let pool = ITEMS[tab];
+  if (tab === "industry" && state.industries.length) pool = pool.filter((i) => state.industries.includes(i.group));
+
+  // stats for the current pool (before the display filter)
+  const k = pool.filter((i) => state.marks[i.id] === "k").length;
+  const u = pool.filter((i) => state.marks[i.id] === "u").length;
+  $("st-k").textContent = "会 " + k; $("st-u").textContent = "不会 " + u; $("st-n").textContent = "未标 " + (pool.length - k - u);
+  $("m-k").style.width = (pool.length ? (k / pool.length) * 100 : 0) + "%";
+  $("m-u").style.width = (pool.length ? (u / pool.length) * 100 : 0) + "%";
+
+  const list = $("list");
+  list.replaceChildren();
+  const shown = pool.filter(visible);
+  if (!shown.length) {
+    const msg = state.filter === "unknown" ? "这一页没有标成“不会”的条目。" : state.filter === "mistakes" ? "这一页没有待改的错题。" : "这一页的条目都已经标成“会”了。切到“全部”可以重新看。";
+    list.append(el("div", "empty", msg));
+    return;
+  }
+  if (state.shuffle) {
+    const sec = el("section", "group");
+    const h = el("h2", null, "打乱顺序"); h.append(el("span", "cnt", shown.length + " 条"));
+    const grid = el("div", "grid wide");
+    shuffled(shown, tab + state.industries.join()).forEach((i) => grid.append(card(i)));
+    sec.append(h, grid); list.append(sec);
+    return;
+  }
+  const groups = [...new Set(shown.map((i) => i.group))];
+  for (const g of groups) {
+    const items = shown.filter((i) => i.group === g);
+    const sec = el("section", "group");
+    const h = el("h2", null, g);
+    if (items[0].groupEn) h.append(el("small", null, items[0].groupEn));
+    h.append(el("span", "cnt", items.length + " 条"));
+    sec.append(h);
+    if (tab === "stories") sec.append(storyBlock(STORIES[items[0].story]));
+    const grid = el("div", "grid wide");
+    items.forEach((i) => grid.append(card(i)));
+    sec.append(grid); list.append(sec);
+  }
+}
+
+// ---- mistakes: compare an answer word by word, show what went wrong, keep it in the 错题本 ----
+const KEY = norm;            // comparison key of one word: lower case, no punctuation, contractions spelled out
+const CASE_MATTERS = false;  // English capitals are not checked
+const FOREIGN = "en";
+const MKEY = "lesson2-mistakes";
+function MISSED(value, target) {
+  const ans = el("span", "ans");
+  missedWords(value, target).forEach(([w, okw], i) => { if (i) ans.append(" "); ans.append(okw ? document.createTextNode(w) : el("span", "miss", w)); });
+  const d = el("div"); d.append("参考答案：", ans); return d;
+}
+const MTYPES = { spell: "拼写", word: "用词", miss: "漏词", extra: "多写", order: "词序", case: "大小写", whole: "整句" };
+const TAB_OF = { p: "phrases", i: "industry", t: "stories", s: "sentences", f: "friends" };
+let mistakes = (() => { const v = readLocal(MKEY); return Array.isArray(v) ? v : []; })();
+let mRemote = null, mTimer = null;
+function dayStr() { const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function splitPunct(tok) { const m = tok.match(/^([^\p{L}\p{N}]*)(.*?)([^\p{L}\p{N}]*)$/u); return m ? [m[1], m[2], m[3]] : ["", tok, ""]; }
+const clean = (tok) => splitPunct(tok)[1];
+function caseDiff(a, b) { const up = (s) => !!s && s[0] !== s[0].toLowerCase(); return up(a) !== up(b); }
+function lev(a, b) {
+  if (!a.length) return b.length; if (!b.length) return a.length;
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[b.length];
+}
+// Letters of the right word that the typed word got wrong or left out.
+function charMarks(ref, typed) {
+  const a = ref.toLowerCase(), b = typed.toLowerCase(), m = a.length, n = b.length;
+  const D = Array.from({ length: m + 1 }, (_, i) => Array.from({ length: n + 1 }, (_, j) => (i ? (j ? 0 : i) : j)));
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+    D[i][j] = Math.min(D[i - 1][j] + 1, D[i][j - 1] + 1, D[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  const rm = new Array(m).fill(false);
+  for (let i = m, j = n; i > 0 || j > 0;) {
+    if (i > 0 && j > 0 && D[i][j] === D[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)) { if (a[i - 1] !== b[j - 1]) rm[i - 1] = true; i--; j--; }
+    else if (i > 0 && D[i][j] === D[i - 1][j] + 1) { rm[i - 1] = true; i--; }
+    else j--;
+  }
+  return rm;
+}
+// Comparison units: one per word of the key (a contraction or a hyphenated word can give two), each remembering its original word.
+function unitsOf(s) {
+  const out = [];
+  s.split(/\s+/).filter(Boolean).forEach((tok, ti) => KEY(tok).split(" ").filter(Boolean).forEach((key) => out.push({ key, tok, ti })));
+  return out;
+}
+// Cost of putting reference unit a against typed unit b: same word 0, a misspelling < 1, a different word 1.6 (cheaper than missing + extra).
+function sim(a, b) {
+  if (a === b) return 0;
+  const d = lev(a, b), m = Math.max(a.length, b.length);
+  return d <= Math.max(1, Math.round(m * 0.4)) ? 0.5 + d / m : 1.6;
+}
+function diffAnswer(value, ref) {
+  const R = unitsOf(ref), T = unitsOf(value), m = R.length, n = T.length;
+  const C = Array.from({ length: m + 1 }, (_, i) => Array.from({ length: n + 1 }, (_, j) => (i ? (j ? 0 : i) : j)));
+  for (let i = 1; i <= m; i++) for (let j = 1; j <= n; j++)
+    C[i][j] = Math.min(C[i - 1][j] + 1, C[i][j - 1] + 1, C[i - 1][j - 1] + sim(R[i - 1].key, T[j - 1].key));
+  const ops = [];
+  for (let i = m, j = n; i > 0 || j > 0;) {
+    if (i > 0 && j > 0 && Math.abs(C[i][j] - C[i - 1][j - 1] - sim(R[i - 1].key, T[j - 1].key)) < 1e-9) { ops.push({ r: R[i - 1], t: T[j - 1] }); i--; j--; }
+    else if (i > 0 && Math.abs(C[i][j] - C[i - 1][j] - 1) < 1e-9) { ops.push({ r: R[i - 1], t: null }); i--; }
+    else { ops.push({ r: null, t: T[j - 1] }); j--; }
+  }
+  ops.reverse();
+  for (const o of ops) {
+    if (o.r && o.t) { const s = sim(o.r.key, o.t.key); o.op = s === 0 ? (CASE_MATTERS && caseDiff(clean(o.r.tok), clean(o.t.tok)) ? "case" : "eq") : s < 1.6 ? "spell" : "word"; }
+    else o.op = o.r ? "miss" : "extra";
+  }
+  // A word missing in one place and extra in another was put in the wrong position.
+  for (const o of ops) if (o.op === "miss") {
+    const x = ops.find((p) => p.op === "extra" && p.t.key === o.r.key);
+    if (x) { o.op = "order"; x.op = "moved"; }
+  }
+  const toks = ref.split(/\s+/).filter(Boolean);
+  const info = toks.map(() => ({ op: "eq", typed: [] }));
+  const RANK = { eq: 0, case: 1, spell: 2, word: 3, miss: 3, order: 3 };
+  const extras = {};  // index of the reference word they follow (-1 = before the first) -> typed words
+  let last = -1;
+  for (const o of ops) {
+    if (o.r) { const f = info[o.r.ti]; if (RANK[o.op] > RANK[f.op]) f.op = o.op; if (o.t && !f.typed.includes(o.t.tok)) f.typed.push(o.t.tok); last = o.r.ti; }
+    else { const xs = extras[last] = extras[last] || []; if (!xs.length || xs[xs.length - 1].tok !== o.t.tok) xs.push({ tok: o.t.tok, op: o.op }); }
+  }
+  const errors = [];
+  info.forEach((f, ti) => {
+    if (f.op === "eq") return;
+    errors.push({ type: f.op, ref: clean(toks[ti]), typed: f.op === "miss" || f.op === "order" ? "" : clean(f.typed.join(" ")), ti });
+  });
+  for (const k in extras) for (const x of extras[k]) if (x.op === "extra") errors.push({ type: "extra", ref: "", typed: clean(x.tok), ti: Number(k) });
+  return { toks, info, extras, errors };
+}
+// The right word, with the letters that were wrong or missing highlighted (punctuation stays outside).
+function fixedWord(tok, typedW, cls) {
+  const [pre, w, post] = splitPunct(tok);
+  const ins = el("ins", cls || null);
+  const marks = cls === "d-case" ? [...w].map((_, i) => i === 0) : typedW != null ? charMarks(w, typedW) : null;
+  if (cls === "d-spell-case") marks[0] = true;   // misspelt and also wrong capital
+  if (marks) {
+    let run = "", on = false;
+    const flush = () => { if (run) ins.append(on ? el("span", "ch", run) : document.createTextNode(run)); run = ""; };
+    [...w].forEach((ch, i) => { if (marks[i] !== on) { flush(); on = marks[i]; } run += ch; });
+    flush();
+  } else ins.append(w);
+  const f = document.createDocumentFragment(); f.append(pre, ins, post); return f;
+}
+// The reference sentence in track-changes style: what you wrote is struck through, the fix follows it.
+function diffView(d) {
+  const box = el("div", "diff"); box.lang = FOREIGN;
+  const extra = (k) => (d.extras[k] || []).forEach((x) => {
+    box.append(" ");
+    const s = el("del", x.op === "moved" ? "d-moved" : null, clean(x.tok)); s.title = x.op === "moved" ? "这个词放错了位置" : "多写的词"; box.append(s);
+  });
+  extra(-1);
+  d.toks.forEach((tok, ti) => {
+    const f = d.info[ti], typedW = clean(f.typed.join(" "));
+    if (ti || (d.extras[-1] || []).length) box.append(" ");
+    if (f.op === "eq") box.append(tok);
+    else if (f.op === "spell") { box.append(el("del", null, typedW)); box.append(fixedWord(tok, typedW, CASE_MATTERS && caseDiff(clean(tok), typedW) ? "d-spell-case" : null)); }
+    else if (f.op === "word") { box.append(el("del", null, typedW)); box.append(fixedWord(tok)); }
+    else if (f.op === "case") { const w = fixedWord(tok, typedW, "d-case"); w.querySelector("ins").title = "大小写：你写成 " + typedW; box.append(w); }
+    else if (f.op === "miss") { const w = fixedWord(tok, null, "d-miss"); w.querySelector("ins").title = "漏写的词"; box.append(w); }
+    else { const w = fixedWord(tok, null, "d-moved"); w.querySelector("ins").title = "这个词应该在这里"; box.append(w); }
+    extra(ti);
+  });
+  return box;
+}
+function legend() {
+  const d = el("div", "d-legend");
+  d.append(el("del", null, "你写的"), el("ins", null, "正确写法"), el("ins", "d-miss", "漏写"), el("ins", "d-moved", "位置不对"));
+  return d;
+}
+// What one checked answer shows and what it keeps: a "bad" answer keeps every mistake (or one "整句" entry when most of it is wrong);
+// a "near" answer (key phrase right, wording differs) keeps spelling, capitals and missing words.
+function analyse(value, target, verdict) {
+  const d = diffAnswer(value, target);
+  const real = d.errors.filter((e) => e.type !== "case");
+  const whole = verdict === "bad" && (!value.trim() || real.length > Math.max(3, Math.ceil(d.toks.length / 2)));
+  const stored = whole ? [{ type: "whole", ref: target, typed: "", ti: -1 }]
+    : verdict === "bad" ? d.errors : d.errors.filter((e) => e.type === "spell" || e.type === "case" || e.type === "miss");
+  return { d, whole, stored };
+}
+function savedNote(stored) {
+  if (!stored.length) return null;
+  const c = {}; stored.forEach((e) => { c[e.type] = (c[e.type] || 0) + 1; });
+  return el("div", "saved-note", "已记入错题本：" + Object.entries(c).map(([k, v]) => MTYPES[k] + (v > 1 ? " " + v : "")).join(" · "));
+}
+function correction(value, target, verdict) {
+  const a = analyse(value, target, verdict);
+  const f = document.createDocumentFragment();
+  if (a.whole) f.append(MISSED(value, target));
+  else if (a.d.errors.length) { f.append(el("div", "d-lead", verdict === "near" ? "和参考答案对比：" : "对照改正：")); f.append(diffView(a.d), legend()); }
+  const n = savedNote(a.stored); if (n) f.append(n);
+  return f;
+}
+const midOf = (key, e) => key + "|" + e.type + "|" + KEY(e.ref || e.typed);
+// Mastered after being written right on two different days.
+function credit(m, today) {
+  m.days = m.days || [];
+  if (!m.days.includes(today)) m.days.push(today);
+  if (m.days.length >= 2) { m.done = true; m.doneOn = today; }
+}
+// After each check: add or bump what went wrong, and credit earlier mistakes of this sentence that were not repeated.
+function noteMistakes(item, key, target, zh, value, verdict) {
+  const a = analyse(value, target, verdict), today = dayStr();
+  const now = new Set((a.whole ? a.stored : a.d.errors).map((e) => midOf(key, e)));
+  for (const e of a.stored) {
+    const mid = midOf(key, e);
+    let m = mistakes.find((z) => z.mid === mid);
+    if (!m) { m = { mid, key, item: item.id, type: e.type, ref: e.ref, n: 0, first: today }; mistakes.push(m); }
+    Object.assign(m, { typed: e.typed, ti: e.ti, ctx: target, zh, n: m.n + 1, last: today, days: [], done: false });
+  }
+  if (!a.whole) for (const m of mistakes) {
+    if (m.key !== key || m.done || now.has(m.mid) || (m.type === "whole" && verdict === "bad")) continue;
+    credit(m, today);
+  }
+  saveMistakes();
+}
+function saveMistakes() {
+  writeLocal(MKEY, mistakes);
+  if (!mRemote) return;
+  clearTimeout(mTimer);
+  mTimer = setTimeout(() => { mRemote.set({ list: mistakes, updatedAt: Date.now() }).catch(() => {}); }, 800);
+}
+async function initMistakes(db, uid) {
+  try {
+    mRemote = db.doc("data/users/" + uid + "/mistakes");
+    const snap = await mRemote.get();
+    const saved = snap.exists && Array.isArray(snap.data().list) ? snap.data().list : [];
+    const byMid = new Map(saved.map((m) => [m.mid, m]));
+    const newer = (a, b) => (a.last || "") > (b.last || "") || ((a.last || "") === (b.last || "") && (a.n > b.n || (a.n === b.n && (a.days || []).length > (b.days || []).length)));
+    for (const m of mistakes) { const o = byMid.get(m.mid); if (!o || newer(m, o)) byMid.set(m.mid, m); }
+    const merged = [...byMid.values()];
+    const changed = JSON.stringify(merged) !== JSON.stringify(saved);
+    mistakes = merged; writeLocal(MKEY, mistakes);
+    if (changed) saveMistakes();
+    render();
+  } catch { mRemote = null; }
+}
+function hasMistake(id) { return mistakes.some((m) => !m.done && m.item === id); }
+// Above an answer box: where you went wrong last time, without giving the answer away.
+function prevMissLine(key) {
+  const ms = mistakes.filter((m) => !m.done && m.key === key);
+  if (!ms.length) return null;
+  const d = el("div", "prev-miss");
+  d.append(el("b", null, "上次错在："));
+  ms.forEach((m, i) => {
+    if (i) d.append(" · ");
+    if (m.type === "miss") d.append("漏了一个词");
+    else if (m.type === "order") d.append("词序");
+    else if (m.type === "whole") d.append("整句没写出来");
+    else { const s = el("s", null, m.typed || "?"); s.lang = FOREIGN; d.append(s); if (m.type === "case") d.append("（大小写）"); if (m.type === "extra") d.append("（多写）"); }
+  });
+  return d;
+}
+
+// ---- 错题本 ----
+let nbType = "all", nbShowDone = false, nbOrder = null;
+const cloze = {};          // mistake id -> { value, result: "ok" | "case" | "bad" | null }
+const nbOpen = new Set();  // mistakes whose answer is shown
+const CLOZE = new Set(["spell", "word", "case", "miss"]);
+function itemById(id) { for (const list of Object.values(ITEMS)) { const it = list.find((i) => i.id === id); if (it) return it; } return null; }
+function sortedMistakes() {
+  if (!nbOrder) nbOrder = [...mistakes].sort((a, b) => (a.done - b.done) || (b.n - a.n) || ((b.last || "") > (a.last || "") ? 1 : (b.last || "") < (a.last || "") ? -1 : 0)).map((m) => m.mid);
+  const pos = new Map(nbOrder.map((id, i) => [id, i]));
+  return [...mistakes].sort((a, b) => (pos.has(a.mid) ? pos.get(a.mid) : -1) - (pos.has(b.mid) ? pos.get(b.mid) : -1));
+}
+function renderNotebook() {
+  const list = $("list");
+  list.replaceChildren();
+  const active = mistakes.filter((m) => !m.done), done = mistakes.length - active.length;
+  $("st-k").textContent = "已掌握 " + done; $("st-u").textContent = "待改 " + active.length; $("st-n").textContent = "";
+  $("m-k").style.width = (mistakes.length ? (done / mistakes.length) * 100 : 0) + "%";
+  $("m-u").style.width = (mistakes.length ? (active.length / mistakes.length) * 100 : 0) + "%";
+  const sec = el("section", "group");
+  const h = el("h2", null, "错题本"); h.append(el("span", "cnt", "待改 " + active.length + " · 已掌握 " + done));
+  sec.append(h, el("p", "nb-intro", "默写时写错的地方会自动记到这里。先看自己上次写错的样子，再在空格里写出正确的词，回车检查；同一个错误要在两个不同的日子写对才算掌握。词序和整句的错误，点“去练整句”回到原来的卡片重写。"));
+  const counts = {}; active.forEach((m) => { counts[m.type] = (counts[m.type] || 0) + 1; });
+  const chips = el("div", "chips nb-chips");
+  for (const [k, label] of [["all", "全部 " + active.length], ...Object.keys(MTYPES).filter((k) => counts[k]).map((k) => [k, MTYPES[k] + " " + counts[k]])]) {
+    const b = el("button", "chip", label);
+    b.setAttribute("aria-pressed", String(nbType === k));
+    b.addEventListener("click", () => { nbType = k; nbOrder = null; render(); });
+    chips.append(b);
+  }
+  if (done) {
+    const b = el("button", "chip", "显示已掌握 " + done);
+    b.setAttribute("aria-pressed", String(nbShowDone));
+    b.addEventListener("click", () => { nbShowDone = !nbShowDone; render(); });
+    chips.append(b);
+  }
+  sec.append(chips);
+  const shown = sortedMistakes().filter((m) => (nbShowDone || !m.done) && (nbType === "all" || m.type === nbType));
+  if (!shown.length) {
+    sec.append(el("div", "empty", mistakes.length ? "这一类没有待改的错题。" : "还没有错题。在练习里默写句子，按回车检查后，写错的地方会自动记到这里。"));
+  } else {
+    const grid = el("div", "grid wide");
+    shown.forEach((m) => grid.append(mistakeCard(m)));
+    sec.append(grid);
+  }
+  list.append(sec);
+}
+// The sentence with the word to recall left blank (or highlighted once answered).
+function clozeLine(m, blank) {
+  const d = el("div", "m-ctx"); d.lang = FOREIGN;
+  m.ctx.split(/\s+/).forEach((tok, i) => {
+    if (i) d.append(" ");
+    if (i !== m.ti || m.type === "extra") { d.append(tok); return; }
+    const [pre, w, post] = splitPunct(tok);
+    d.append(pre, blank ? el("span", "m-blank", " ") : el("span", "hl", w), post);
+  });
+  return d;
+}
+function checkCloze(m, value) {
+  const today = dayStr(), same = KEY(value) === KEY(m.ref);
+  const caseWrong = same && CASE_MATTERS && caseDiff(m.ref, clean(value.trim()));
+  const ok = same && !(caseWrong && m.type === "case");
+  cloze[m.mid] = { value, result: !same ? "bad" : caseWrong ? "case" : "ok" };
+  if (ok) credit(m, today);
+  else { m.n += 1; m.last = today; m.typed = clean(value.trim()) || m.typed; m.days = []; }
+  saveMistakes();
+  const order = [...document.querySelectorAll(".cloze-in")].map((x) => x.dataset.id), at = order.indexOf("m:" + m.mid);
+  render();
+  if (!document.querySelector('.type-in[data-id="m:' + m.mid + '"]')) {
+    for (const id of order.slice(at + 1)) { const nx = document.querySelector('.type-in[data-id="' + id + '"]'); if (nx) { nx.focus({ preventScroll: true }); break; } }
+  }
+}
+function clozeInput(m, cs) {
+  const box = el("div", "typer");
+  const inp = el("textarea", "type-in cloze-in" + (cs.result ? " " + (cs.result === "bad" ? "bad" : "ok") : ""));
+  inp.rows = 1; inp.dataset.id = "m:" + m.mid; inp.id = "cloze-" + mistakes.indexOf(m); inp.value = cs.value;
+  inp.placeholder = m.type === "miss" ? "写出漏掉的词，回车检查" : "写出空格里的词，回车检查";
+  inp.setAttribute("aria-label", "填空：" + m.zh);
+  for (const [k, v] of [["autocomplete", "off"], ["autocapitalize", "off"], ["autocorrect", "off"], ["spellcheck", "false"], ["lang", FOREIGN], ["enterkeyhint", "next"]]) inp.setAttribute(k, v);
+  inp.addEventListener("keydown", (e) => {
+    if (e.isComposing) return;
+    if (e.key === "Enter") { e.preventDefault(); const c = cloze[m.mid]; if (c && c.result && c.value === inp.value) moveFocus(inp.dataset.id, 1); else checkCloze(m, inp.value); }
+    else if (e.key === "Tab") { e.preventDefault(); moveFocus(inp.dataset.id, e.shiftKey ? -1 : 1); }
+  });
+  inp.addEventListener("input", () => { fitBox(inp); cloze[m.mid] = { value: inp.value, result: null }; inp.classList.remove("ok", "bad"); const v = box.querySelector(".verdict"); if (v) v.remove(); });
+  box.append(inp);
+  if (cs.result) {
+    const v = el("div", "verdict " + (cs.result === "bad" ? "bad" : "ok"));
+    if (cs.result === "ok") v.append(m.done ? "✓ 对了，已掌握" : "✓ 对了，换一天再写对一次就掌握");
+    else if (cs.result === "case") { v.append("✓ 拼写对了，注意大小写：", fixedWord(m.ref, clean(cs.value.trim()), "d-case")); }
+    else { v.append(el("span", "tag", "✗ 还不对"), el("del", null, clean(cs.value.trim()) || "（空）"), " → "); const fx = el("span", "m-fix"); fx.append(fixedWord(m.ref, clean(cs.value.trim()))); v.append(fx); }
+    box.append(v);
+  }
+  return box;
+}
+function practiseAgain(m) {
+  const item = itemById(m.item);
+  if (!item) return;
+  state.tab = TAB_OF[m.item[0]]; state.filter = "all"; state.shuffle = false; nbOrder = null;
+  if (state.industries.length && !state.industries.includes(item.group)) state.industries = [];
+  state.cover = FOREIGN; state.typing = true; state.revealed.clear(); sticky.clear();
+  delete typed[m.key];
+  savePrefs(); render();
+  const inp = document.querySelector('.type-in[data-id="' + m.key + '"]');
+  if (inp) { inp.scrollIntoView({ block: "center" }); inp.focus({ preventScroll: true }); }
+}
+function mistakeCard(m) {
+  const c = el("div", "card mcard" + (m.done ? " known" : ""));
+  const top = el("div", "m-top");
+  top.append(el("span", "m-type t-" + m.type, MTYPES[m.type]), el("span", null, "错 " + m.n + " 次 · 最近 " + (m.last || "").slice(5)));
+  top.append(el("span", "m-state", m.done ? "已掌握" : (m.days || []).length ? "已写对 1 天，换一天再写对就掌握" : "待改"));
+  c.append(top);
+  const was = el("div", "m-was");
+  if (m.type === "miss") was.append("上次漏写了一个词");
+  else if (m.type === "order") was.append("上次这个词放错了位置：", el("b", null, m.ref));
+  else if (m.type === "whole") was.append("上次整句没写出来");
+  else if (m.type === "extra") was.append("上次多写了：", el("s", null, m.typed));
+  else was.append(m.type === "case" ? "大小写写错：" : "你写成：", el("s", null, m.typed));
+  c.append(was);
+  const cs = cloze[m.mid] || { value: "", result: null };
+  const open = m.done || nbOpen.has(m.mid) || !!cs.result;
+  const canCloze = CLOZE.has(m.type) && m.ti >= 0 && !m.done;
+  if (canCloze || open) c.append(clozeLine(m, canCloze && !open));
+  c.append(el("div", "zh", m.zh));
+  if (canCloze) c.append(clozeInput(m, cs));
+  const acts = el("div", "marks");
+  if (!open) { const b = el("button", "mk-btn", "看答案"); b.addEventListener("click", () => { nbOpen.add(m.mid); render(); }); acts.append(b); }
+  if (canSpeak) {
+    const say = el("button", "say"); say.innerHTML = SPEAKER_ICON; say.append(document.createTextNode("发音"));
+    say.addEventListener("click", () => speak(m.ctx, say)); acts.append(say);
+  }
+  if (itemById(m.item)) { const go = el("button", "mk-btn", "去练整句"); go.addEventListener("click", () => practiseAgain(m)); acts.append(go); }
+  const del = el("button", "mk-btn", "删除");
+  del.title = "判错了或不想再练，就从错题本删掉";
+  del.addEventListener("click", () => { mistakes = mistakes.filter((z) => z !== m); saveMistakes(); render(); });
+  acts.append(del);
+  c.append(acts);
+  return c;
+}
+
+// ---- pronunciation (the browser's built-in English voice) ----
+const synth = window.speechSynthesis;
+const canSpeak = !!(synth && window.SpeechSynthesisUtterance);
+let voice = null;
+function pickVoice() {
+  if (!canSpeak) return;
+  const vs = synth.getVoices().filter((v) => /^en[-_]/i.test(v.lang));
+  const rank = (v) => (/en[-_]US/i.test(v.lang) ? 0 : /en[-_]GB/i.test(v.lang) ? 1 : 2) * 10
+    + (/(natural|neural|google|samantha|aria|jenny|ava|alex)/i.test(v.name) ? 0 : 5) + (v.localService ? 0 : 1);
+  voice = vs.sort((a, b) => rank(a) - rank(b))[0] || null;
+}
+if (canSpeak) { pickVoice(); synth.addEventListener?.("voiceschanged", pickVoice); }
+function spoken(text) {
+  return text.replace(/\bsb\./g, "somebody").replace(/\bsth\./g, "something").replace(/\s\/\s/g, ", or ");
+}
+let playingBtn = null;
+function speak(text, btn) {
+  if (!canSpeak) return;
+  synth.cancel();
+  if (playingBtn) playingBtn.classList.remove("playing");
+  const u = new SpeechSynthesisUtterance(spoken(text));
+  u.lang = voice ? voice.lang : "en-US";
+  if (voice) u.voice = voice;
+  u.rate = state.speed || 0.95;
+  playingBtn = btn; btn.classList.add("playing");
+  const done = () => { btn.classList.remove("playing"); if (playingBtn === btn) playingBtn = null; };
+  u.onend = done; u.onerror = done;
+  synth.speak(u);
+}
+
+// ---- explanations from Claude ----
+let sampleFn = null;        // claude.use("sample") result, null when unavailable
+let sampleBlocked = false;  // viewer declined or Claude unavailable in this view
+let dbRef = null, userId = null;
+const explainCache = {};    // id -> turns
+let cur = null;             // { item, turns, ctl, opener }
+let lastError = "";
+
+const KIND = { phrases: "职场词组", industry: "行业词汇", stories: "句子", sentences: "句子" };
+function kindOf(item) { return item.id[0] === "p" ? "phrases" : item.id[0] === "i" ? "industry" : "sentences"; }
+function exampleLine(item) { return item.ex ? "\n课本例句：" + item.ex.map((x) => (x.tag ? x.tag + "：" : "") + x.target + "（" + x.zh + "）").join("；") : ""; }
+const LEARNER = "学习者：中文母语，英语大约雅思 5 分，目标是能在工程技术工作中开口说英语（生产、质量、采购物流、测试认证、能源和工地；行业包括医疗、电气、电子信息、能源、物流、供应链、汽车、制造、机械、建筑、生物技术）。";
+function promptFor(item) {
+  const k = kindOf(item);
+  if (k === "sentences") {
+    return "你是职场英语老师。" + LEARNER + "\n请用中文讲解下面这个句子，英文部分保持英文。\n中文：" + item.zh + "\n参考英文：" + item.en +
+      "\n\n按下面的结构输出，每部分 2-4 行，简洁，不要开场白和结束语：\n### 句子结构\n### 关键词组\n### 更口语的说法\n### 更正式的说法（写邮件用）\n### 中国人常见错误";
+  }
+  return "你是职场英语老师。" + LEARNER + "\n请用中文讲解下面这个" + KIND[k] + "，英文例句保持英文。\n条目：" + item.en + "（" + item.zh + "）" + exampleLine(item) +
+    "\n\n按下面的结构输出，简洁，不要开场白和结束语：\n### 意思和用法\n### 常见搭配（3-5 个）\n### 工作例句（3 句，生产、质量、采购物流、测试或工地场景，每句后面附中文）\n### 中国人常见错误（1-2 条）\n### 近义说法（如果有）";
+}
+function copyPromptFor(item) {
+  return kindOf(item) === "sentences"
+    ? "请讲解这个职场英语句子：" + item.en + "（" + item.zh + "）。包括句子结构、关键词组、更口语和更正式的说法、常见错误。不需要讲发音。"
+    : "请讲解这个职场英语" + KIND[kindOf(item)] + "：" + item.en + "（" + item.zh + "）。包括意思用法、常见搭配、3 个生产、质量、采购物流、测试或工地场景的例句、中国人常见错误、近义说法。不需要讲发音。";
+}
+
+// Minimal Markdown to DOM (headings, lists, bold) without innerHTML.
+function inline(parent, text) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  for (const part of parts) {
+    if (/^\*\*[^*]+\*\*$/.test(part)) parent.append(el("strong", null, part.slice(2, -2)));
+    else if (part) parent.append(document.createTextNode(part));
+  }
+}
+function renderMarkdown(text, into) {
+  let list = null, skip = false;
+  for (const raw of text.split("\n")) {
+    const line = raw.trimEnd();
+    const h = line.match(/^#{1,6}\s+(.*)$/);
+    if (h) skip = /发音/.test(h[1]);   // pronunciation notes are left out on purpose
+    if (skip) continue;
+    const ul = line.match(/^\s*[-*•]\s+(.*)$/);
+    const ol = line.match(/^\s*\d+[.)]\s+(.*)$/);
+    if (h) { list = null; const e = el("h4"); inline(e, h[1]); into.append(e); }
+    else if (ul || ol) {
+      const tag = ul ? "UL" : "OL";
+      if (!list || list.tagName !== tag) { list = el(tag.toLowerCase()); into.append(list); }
+      const li = el("li"); inline(li, (ul || ol)[1]); list.append(li);
+    } else if (line.trim()) { list = null; const p = el("p"); inline(p, line); into.append(p); }
+    else list = null;
+  }
+}
+
+function drawTurns(streaming) {
+  const body = $("dr-body");
+  body.replaceChildren();
+  const turns = cur.turns;
+  for (let i = 1; i < turns.length; i++) {
+    const t = turns[i];
+    if (t.role === "user") body.append(el("div", "q-you", t.content));
+    else { const box = el("div"); renderMarkdown(t.content, box); body.append(box); }
+  }
+  if (streaming !== undefined) {
+    const box = el("div");
+    if (streaming) renderMarkdown(streaming, box); else box.append(el("p", "thinking", "Claude 正在写解释……"));
+    body.append(box);
+    return box;
+  }
+}
+
+function setBusy(busy) {
+  $("dr-stop").hidden = !busy;
+  $("ask-send").disabled = busy;
+  $("dr-regen").disabled = busy;
+}
+
+async function saveExplain(item) {
+  explainCache[item.id] = cur.turns;
+  if (!dbRef || !userId) return;
+  try { await dbRef.doc("data/users/" + userId + "/explain-" + item.id).set({ turns: cur.turns, updatedAt: Date.now() }); } catch {}
+}
+
+const ERRORS = {
+  rate_limited: "请求太频繁或已到使用上限，稍后再试。",
+  session_expired: "登录已过期，请重新登录 claude.ai 后再试。",
+  refused: "Claude 没有回答这个问题，换个问法试试。",
+  empty_completion: "没有得到回答，换个问法试试。",
+  upstream_error: "连接中断了，点“重新解释”或再发一次。",
+};
+
+async function runSample(item, turns) {
+  if (!sampleFn || sampleBlocked) { showCopyFallback(item); return null; }
+  const ctl = new AbortController();
+  cur.ctl = ctl;
+  setBusy(true);
+  let box = drawTurns("");
+  $("dr-note").textContent = ""; lastError = "已停止。";
+  try {
+    const input = turns.length === 1 ? turns[0].content : turns;
+    const { text } = await sampleFn(input, {
+      modelTier: "quick", signal: ctl.signal, cache: turns.length === 1 ? true : false,
+      onText: ({ text }) => { if (cur && cur.item === item) { box.replaceChildren(); renderMarkdown(text, box); } },
+    });
+    return text;
+  } catch (e) {
+    const code = e && e.code;
+    if (code === "cancelled") { $("dr-note").textContent = "已停止。"; return e.text || null; }
+    if (["not_granted", "sampling_disabled", "not_declared", "capability_disabled", "capability_removed"].includes(code)) {
+      sampleBlocked = true; showCopyFallback(item); return null;
+    }
+    lastError = ERRORS[code] || ERRORS.upstream_error;
+    box.replaceChildren(); if (e && e.text) renderMarkdown(e.text, box);
+    box.append(el("p", "err", lastError));
+    return null;
+  } finally {
+    if (cur) { cur.ctl = null; setBusy(false); }
+  }
+}
+
+function showCopyFallback(item) {
+  const body = $("dr-body");
+  body.replaceChildren();
+  body.append(el("p", null, "这里暂时不能直接调用 Claude（可能是没有允许，或当前环境不支持）。可以复制下面的问题，粘贴到 Claude 对话里问："));
+  const ta = el("textarea", "copybox"); ta.rows = 4; ta.value = copyPromptFor(item); ta.readOnly = true; ta.id = "copy-" + item.id;
+  body.append(ta);
+  $("ask-row").hidden = true; $("dr-regen").hidden = true;
+}
+
+async function loadSaved(item) {
+  if (explainCache[item.id]) return explainCache[item.id];
+  if (!dbRef || !userId) return null;
+  try {
+    const snap = await dbRef.doc("data/users/" + userId + "/explain-" + item.id).get();
+    if (snap.exists && Array.isArray(snap.data().turns)) return (explainCache[item.id] = snap.data().turns);
+  } catch {}
+  return null;
+}
+
+async function openExplain(item, opener) {
+  if (cur && cur.ctl) cur.ctl.abort();
+  cur = { item, turns: [{ role: "user", content: promptFor(item) }], ctl: null, opener };
+  $("dr-en").textContent = item.en; $("dr-zh").textContent = item.zh;
+  $("ask-row").hidden = false; $("dr-regen").hidden = false; $("dr-note").textContent = "";
+  $("ask-in").value = "";
+  $("drawer").hidden = false; $("scrim").hidden = false;
+  $("dr-close").focus();
+  const saved = await loadSaved(item);
+  if (!cur || cur.item !== item) return;
+  if (saved && saved.length > 1) { cur.turns = saved.map((t) => ({ ...t })); drawTurns(); $("dr-note").textContent = "这是之前保存的解释。"; return; }
+  const text = await runSample(item, cur.turns);
+  if (text && cur && cur.item === item) { cur.turns.push({ role: "assistant", content: text }); drawTurns(); saveExplain(item); }
+}
+
+async function askFollowUp() {
+  if (!cur || cur.ctl) return;
+  const q = $("ask-in").value.trim();
+  if (!q) return;
+  if (cur.turns.length < 2) return;
+  const item = cur.item;
+  $("ask-in").value = "";
+  cur.turns.push({ role: "user", content: q });
+  const recent = [cur.turns[0], ...cur.turns.slice(1).slice(-12)];
+  const text = await runSample(item, recent);
+  if (cur && cur.item === item) {
+    if (text) { cur.turns.push({ role: "assistant", content: text }); drawTurns(); saveExplain(item); }
+    else if (!sampleBlocked) { cur.turns.pop(); drawTurns(); $("ask-in").value = q; $("dr-note").textContent = lastError; }
+  }
+}
+
+function closeExplain() {
+  if (!cur) return;
+  if (cur.ctl) cur.ctl.abort();
+  const opener = cur.opener; cur = null;
+  $("drawer").hidden = true; $("scrim").hidden = true;
+  if (opener && opener.isConnected) opener.focus();
+}
+
+$("dr-close").addEventListener("click", closeExplain);
+$("scrim").addEventListener("click", closeExplain);
+$("dr-stop").addEventListener("click", () => { if (cur && cur.ctl) cur.ctl.abort(); });
+$("ask-send").addEventListener("click", askFollowUp);
+$("ask-in").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); askFollowUp(); } });
+$("dr-regen").addEventListener("click", async () => {
+  if (!cur || cur.ctl) return;
+  const item = cur.item;
+  cur.turns = [{ role: "user", content: promptFor(item) }];
+  delete explainCache[item.id];
+  const text = await runSample(item, cur.turns);
+  if (text && cur && cur.item === item) { cur.turns.push({ role: "assistant", content: text }); drawTurns(); saveExplain(item); }
+});
+$("dr-copy").addEventListener("click", async () => {
+  if (!cur) return;
+  const text = copyPromptFor(cur.item);
+  try { await navigator.clipboard.writeText(text); $("dr-note").textContent = "已复制，可以粘贴到 Claude 对话里。"; }
+  catch { showCopyFallback(cur.item); const ta = document.querySelector(".copybox"); if (ta) { ta.focus(); ta.select(); } $("dr-note").textContent = "请手动复制上面的文字。"; }
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape" && cur) closeExplain(); });
+
+// ---- controls ----
+for (const b of document.querySelectorAll("[data-tab]")) b.addEventListener("click", () => {
+  state.tab = b.dataset.tab; state.revealed.clear(); sticky.clear(); nbOrder = null;
+  if ((state.tab === "sentences" || state.tab === "stories") && state.cover === "zh") state.cover = "en";
+  savePrefs(); render(); window.scrollTo({ top: 0 });
+});
+for (const b of document.querySelectorAll("[data-cover]")) b.addEventListener("click", () => { state.cover = b.dataset.cover; state.revealed.clear(); sticky.clear(); savePrefs(); render(); });
+for (const b of document.querySelectorAll("[data-filter]")) b.addEventListener("click", () => { state.filter = b.dataset.filter; sticky.clear(); savePrefs(); render(); });
+$("typing").addEventListener("click", () => {
+  state.typing = !state.typing; sticky.clear();
+  if (state.typing && state.cover !== "en") { state.cover = "en"; state.revealed.clear(); }
+  savePrefs(); render();
+  if (state.typing) { const first = document.querySelector(".type-in"); if (first) first.focus(); }
+});
+for (const b of document.querySelectorAll("[data-speed]")) b.addEventListener("click", () => { state.speed = Number(b.dataset.speed); savePrefs(); render(); });
+if (!canSpeak) $("speed-ctl").hidden = true;
+$("shuffle").addEventListener("click", () => { state.shuffle = !state.shuffle; order = {}; savePrefs(); render(); });
+// On touch screens the practice settings fold behind this button so the sticky bar stays one row.
+$("opts-toggle").addEventListener("click", () => {
+  const open = !$("bar").classList.contains("open");
+  $("bar").classList.toggle("open", open);
+  $("opts-toggle").setAttribute("aria-expanded", String(open));
+});
+
+function rebuildReset() {
+  const wrap = $("reset-wrap");
+  const b = el("button", "tool danger", "清除本页标记");
+  b.id = "reset";
+  b.addEventListener("click", () => {
+    const box = el("span", "confirm");
+    const yes = el("button", "tool danger", "确认清除");
+    const no = el("button", "tool", "取消");
+    box.append("清除当前这一页的所有标记？", yes, no);
+    wrap.replaceChildren(box);
+    no.addEventListener("click", rebuildReset);
+    yes.addEventListener("click", () => { for (const i of ITEMS[state.tab]) delete state.marks[i.id]; persist(); rebuildReset(); render(); });
+  });
+  wrap.replaceChildren(b);
+}
+rebuildReset();
+
+function setMark(id, v) {
+  if (v) state.marks[id] = v; else delete state.marks[id];
+  persist(); render();
+}
+
+// ---- persistence: account storage when available, browser storage otherwise ----
+let remote = null, writing = Promise.resolve(), timer = null, remoteFailed = false;
+function persist() {
+  writeLocal(marksKey, state.marks);
+  if (!remote || remoteFailed) return;
+  clearTimeout(timer);
+  timer = setTimeout(() => {
+    const body = { marks: { ...state.marks }, updatedAt: Date.now() };
+    writing = writing.then(() => remote.set(body)).then(
+      () => { $("sync").textContent = "标记已保存到你的账号"; },
+      (e) => { if (e && e.code === "invalid_argument") { remoteFailed = true; } $("sync").textContent = "标记暂存在本浏览器"; }
+    );
+  }, 600);
+}
+
+async function initRemote() {
+  if (!window.claude || !window.claude.use) return;
+  try {
+    const [db, user] = await Promise.all([window.claude.use("db"), window.claude.use("user")]);
+    if (!db || !user) return;
+    const uid = await user.id();
+    if (!uid) return;
+    dbRef = db; userId = uid;
+    initMistakes(db, uid);
+    remote = db.doc("data/users/" + uid + "/progress");
+    const snap = await remote.get();
+    if (snap.exists) {
+      const saved = snap.data().marks || {};
+      const merged = { ...state.marks, ...saved };
+      state.marks = merged;
+      writeLocal(marksKey, state.marks);
+      render();
+      if (JSON.stringify(merged) !== JSON.stringify(saved)) persist();
+    } else if (Object.keys(state.marks).length) {
+      persist();
+    }
+    $("sync").textContent = "标记已保存到你的账号";
+    remote.onSnapshot((s) => {
+      if (!s.exists || s.metadata.hasPendingWrites) return;
+      const saved = s.data().marks || {};
+      if (JSON.stringify(saved) !== JSON.stringify(state.marks)) { state.marks = { ...saved }; writeLocal(marksKey, state.marks); render(); }
+    }, () => {});
+  } catch (e) {
+    remote = null;
+  }
+}
+
+render();
+initRemote();
+window.addEventListener("resize", () => document.querySelectorAll(".type-in").forEach(fitBox));
+(async () => { try { sampleFn = window.claude && window.claude.use ? await window.claude.use("sample") : null; } catch { sampleFn = null; } })();
+</script>
