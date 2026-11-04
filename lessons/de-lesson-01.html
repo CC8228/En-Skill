@@ -197,13 +197,21 @@
   .diff { font: 400 15px/1.8 var(--font-de); color: var(--ink); overflow-wrap: anywhere; margin-top: 2px; }
   .diff del, .d-legend del { color: var(--unknown); text-decoration: line-through; text-decoration-thickness: 1.5px; margin-right: 3px; }
   .diff ins, .d-legend ins { text-decoration: none; font-weight: 600; color: var(--known); background: var(--known-soft); border-radius: 3px; padding: 1px 3px; }
-  .diff .ch, .m-fix .ch { color: var(--surface); background: var(--known); border-radius: 2px; padding: 0 1px; }
+  .diff .ch, .m-fix .ch, .pick-note .ch { color: var(--surface); background: var(--known); border-radius: 2px; padding: 0 1px; }
   .diff ins.d-miss, .d-legend ins.d-miss { color: var(--warn); background: var(--warn-soft); }
   .diff ins.d-moved, .d-legend ins.d-moved { color: var(--accent); background: var(--accent-soft); }
   .diff del.d-moved { color: var(--accent); }
   .d-lead { color: var(--muted); }
   .d-legend { display: flex; flex-wrap: wrap; gap: 4px 10px; font: 400 12px/1.6 var(--font-zh); color: var(--muted); margin-top: 2px; }
-  .saved-note { font: 400 12.5px/1.5 var(--font-zh); color: var(--warn); margin-top: 2px; }
+  .pick { cursor: pointer; }
+  .pick:hover { outline: 1.5px dashed currentColor; outline-offset: 1px; }
+  .pick:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .pick.picked { box-shadow: inset 0 -2px 0 var(--warn); }
+  .pick.picked::after { content: "★"; color: var(--warn); font-size: 0.75em; margin-left: 2px; vertical-align: super; }
+  .pick-note { font: 400 12.5px/1.6 var(--font-zh); color: var(--muted); margin-top: 2px; }
+  .pick-note.on { color: var(--warn); }
+  .pick-note ins { text-decoration: none; font: 600 14px/1.6 var(--font-de); color: var(--known); background: var(--known-soft); border-radius: 3px; padding: 1px 3px; }
+  .mk-btn.picked { border-color: var(--warn); color: var(--warn); }
   .prev-miss { font: 400 13px/1.6 var(--font-zh); color: var(--warn); background: var(--warn-soft); border-radius: 6px; padding: 4px 8px; overflow-wrap: anywhere; }
   .prev-miss s { font-family: var(--font-de); color: var(--ink); text-decoration-color: var(--unknown); }
   .nb-intro { margin: 0 0 12px; color: var(--muted); font: 400 13.5px/1.65 var(--font-zh); max-width: 82ch; }
@@ -389,7 +397,7 @@
     <div class="chips" id="chips" hidden></div>
   </div>
 
-  <details class="hint" id="hint"><summary>怎么练</summary><p>每个词组有两个例句：一句<b>口语</b>（开会、打电话、现场沟通，同事之间多用 du），一句<b>书面</b>（邮件、报告、合同，用 Sie）；口语里常用的词组配两句口语，邮件固定用语配两句书面。先看例句理解词组：读一遍、点“发音”听一遍、跟读一遍。再选<b>遮德语</b>，看中文<b>默写整句德语</b>，<b>回车</b>检查：整句对，或者句子略有不同但词组用对了，都算对；词组没用对显示参考答案。词组卡片有两个例句，<b>两句都写对</b>才自动标“会”，有一句不对就标“不会”。<b>Tab</b> 跳到下一句，Shift+Tab 回上一句。大小写和变音符号打错不扣分（ae / oe / ue / ss 也行），但会提醒（德语名词首字母大写）。名词卡片上的冠词颜色：<span class="art der">der</span> 阳性 · <span class="art die">die</span> 阴性 · <span class="art das">das</span> 中性。“中译德”和“德英易混”的练法不变。</p><p>点被遮住的哪一行，就只翻开哪一行；回车检查哪一句，也只翻开那一句，另一句仍然遮着。回车检查后，写错的地方会逐词标出来：<del>划掉的</del>是你写的，绿色是正确写法，黄色是漏写的词，蓝紫色是放错位置的词；拼写错误会标到具体字母。这些错误会自动记进<b>错题本</b>：先看自己写错的样子，再填出正确的词；同一个错误要在两个不同的日子写对才算掌握。卡片上会提示“上次错在哪”，“显示”里的<b>有错题</b>只看还没改对的卡片。</p></details>
+  <details class="hint" id="hint"><summary>怎么练</summary><p>每个词组有两个例句：一句<b>口语</b>（开会、打电话、现场沟通，同事之间多用 du），一句<b>书面</b>（邮件、报告、合同，用 Sie）；口语里常用的词组配两句口语，邮件固定用语配两句书面。先看例句理解词组：读一遍、点“发音”听一遍、跟读一遍。再选<b>遮德语</b>，看中文<b>默写整句德语</b>，<b>回车</b>检查：整句对，或者句子略有不同但词组用对了，都算对；词组没用对显示参考答案。词组卡片有两个例句，<b>两句都写对</b>才自动标“会”，有一句不对就标“不会”。<b>Tab</b> 跳到下一句，Shift+Tab 回上一句。大小写和变音符号打错不扣分（ae / oe / ue / ss 也行），但会提醒（德语名词首字母大写）。名词卡片上的冠词颜色：<span class="art der">der</span> 阳性 · <span class="art die">die</span> 阴性 · <span class="art das">das</span> 中性。“中译德”和“德英易混”的练法不变。</p><p>点被遮住的哪一行，就只翻开哪一行；回车检查哪一句，也只翻开那一句，另一句仍然遮着。回车检查后，写错的地方会逐词标出来：<del>划掉的</del>是你写的，绿色是正确写法，黄色是漏写的词，蓝紫色是放错位置的词；拼写错误会标到具体字母。想重点记住哪一处，就<b>点它的绿色正确写法</b>（多写的词点划掉的那个），它会加入<b>错题本</b>并标上 ★，再点一次移出；错题本里先看自己写错的样子，再填出正确的词；同一个错误要在两个不同的日子写对才算掌握。卡片上会提示“上次错在哪”，“显示”里的<b>有错题</b>只看还没改对的卡片。</p></details>
   </div>
   <main id="list"></main>
 </div>
@@ -616,17 +624,17 @@ function sentenceTyper(item, idx) {
       fix.append(el("span", "ans", x.plain));
       v.append(fix);
     }
-    const sn = savedNote(analyse(t.value, x.plain, "ok").stored); if (sn) v.append(sn);
+    const pc = caseChips(t.value, x.plain, { item, key, target: x.plain, zh: x.zh }); if (pc) v.append(pc);
     box.append(v);
   }
   if (t.result === "near") {
     const v = el("div", "verdict near");
-    v.append(el("b", null, "✓ 词组用对了"), "，句子和参考答案略有不同。", correction(t.value, x.plain, "near"));
+    v.append(el("b", null, "✓ 词组用对了"), "，句子和参考答案略有不同。", correction(t.value, x.plain, "near", { item, key, target: x.plain, zh: x.zh }));
     box.append(v);
   }
   if (t.result === "bad") {
     const v = el("div", "verdict bad");
-    v.append(el("span", "tag", t.value.trim() ? "✗ 不对" : "✗ 没填"), correction(t.value, x.plain, "bad"));
+    v.append(el("span", "tag", t.value.trim() ? "✗ 不对" : "✗ 没填"), correction(t.value, x.plain, "bad", { item, key, target: x.plain, zh: x.zh }));
     if (x.keys.length) v.append(el("div", "need", "要用到：" + x.keys.join(" … ")));
     box.append(v);
   }
@@ -708,7 +716,7 @@ function typer(item) {
       fix.append(el("span", "ans", t.form));
       v.append(fix);
     }
-    const sn = savedNote(analyse(t.value, item.de, "ok").stored); if (sn) v.append(sn);
+    const pc = caseChips(t.value, item.de, { item, key: item.id, target: item.de, zh: item.zh }); if (pc) v.append(pc);
     box.append(v);
   }
   if (t.result === "bad") {
@@ -716,7 +724,7 @@ function typer(item) {
     const ai = t.value.trim() ? articleIssue(t.value, item) : null;
     v.append(el("span", "tag", !t.value.trim() ? "✗ 没填" : ai ? (ai.kind === "missing" ? "✗ 缺冠词" : "✗ 冠词不对") : "✗ 不对"));
     if (ai) v.append("要连冠词一起记，是 " + ai.art + "（" + GENDER[ai.art] + "）。");
-    v.append(correction(t.value, item.de, "bad"));
+    v.append(correction(t.value, item.de, "bad", { item, key: item.id, target: item.de, zh: item.zh }));
     box.append(v);
   }
   return box;
@@ -1035,22 +1043,29 @@ function fixedWord(tok, typedW, cls) {
   const f = document.createDocumentFragment(); f.append(pre, ins, post); return f;
 }
 // The reference sentence in track-changes style: what you wrote is struck through, the fix follows it.
-function diffView(d) {
+// With ctx, each correction (or an extra word you wrote) can be clicked to put it into the 错题本.
+function diffView(d, ctx) {
   const box = el("div", "diff"); box.lang = FOREIGN;
+  const errOf = (type, ti, typedW) => d.errors.find((e) => e.type === type && e.ti === ti && (typedW == null || e.typed === typedW));
   const extra = (k) => (d.extras[k] || []).forEach((x) => {
     box.append(" ");
-    const s = el("del", x.op === "moved" ? "d-moved" : null, clean(x.tok)); s.title = x.op === "moved" ? "这个词放错了位置" : "多写的词"; box.append(s);
+    const s = el("del", x.op === "moved" ? "d-moved" : null, clean(x.tok)); s.title = x.op === "moved" ? "这个词放错了位置" : "多写的词";
+    if (x.op === "extra") { const e = errOf("extra", Number(k), clean(x.tok)); if (e) pickable(s, ctx, e); }
+    box.append(s);
   });
   extra(-1);
   d.toks.forEach((tok, ti) => {
     const f = d.info[ti], typedW = clean(f.typed.join(" "));
     if (ti || (d.extras[-1] || []).length) box.append(" ");
-    if (f.op === "eq") box.append(tok);
-    else if (f.op === "spell") { box.append(el("del", null, typedW)); box.append(fixedWord(tok, typedW, CASE_MATTERS && caseDiff(clean(tok), typedW) ? "d-spell-case" : null)); }
-    else if (f.op === "word") { box.append(el("del", null, typedW)); box.append(fixedWord(tok)); }
-    else if (f.op === "case") { const w = fixedWord(tok, typedW, "d-case"); w.querySelector("ins").title = "大小写：你写成 " + typedW; box.append(w); }
-    else if (f.op === "miss") { const w = fixedWord(tok, null, "d-miss"); w.querySelector("ins").title = "漏写的词"; box.append(w); }
-    else { const w = fixedWord(tok, null, "d-moved"); w.querySelector("ins").title = "这个词应该在这里"; box.append(w); }
+    if (f.op === "eq") { box.append(tok); extra(ti); return; }
+    let w;
+    if (f.op === "spell") { box.append(el("del", null, typedW)); w = fixedWord(tok, typedW, CASE_MATTERS && caseDiff(clean(tok), typedW) ? "d-spell-case" : null); }
+    else if (f.op === "word") { box.append(el("del", null, typedW)); w = fixedWord(tok); }
+    else if (f.op === "case") { w = fixedWord(tok, typedW, "d-case"); w.querySelector("ins").title = "大小写：你写成 " + typedW; }
+    else if (f.op === "miss") { w = fixedWord(tok, null, "d-miss"); w.querySelector("ins").title = "漏写的词"; }
+    else { w = fixedWord(tok, null, "d-moved"); w.querySelector("ins").title = "这个词应该在这里"; }
+    const e = errOf(f.op, ti); if (e) pickable(w.querySelector("ins"), ctx, e);
+    box.append(w);
     extra(ti);
   });
   return box;
@@ -1060,27 +1075,65 @@ function legend() {
   d.append(el("del", null, "你写的"), el("ins", null, "正确写法"), el("ins", "d-miss", "漏写"), el("ins", "d-moved", "位置不对"));
   return d;
 }
-// What one checked answer shows and what it keeps: a "bad" answer keeps every mistake (or one "整句" entry when most of it is wrong);
-// a "near" answer (key phrase right, wording differs) keeps spelling, capitals and missing words.
+// What one checked answer can put into the 错题本: each difference from the reference,
+// or a single "整句" entry when most of the sentence is wrong.
 function analyse(value, target, verdict) {
   const d = diffAnswer(value, target);
   const real = d.errors.filter((e) => e.type !== "case");
   const whole = verdict === "bad" && (!value.trim() || real.length > Math.max(3, Math.ceil(d.toks.length / 2)));
-  const stored = whole ? [{ type: "whole", ref: target, typed: "", ti: -1 }]
-    : verdict === "bad" ? d.errors : d.errors.filter((e) => e.type === "spell" || e.type === "case" || e.type === "miss");
-  return { d, whole, stored };
+  const picks = whole ? [{ type: "whole", ref: target, typed: "", ti: -1 }] : d.errors;
+  return { d, whole, picks };
 }
-function savedNote(stored) {
-  if (!stored.length) return null;
-  const c = {}; stored.forEach((e) => { c[e.type] = (c[e.type] || 0) + 1; });
-  return el("div", "saved-note", "已记入错题本：" + Object.entries(c).map(([k, v]) => MTYPES[k] + (v > 1 ? " " + v : "")).join(" · "));
+const isPicked = (ctx, e) => mistakes.some((m) => m.mid === midOf(ctx.key, e) && !m.done);
+// Nothing goes into the 错题本 by itself: a click adds the correction, a second click takes it out again.
+function togglePick(ctx, e) {
+  const mid = midOf(ctx.key, e), today = dayStr();
+  const m = mistakes.find((z) => z.mid === mid);
+  if (m && !m.done) mistakes = mistakes.filter((z) => z !== m);
+  else if (m) Object.assign(m, { typed: e.typed, ti: e.ti, ctx: ctx.target, zh: ctx.zh, n: m.n + 1, last: today, days: [], done: false });
+  else mistakes.push({ mid, key: ctx.key, item: ctx.item.id, type: e.type, ref: e.ref, typed: e.typed, ti: e.ti, ctx: ctx.target, zh: ctx.zh, n: 1, first: today, last: today, days: [], done: false });
+  nbOrder = null; saveMistakes(); render();
 }
-function correction(value, target, verdict) {
+function pickable(node, ctx, e) {
+  if (!ctx) return node;
+  const on = isPicked(ctx, e);
+  node.classList.add("pick"); if (on) node.classList.add("picked");
+  node.tabIndex = 0; node.setAttribute("role", "button");
+  node.title = (node.title ? node.title + " · " : "") + (on ? "已在错题本里，再点一次移出" : "点击加入错题本（" + MTYPES[e.type] + "）");
+  const go = (ev) => { ev.stopPropagation(); togglePick(ctx, e); };
+  node.addEventListener("click", go);
+  node.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(ev); } });
+  return node;
+}
+function pickNote(ctx, a) {
+  if (!ctx || a.whole || !a.d.errors.length) return null;
+  const picked = a.picks.filter((e) => isPicked(ctx, e));
+  if (!picked.length) return el("div", "pick-note", "想重点记住哪一处，就点它的绿色正确写法（多写的词点划掉的那个），加入错题本。");
+  const c = {}; picked.forEach((e) => { c[e.type] = (c[e.type] || 0) + 1; });
+  return el("div", "pick-note on", "★ 已加入错题本：" + Object.entries(c).map(([k, v]) => MTYPES[k] + (v > 1 ? " " + v : "")).join(" · ") + "（再点一次可移出）");
+}
+function wholeButton(ctx, e) {
+  const on = isPicked(ctx, e);
+  const b = el("button", "mk-btn" + (on ? " picked" : ""), on ? "★ 整句已在错题本（点击移出）" : "整句加入错题本");
+  b.type = "button";
+  b.addEventListener("click", () => togglePick(ctx, e));
+  return b;
+}
+// A right answer with wrong capitals: the capitals can still go into the 错题本 with a click.
+function caseChips(value, target, ctx) {
+  const cs = analyse(value, target, "ok").picks.filter((e) => e.type === "case");
+  if (!cs.length) return null;
+  const d = el("div", "pick-note" + (cs.some((e) => isPicked(ctx, e)) ? " on" : ""));
+  d.append("点单词可以把大小写加入错题本：");
+  cs.forEach((e) => { d.append(" "); const w = fixedWord(e.ref, e.typed, "d-case"); pickable(w.querySelector("ins"), ctx, e); d.append(w); });
+  return d;
+}
+function correction(value, target, verdict, ctx) {
   const a = analyse(value, target, verdict);
   const f = document.createDocumentFragment();
-  if (a.whole) f.append(MISSED(value, target));
-  else if (a.d.errors.length) { f.append(el("div", "d-lead", verdict === "near" ? "和参考答案对比：" : "对照改正：")); f.append(diffView(a.d), legend()); }
-  const n = savedNote(a.stored); if (n) f.append(n);
+  if (a.whole) { f.append(MISSED(value, target)); if (ctx) f.append(wholeButton(ctx, a.picks[0])); }
+  else if (a.d.errors.length) { f.append(el("div", "d-lead", verdict === "near" ? "和参考答案对比：" : "对照改正：")); f.append(diffView(a.d, ctx), legend()); }
+  const n = pickNote(ctx, a); if (n) f.append(n);
   return f;
 }
 const midOf = (key, e) => key + "|" + e.type + "|" + KEY(e.ref || e.typed);
@@ -1090,21 +1143,19 @@ function credit(m, today) {
   if (!m.days.includes(today)) m.days.push(today);
   if (m.days.length >= 2) { m.done = true; m.doneOn = today; }
 }
-// After each check: add or bump what went wrong, and credit earlier mistakes of this sentence that were not repeated.
+// After each check, only mistakes already in the 错题本 for this sentence change: made again -> counted again,
+// not made this time -> written right once more. New ones are added by clicking the correction.
 function noteMistakes(item, key, target, zh, value, verdict) {
   const a = analyse(value, target, verdict), today = dayStr();
-  const now = new Set((a.whole ? a.stored : a.d.errors).map((e) => midOf(key, e)));
-  for (const e of a.stored) {
-    const mid = midOf(key, e);
-    let m = mistakes.find((z) => z.mid === mid);
-    if (!m) { m = { mid, key, item: item.id, type: e.type, ref: e.ref, n: 0, first: today }; mistakes.push(m); }
-    Object.assign(m, { typed: e.typed, ti: e.ti, ctx: target, zh, n: m.n + 1, last: today, days: [], done: false });
+  const now = new Map(a.picks.map((e) => [midOf(key, e), e]));
+  let changed = false;
+  for (const m of mistakes) {
+    if (m.key !== key || m.done) continue;
+    const e = now.get(m.mid);
+    if (e) { Object.assign(m, { typed: e.typed, ti: e.ti, ctx: target, zh, n: m.n + 1, last: today, days: [] }); changed = true; }
+    else if (!a.whole && !(m.type === "whole" && verdict === "bad")) { credit(m, today); changed = true; }
   }
-  if (!a.whole) for (const m of mistakes) {
-    if (m.key !== key || m.done || now.has(m.mid) || (m.type === "whole" && verdict === "bad")) continue;
-    credit(m, today);
-  }
-  saveMistakes();
+  if (changed) saveMistakes();
 }
 function saveMistakes() {
   writeLocal(MKEY, mistakes);
@@ -1164,7 +1215,7 @@ function renderNotebook() {
   $("m-u").style.width = (mistakes.length ? (active.length / mistakes.length) * 100 : 0) + "%";
   const sec = el("section", "group");
   const h = el("h2", null, "错题本"); h.append(el("span", "cnt", "待改 " + active.length + " · 已掌握 " + done));
-  sec.append(h, el("p", "nb-intro", "默写时写错的地方会自动记到这里。先看自己上次写错的样子，再在空格里写出正确的词，回车检查；同一个错误要在两个不同的日子写对才算掌握。词序和整句的错误，点“去练整句”回到原来的卡片重写。"));
+  sec.append(h, el("p", "nb-intro", "默写检查后，点绿色的正确写法，就会把那一处加到这里。先看自己上次写错的样子，再在空格里写出正确的词，回车检查；同一个错误要在两个不同的日子写对才算掌握。词序和整句的错误，点“去练整句”回到原来的卡片重写。"));
   const counts = {}; active.forEach((m) => { counts[m.type] = (counts[m.type] || 0) + 1; });
   const chips = el("div", "chips nb-chips");
   for (const [k, label] of [["all", "全部 " + active.length], ...Object.keys(MTYPES).filter((k) => counts[k]).map((k) => [k, MTYPES[k] + " " + counts[k]])]) {
@@ -1182,7 +1233,7 @@ function renderNotebook() {
   sec.append(chips);
   const shown = sortedMistakes().filter((m) => (nbShowDone || !m.done) && (nbType === "all" || m.type === nbType));
   if (!shown.length) {
-    sec.append(el("div", "empty", mistakes.length ? "这一类没有待改的错题。" : "还没有错题。在练习里默写句子，按回车检查后，写错的地方会自动记到这里。"));
+    sec.append(el("div", "empty", mistakes.length ? "这一类没有待改的错题。" : "还没有错题。默写句子按回车检查后，点绿色的正确写法，就能把它加进来。"));
   } else {
     const grid = el("div", "grid wide");
     shown.forEach((m) => grid.append(mistakeCard(m)));
