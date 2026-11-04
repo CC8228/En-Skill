@@ -218,7 +218,9 @@
   .type-row { display: flex; gap: 8px; align-items: flex-start; }
   .type-row .type-in { flex: 1 1 auto; }
   .submit-btn { flex: none; font: 600 13px/1 var(--font-zh); color: var(--surface); background: var(--accent); border: 1px solid var(--accent); border-radius: 6px; padding: 10px 14px; cursor: pointer; white-space: nowrap; }
-  .submit-btn:disabled { background: var(--surface); color: var(--muted); border-color: var(--line); cursor: default; }
+  .submit-btn.done { display: flex; flex-direction: column; align-items: center; gap: 5px; padding: 8px 12px; background: var(--surface); color: var(--muted); border-color: var(--line); }
+  .submit-btn.done small { font: 500 11px/1 var(--font-zh); color: var(--accent); }
+  .submit-btn.done:hover { border-color: var(--accent); color: var(--accent); }
   .submit-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .face { cursor: auto; }
   .rv { cursor: pointer; border-radius: 3px; }
@@ -279,6 +281,7 @@
     .say svg, .ask svg { width: 17px; height: 17px; }
     .type-in { font-size: 17px; padding: 10px 12px; }
     .submit-btn { min-height: 44px; padding: 0 16px; font-size: 14.5px; border-radius: 9px; }
+    .submit-btn.done { padding: 6px 14px; }
     .type-in::placeholder { font-size: 14.5px; }
     .ask-in { font-size: 17px; min-height: 44px; }
     .dr-btn, .dr-close { min-height: 44px; padding: 0 16px; font-size: 14.5px; }
@@ -366,7 +369,7 @@
     <div class="chips" id="chips" hidden></div>
   </div>
 
-  <details class="hint" id="hint"><summary>怎么练</summary><p>每个词组有两个例句：一句<b>口语</b>（开会、打电话、现场沟通），一句<b>书面</b>（邮件、报告）；口语里常用的词组配两句口语。先读例句、点“发音”听一遍、跟读。再选<b>遮英文</b>，看中文<b>默写整句英文</b>，点输入框右边的<b>提交</b>检查（回车不提交）：整句对，或者句子略有不同但词组用对了，都算对；词组没用对就显示参考答案。词组卡片<b>两句都写对</b>才自动标“会”，有一句不对就标“不会”。<b>Tab</b> 跳到下一句，Shift+Tab 回上一句；点被遮住的哪一行，就只翻开哪一行，再点一次重新遮住。</p><p>点被遮住的哪一行，就只翻开哪一行；两句各用自己的提交按钮：提交哪一句，就只检查、翻开那一句，另一句仍然遮着。提交后，写错的地方会逐词标出来：<del>划掉的</del>是你写的，绿色是正确写法，黄色是漏写的词，蓝紫色是放错位置的词；拼写错误会标到具体字母。想重点记住哪一处，就<b>点它的绿色正确写法</b>（多写的词点划掉的那个），它会加入<b>错题本</b>并标上 ★，再点一次移出；错题本里先看自己写错的样子，再填出正确的词；同一个错误要在两个不同的日子写对才算掌握。点开被遮住的那一句后，会提示它“上次错在哪”（遮着的时候不显示）；“显示”里的<b>有错题</b>只看还没改对的卡片。</p></details>
+  <details class="hint" id="hint"><summary>怎么练</summary><p>每个词组有两个例句：一句<b>口语</b>（开会、打电话、现场沟通），一句<b>书面</b>（邮件、报告）；口语里常用的词组配两句口语。先读例句、点“发音”听一遍、跟读。再选<b>遮英文</b>，看中文<b>默写整句英文</b>，点输入框右边的<b>提交</b>检查（回车不提交）：整句对，或者句子略有不同但词组用对了，都算对；词组没用对就显示参考答案。词组卡片<b>两句都写对</b>才自动标“会”，有一句不对就标“不会”。<b>Tab</b> 跳到下一句，Shift+Tab 回上一句；点被遮住的哪一行，就只翻开哪一行，再点一次重新遮住。</p><p>点被遮住的哪一行，就只翻开哪一行；两句各用自己的提交按钮：提交哪一句，就只检查、翻开那一句，另一句仍然遮着。提交后按钮变成<b>已检查</b>；没写完误点了提交，就再点一下它<b>撤回</b>，这一句重新遮上、标记和错题本也恢复原样，可以接着写。提交后，写错的地方会逐词标出来：<del>划掉的</del>是你写的，绿色是正确写法，黄色是漏写的词，蓝紫色是放错位置的词；拼写错误会标到具体字母。想重点记住哪一处，就<b>点它的绿色正确写法</b>（多写的词点划掉的那个），它会加入<b>错题本</b>并标上 ★，再点一次移出；错题本里先看自己写错的样子，再填出正确的词；同一个错误要在两个不同的日子写对才算掌握。点开被遮住的那一句后，会提示它“上次错在哪”（遮着的时候不显示）；“显示”里的<b>有错题</b>只看还没改对的卡片。</p></details>
   </div>
   <main id="list"></main>
 </div>
@@ -517,9 +520,17 @@ function moveFocus(fromId, dir) {
   if (next) { next.focus({ preventScroll: true }); next.scrollIntoView({ block: "center", behavior: "smooth" }); }
 }
 // Cards with examples follow all their sentences: any wrong -> "不会"; all right -> "会".
+function undoSentence(item, idx, value) {
+  const key = item.ex ? item.id + ":" + idx : item.id;
+  typed[key] = { value, result: null };
+  const others = item.ex ? item.ex.map((_, k) => (k === idx ? undefined : (typed[item.id + ":" + k] || {}).result)) : [];
+  restoreSnap(key, others);
+  render();
+}
 function checkTyped(item, idx, value) {
   const x = item.ex ? item.ex[idx] : item;
   const key = item.ex ? item.id + ":" + idx : item.id;
+  snapBefore(key, item.id, partKey(item, idx), (m) => m.key === key);
   typed[key] = { value, result: verdictFor(value, x) };
   noteMistakes(item, key, x.target, x.zh, value, typed[key].result);
   sticky.add(item.id);
@@ -558,7 +569,7 @@ function typer(item, idx) {
   });
   // Where it went wrong last time shows only after the sentence is opened, not while it is covered.
   if (!t.result && state.revealed.has(partKey(item, idx))) { const pm = prevMissLine(key); if (pm) box.append(pm); }
-  box.append(answerRow(inp, !!t.result, (v) => checkTyped(item, idx, v)));
+  box.append(answerRow(inp, !!t.result, (v) => checkTyped(item, idx, v), (v) => undoSentence(item, idx, v)));
   if (t.result === "ok") box.append(el("div", "verdict ok", "✓ 完全正确"));
   if (t.result === "near") {
     const v = el("div", "verdict near");
@@ -1030,20 +1041,61 @@ function prevMissLine(key) {
   return d;
 }
 
-// The answer box next to its own 提交 button. Enter does not submit (and adds no line break); after a check
-// the button reads 已检查 until the answer is changed, so the same answer is not counted twice.
-function answerRow(inp, checked, submit) {
+// 撤回: a submit can be taken back. The state from before a box's first submit is kept until it is undone, so
+// undoing always returns to "not submitted yet": the cover, the card's 会/不会 and this sentence's 错题本 entries.
+const undoSnap = {};       // box id -> state before its first submit
+function snapBefore(boxId, itemId, rkey, mine) {
+  if (undoSnap[boxId]) return;
+  undoSnap[boxId] = { itemId, rkey, mine, mark: itemId ? state.marks[itemId] : undefined,
+    revealed: rkey ? state.revealed.has(rkey) : true, ms: JSON.parse(JSON.stringify(mistakes.filter(mine))) };
+}
+// otherResults: the results of the card's other answer boxes, which still count for its 会/不会.
+function restoreSnap(boxId, otherResults) {
+  const s = undoSnap[boxId]; if (!s) return;
+  delete undoSnap[boxId];
+  if (s.rkey && !s.revealed) state.revealed.delete(s.rkey);
+  if (s.itemId && state.marks[s.itemId] !== undefined) {   // a mark cleared meanwhile stays cleared
+    if (otherResults.includes("bad")) state.marks[s.itemId] = "u";
+    else if (s.mark) state.marks[s.itemId] = s.mark; else delete state.marks[s.itemId];
+    persist();
+  }
+  const before = new Map(s.ms.map((m) => [m.mid, m]));
+  const next = [];
+  for (const m of mistakes) {
+    if (!s.mine(m)) { next.push(m); continue; }
+    const o = before.get(m.mid);
+    if (!o) continue;   // added after the submit
+    for (const k of Object.keys(m)) if (!(k in o)) delete m[k];
+    next.push(Object.assign(m, o)); before.delete(m.mid);
+  }
+  mistakes = [...next, ...before.values()];
+  saveMistakes();
+}
+// The answer box next to its own 提交 button. Enter does not submit (and adds no line break). After a check the
+// button reads 已检查; clicking it takes the submit back (a mis-click, or not finished writing). Editing the answer
+// turns it back into 提交.
+function answerRow(inp, checked, submit, undo) {
   const row = el("div", "type-row");
-  const btn = el("button", "submit-btn", checked ? "已检查" : "提交");
-  btn.type = "button"; btn.disabled = checked;
-  btn.setAttribute("aria-label", "提交这一句");
+  const btn = el("button", "submit-btn");
+  btn.type = "button";
+  let done = checked;
+  const show = () => {
+    btn.classList.toggle("done", done);
+    btn.replaceChildren(done ? "已检查" : "提交");
+    if (done) btn.append(el("small", null, "点击撤回"));
+    btn.title = done ? "撤回这次提交，回到没提交的状态接着写" : "检查这一句";
+    btn.setAttribute("aria-label", done ? "已检查，点击撤回这次提交" : "提交这一句");
+  };
+  show();
   btn.addEventListener("click", () => {
-    const id = inp.dataset.id;
-    submit(inp.value);
+    const id = inp.dataset.id, wasDone = done;
+    if (wasDone) undo(inp.value); else submit(inp.value);
     const again = document.querySelector('.type-in[data-id="' + id + '"]');
-    if (again) again.focus({ preventScroll: true });
+    if (!again) return;
+    again.focus({ preventScroll: true });
+    if (wasDone) { const n = again.value.length; again.setSelectionRange(n, n); }
   });
-  inp.addEventListener("input", () => { btn.disabled = false; btn.textContent = "提交"; });
+  inp.addEventListener("input", () => { if (done) { done = false; show(); } });
   row.append(inp, btn);
   return row;
 }
@@ -1105,7 +1157,13 @@ function clozeLine(m, blank) {
   });
   return d;
 }
+function undoCloze(m, value) {
+  cloze[m.mid] = { value, result: null };
+  restoreSnap("m:" + m.mid, []);
+  render();
+}
 function checkCloze(m, value) {
+  snapBefore("m:" + m.mid, null, null, (x) => x.mid === m.mid);
   const today = dayStr(), same = KEY(value) === KEY(m.ref);
   const caseWrong = same && CASE_MATTERS && caseDiff(m.ref, clean(value.trim()));
   const ok = same && !(caseWrong && m.type === "case");
@@ -1132,7 +1190,7 @@ function clozeInput(m, cs) {
     else if (e.key === "Tab") { e.preventDefault(); moveFocus(inp.dataset.id, e.shiftKey ? -1 : 1); }
   });
   inp.addEventListener("input", () => { fitBox(inp); cloze[m.mid] = { value: inp.value, result: null }; inp.classList.remove("ok", "bad"); const v = box.querySelector(".verdict"); if (v) v.remove(); });
-  box.append(answerRow(inp, !!cs.result, (v) => checkCloze(m, v)));
+  box.append(answerRow(inp, !!cs.result, (v) => checkCloze(m, v), (v) => undoCloze(m, v)));
   if (cs.result) {
     const v = el("div", "verdict " + (cs.result === "bad" ? "bad" : "ok"));
     if (cs.result === "ok") v.append(m.done ? "✓ 对了，已掌握" : "✓ 对了，换一天再写对一次就掌握");
