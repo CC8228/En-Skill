@@ -464,6 +464,8 @@ const typed = {};          // id -> { value, result: "ok" | "bad" | null, form }
 const sticky = new Set();  // items answered this round stay on screen even if the filter would hide them
 function readLocal(k) { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } }
 function writeLocal(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+// Documents read from the account database are read-only; the page works on plain copies it may change.
+const plain = (v) => JSON.parse(JSON.stringify(v));
 Object.assign(state, readLocal(prefsKey) || {});
 if (!ITEMS[state.tab] && state.tab !== "mistakes") state.tab = "phrases";
 state.revealed = new Set();
@@ -1187,7 +1189,7 @@ async function initMistakes(db, uid) {
   try {
     mRemote = db.doc("data/users/" + uid + "/mistakes");
     const snap = await mRemote.get();
-    const saved = snap.exists && Array.isArray(snap.data().list) ? snap.data().list : [];
+    const saved = snap.exists && Array.isArray(snap.data().list) ? plain(snap.data().list) : [];
     const byMid = new Map(saved.map((m) => [m.mid, m]));
     const newer = (a, b) => (a.last || "") > (b.last || "") || ((a.last || "") === (b.last || "") && (a.n > b.n || (a.n === b.n && (a.days || []).length > (b.days || []).length)));
     for (const m of mistakes) { const o = byMid.get(m.mid); if (!o || newer(m, o)) byMid.set(m.mid, m); }
@@ -1239,8 +1241,7 @@ function restoreSnap(boxId, otherResults) {
     if (!s.mine(m)) { next.push(m); continue; }
     const o = before.get(m.mid);
     if (!o) continue;   // added after the submit
-    for (const k of Object.keys(m)) if (!(k in o)) delete m[k];
-    next.push(Object.assign(m, o)); before.delete(m.mid);
+    next.push(o); before.delete(m.mid);
   }
   mistakes = [...next, ...before.values()];
   saveMistakes();
@@ -1610,7 +1611,7 @@ async function loadSaved(item) {
   if (!dbRef || !userId) return null;
   try {
     const snap = await dbRef.doc("data/users/" + userId + "/" + EXPLAIN + item.id).get();
-    if (snap.exists && Array.isArray(snap.data().turns)) return (explainCache[item.id] = snap.data().turns);
+    if (snap.exists && Array.isArray(snap.data().turns)) return (explainCache[item.id] = plain(snap.data().turns));
   } catch {}
   return null;
 }
@@ -1750,7 +1751,7 @@ async function initRemote() {
     remote = db.doc("data/users/" + uid + "/progress");
     const snap = await remote.get();
     if (snap.exists) {
-      const saved = snap.data().marks || {};
+      const saved = plain(snap.data().marks || {});
       const merged = { ...state.marks, ...saved };
       state.marks = merged;
       writeLocal(marksKey, state.marks);
@@ -1762,7 +1763,7 @@ async function initRemote() {
     $("sync").textContent = "标记已保存到你的账号";
     remote.onSnapshot((s) => {
       if (!s.exists || s.metadata.hasPendingWrites) return;
-      const saved = s.data().marks || {};
+      const saved = plain(s.data().marks || {});
       if (JSON.stringify(saved) !== JSON.stringify(state.marks)) { state.marks = { ...saved }; writeLocal(marksKey, state.marks); render(); }
     }, () => {});
   } catch (e) {
