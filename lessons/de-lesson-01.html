@@ -397,7 +397,7 @@
     <div class="chips" id="chips" hidden></div>
   </div>
 
-  <details class="hint" id="hint"><summary>怎么练</summary><p>每个词组有两个例句：一句<b>口语</b>（开会、打电话、现场沟通，同事之间多用 du），一句<b>书面</b>（邮件、报告、合同，用 Sie）；口语里常用的词组配两句口语，邮件固定用语配两句书面。先看例句理解词组：读一遍、点“发音”听一遍、跟读一遍。再选<b>遮德语</b>，看中文<b>默写整句德语</b>，<b>回车</b>检查：整句对，或者句子略有不同但词组用对了，都算对；词组没用对显示参考答案。词组卡片有两个例句，<b>两句都写对</b>才自动标“会”，有一句不对就标“不会”。<b>Tab</b> 跳到下一句，Shift+Tab 回上一句。大小写和变音符号打错不扣分（ae / oe / ue / ss 也行），但会提醒（德语名词首字母大写）。名词卡片上的冠词颜色：<span class="art der">der</span> 阳性 · <span class="art die">die</span> 阴性 · <span class="art das">das</span> 中性。“中译德”和“德英易混”的练法不变。</p><p>点被遮住的哪一行，就只翻开哪一行；回车检查哪一句，也只翻开那一句，另一句仍然遮着。回车检查后，写错的地方会逐词标出来：<del>划掉的</del>是你写的，绿色是正确写法，黄色是漏写的词，蓝紫色是放错位置的词；拼写错误会标到具体字母。想重点记住哪一处，就<b>点它的绿色正确写法</b>（多写的词点划掉的那个），它会加入<b>错题本</b>并标上 ★，再点一次移出；错题本里先看自己写错的样子，再填出正确的词；同一个错误要在两个不同的日子写对才算掌握。卡片上会提示“上次错在哪”，“显示”里的<b>有错题</b>只看还没改对的卡片。</p></details>
+  <details class="hint" id="hint"><summary>怎么练</summary><p>每个词组有两个例句：一句<b>口语</b>（开会、打电话、现场沟通，同事之间多用 du），一句<b>书面</b>（邮件、报告、合同，用 Sie）；口语里常用的词组配两句口语，邮件固定用语配两句书面。先看例句理解词组：读一遍、点“发音”听一遍、跟读一遍。再选<b>遮德语</b>，看中文<b>默写整句德语</b>，<b>回车</b>检查：整句对，或者句子略有不同但词组用对了，都算对；词组没用对显示参考答案。词组卡片有两个例句，<b>两句都写对</b>才自动标“会”，有一句不对就标“不会”。<b>Tab</b> 跳到下一句，Shift+Tab 回上一句。大小写和变音符号打错不扣分（ae / oe / ue / ss 也行），但会提醒（德语名词首字母大写）。名词卡片上的冠词颜色：<span class="art der">der</span> 阳性 · <span class="art die">die</span> 阴性 · <span class="art das">das</span> 中性。“中译德”和“德英易混”的练法不变。</p><p>点被遮住的哪一行，就只翻开哪一行；回车检查哪一句，也只翻开那一句，另一句仍然遮着。回车检查后，写错的地方会逐词标出来：<del>划掉的</del>是你写的，绿色是正确写法，黄色是漏写的词，蓝紫色是放错位置的词；拼写错误会标到具体字母。想重点记住哪一处，就<b>点它的绿色正确写法</b>（多写的词点划掉的那个），它会加入<b>错题本</b>并标上 ★，再点一次移出；错题本里先看自己写错的样子，再填出正确的词；同一个错误要在两个不同的日子写对才算掌握。点开被遮住的那一句后，会提示它“上次错在哪”（遮着的时候不显示）；“显示”里的<b>有错题</b>只看还没改对的卡片。</p></details>
   </div>
   <main id="list"></main>
 </div>
@@ -614,7 +614,8 @@ function sentenceTyper(item, idx) {
     inp.classList.remove("ok", "near", "bad");
     const v = box.querySelector(".verdict"); if (v) v.remove();
   });
-  if (!t.result) { const pm = prevMissLine(key); if (pm) box.append(pm); }
+  // Where it went wrong last time shows only after the sentence is opened, not while it is covered.
+  if (!t.result && state.revealed.has(partKey(item, idx))) { const pm = prevMissLine(key); if (pm) box.append(pm); }
   box.append(inp);
   if (t.result === "ok") {
     const v = el("div", "verdict ok", "✓ 完全正确");
@@ -706,7 +707,7 @@ function typer(item) {
     inp.classList.remove("ok", "bad");
     const v = box.querySelector(".verdict"); if (v) v.remove();
   });
-  if (!t.result) { const pm = prevMissLine(item.id); if (pm) box.append(pm); }
+  if (!t.result && state.revealed.has(partKey(item))) { const pm = prevMissLine(item.id); if (pm) box.append(pm); }
   box.append(inp);
   if (t.result === "ok") {
     const v = el("div", "verdict ok", "✓ 正确");
