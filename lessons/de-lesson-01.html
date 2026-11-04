@@ -246,6 +246,7 @@
   .submit-btn.done small { font: 500 11px/1 var(--font-zh); color: var(--accent); }
   .submit-btn.done:hover { border-color: var(--accent); color: var(--accent); }
   .submit-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .act-err { margin-top: 6px; font: 500 13px/1.5 var(--font-zh); color: var(--unknown); }
   .face { cursor: auto; }
   .rv { cursor: pointer; border-radius: 3px; }
   .rv:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
@@ -630,6 +631,7 @@ function sentenceTyper(item, idx) {
   });
   inp.addEventListener("input", () => {
     fitBox(inp);
+    if (typed[key] && typed[key].result && typed[key].value === inp.value) return;   // nothing changed: keep the result
     typed[key] = { value: inp.value, result: null };
     inp.classList.remove("ok", "near", "bad");
     const v = box.querySelector(".verdict"); if (v) v.remove();
@@ -720,6 +722,7 @@ function typer(item) {
   });
   inp.addEventListener("input", () => {
     fitBox(inp);
+    if (typed[item.id] && typed[item.id].result && typed[item.id].value === inp.value) return;   // nothing changed: keep the result
     typed[item.id] = { value: inp.value, result: null };
     inp.classList.remove("ok", "bad");
     const v = box.querySelector(".verdict"); if (v) v.remove();
@@ -1246,6 +1249,7 @@ function restoreSnap(boxId, otherResults) {
 // The answer box next to its own 提交 button. Enter does not submit (and adds no line break). After a check the
 // button reads 已检查; clicking it takes the submit back (a mis-click, or not finished writing). Editing the answer
 // turns it back into 提交.
+let pressedAt = -1e9;      // when a mouse press last submitted or undid (its click is then ignored)
 function answerRow(inp, checked, submit, undo) {
   const row = el("div", "type-row");
   const btn = el("button", "submit-btn");
@@ -1259,15 +1263,34 @@ function answerRow(inp, checked, submit, undo) {
     btn.setAttribute("aria-label", done ? "已检查，点击撤回这次提交" : "提交这一句");
   };
   show();
-  btn.addEventListener("click", () => {
+  const act = () => {
     const id = inp.dataset.id, wasDone = done;
-    if (wasDone) undo(inp.value); else submit(inp.value);
+    try {
+      if (wasDone) undo(inp.value); else submit(inp.value);
+    } catch (err) {
+      console.error(err);
+      const box = row.parentNode, old = box && box.querySelector(".act-err");
+      if (old) old.remove();
+      row.after(el("div", "act-err", "出错了，没能" + (wasDone ? "撤回" : "检查") + "：" + ((err && err.message) || err) + "（请截图发给 Claude）"));
+      return;
+    }
     const again = document.querySelector('.type-in[data-id="' + id + '"]');
     if (!again) return;
     again.focus({ preventScroll: true });
     if (wasDone) { const n = again.value.length; again.setSelectionRange(n, n); }
+  };
+  // With a mouse or trackpad the press itself acts: the answer box keeps focus (an input method is not interrupted)
+  // and nothing can move or redraw the button between press and release. Touch and the keyboard use the click.
+  btn.addEventListener("pointerdown", (e) => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    e.preventDefault();
+    pressedAt = performance.now();
+    act();
   });
-  inp.addEventListener("input", () => { if (done) { done = false; show(); } });
+  btn.addEventListener("mousedown", (e) => e.preventDefault());
+  btn.addEventListener("click", () => { if (performance.now() - pressedAt > 800) act(); });
+  const checkedValue = inp.value;
+  inp.addEventListener("input", () => { if (done && inp.value !== checkedValue) { done = false; show(); } });
   row.append(inp, btn);
   return row;
 }
@@ -1361,7 +1384,7 @@ function clozeInput(m, cs) {
     if (e.key === "Enter") e.preventDefault();   // submitted with the 提交 button
     else if (e.key === "Tab") { e.preventDefault(); moveFocus(inp.dataset.id, e.shiftKey ? -1 : 1); }
   });
-  inp.addEventListener("input", () => { fitBox(inp); cloze[m.mid] = { value: inp.value, result: null }; inp.classList.remove("ok", "bad"); const v = box.querySelector(".verdict"); if (v) v.remove(); });
+  inp.addEventListener("input", () => { fitBox(inp); const c0 = cloze[m.mid]; if (c0 && c0.result && c0.value === inp.value) return; cloze[m.mid] = { value: inp.value, result: null }; inp.classList.remove("ok", "bad"); const v = box.querySelector(".verdict"); if (v) v.remove(); });
   box.append(answerRow(inp, !!cs.result, (v) => checkCloze(m, v), (v) => undoCloze(m, v)));
   if (cs.result) {
     const v = el("div", "verdict " + (cs.result === "bad" ? "bad" : "ok"));
