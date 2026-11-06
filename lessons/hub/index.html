@@ -1,4 +1,4 @@
-<title>职场英语课程目录</title>
+<title>英德练习</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -101,6 +101,26 @@
 
   .note { margin-top: 20px; color: var(--muted); font-size: 13px; }
 
+  /* Section headings in the main column, and the 德语精读 part */
+  .sec-h { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; margin: 0 0 10px; }
+  .sec-h h2 { margin: 0; font-size: 18px; font-weight: 700; }
+  .sec-h span { color: var(--muted); font-size: 13px; }
+  .reading { margin-top: 32px; display: grid; gap: 12px; }
+  .reading .intro { margin: 0; color: var(--muted); font-size: 14px; max-width: 72ch; }
+  .steps { display: flex; flex-wrap: wrap; gap: 6px; }
+  .steps span { font: 500 13px/1.3 var(--font-zh); color: var(--de); background: var(--de-soft); border-radius: 6px; padding: 5px 9px; }
+  .src-line { font-size: 13.5px; color: var(--ink); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tags span { font-size: 12.5px; color: var(--de); border: 1px solid var(--de-soft); background: var(--de-soft); border-radius: 6px; padding: 2px 8px; }
+  .links { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; }
+  .links a, .sources a { color: var(--de); text-underline-offset: 2px; }
+  .pending { display: flex; align-items: center; justify-content: center; min-height: var(--tap); border: 1px dashed var(--line); border-radius: 9px; color: var(--muted); font: 600 14px/1.3 var(--font-zh); text-align: center; padding: 6px 10px; }
+  .sources { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 14px; min-width: 0; }
+  .sources h3 { margin: 0 0 4px; font-size: 15px; font-weight: 700; }
+  .sources p { margin: 0; font-size: 14px; }
+  .sources ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 14px; }
+  .sources .muted { color: var(--muted); }
+
   /* ---------- Tablet: iPad Air 5 (820 portrait / 1180 landscape, touch) ---------- */
   @media (min-width: 640px) {
     .wrap { max-width: 1120px; padding-left: max(28px, env(safe-area-inset-left, 0px)); padding-right: max(28px, env(safe-area-inset-right, 0px)); padding-block: 32px 64px; }
@@ -117,6 +137,8 @@
     .lesson h2 { font-size: 20px; }
     .contents span { font-size: 13.5px; }
     .note { font-size: 14px; max-width: 70ch; }
+    .reading .lessons { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sources { padding: 20px; }
   }
 
   /* ---------- Desktop: mouse/trackpad, wide window ---------- */
@@ -141,6 +163,9 @@
     .seg button:not([aria-pressed="true"]):hover, .langs button:not([aria-pressed="true"]):hover { color: var(--ink); }
     .dates { text-align: left; }
     .note { margin-top: 24px; }
+    .reading .lessons { grid-template-columns: 1fr; }
+    .sources { padding: 22px 24px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 32px; }
+    .sources .wide { grid-column: 1 / -1; }
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -152,8 +177,8 @@
   <div class="layout">
     <div class="side-panel">
       <header>
-        <h1>职场英语 · 德语课程目录</h1>
-        <p>项目经理 · 项目协调 · 现场售后方向。最新的在最上面；同一课号的英语和德语是同一个主题，可以对照着学。</p>
+        <h1>英德练习</h1>
+        <p>项目经理 · 项目协调 · 现场售后方向。课程最新的在最上面，同一课号的英语和德语是同一个主题，可以对照着学；德语精读用真实播客练语感。</p>
         <div class="summary" id="summary"></div>
       </header>
       <div class="bar">
@@ -167,8 +192,10 @@
     </div>
 
     <main>
+      <div class="sec-h"><h2>课程</h2><span>词组 · 行业词汇 · 情景短文 · 中译外</span></div>
       <div class="lessons" id="lessons"></div>
       <p class="note">“网页练习”可以遮外语 / 遮中文、点开对照、听发音、打字练习，并标记会和不会；德语课的名词带冠词和复数，还能看英语对照。默写写错的地方会逐词标出来，点正确写法就能加进每课的错题本。每次复习完点“今天复习了”，这里会记下日期。</p>
+      <section class="reading" id="reading" aria-labelledby="reading-h"></section>
     </main>
   </div>
 </div>
@@ -214,6 +241,49 @@ const LESSONS = [
     contents: ["60 个职业词组（口语 + 书面例句）", "84 个行业术语（带冠词和例句）", "6 篇情景短文", "24 句 C1 句型中译德", "26 个德英易混"],
     web: "https://claude.ai/artifact/FuArnV7gDNEso5K7JBFSJK",
   },
+];
+// ---- 德语精读: real German podcasts, read closely. A unit gets `web` once its page is built. ----
+const BPB = "https://www.bpb.de";
+const WIW = BPB + "/mediathek/podcasts/wir-im-wandel/";
+const READING = [
+  { no: 1, title: "给德国邮政研发电动车", src: "bpb · Wir im Wandel 第 2 季第 6 集", fields: ["汽车", "物流", "项目"],
+    about: "低碳配送，以及为德国邮政研发的电动送货车。",
+    links: [["节目", WIW], ["逐字稿 PDF", BPB + "/system/files/dokument_pdf/Podcast_Wir_im_Wandel_Staffel_2_Folge_6_Transkript.pdf"]] },
+  { no: 2, title: "退煤与工业转型", src: "bpb · Wir im Wandel 第 2 季第 4 集", fields: ["能源", "制造"],
+    about: "煤炭退出以后，产业和工作岗位怎么转型。",
+    links: [["节目", WIW], ["逐字稿 PDF", BPB + "/system/files/dokument_pdf/Podcast_Wir_im_Wandel_Staffel_2_Folge_4_Transkript.pdf"]] },
+  { no: 3, title: "我们的电网有多稳定", src: "bpb · Szenario Blackout 第 2 集《Wie stabil ist unser Stromsystem?》", fields: ["电气", "能源", "现场"],
+    about: "嘉宾：达姆施塔特工大教授、输电网运营商 50Hertz 的运行负责人、AG Kritis 发言人。",
+    links: [["节目", BPB + "/mediathek/podcasts/581532/wie-stabil-ist-unser-stromsystem/"], ["逐字稿 PDF", BPB + "/system/files/dokument_pdf/Transkript_Szenario_Blackout_Teil_2.pdf"]] },
+  { no: 4, title: "一个村子的区域供热网", src: "bpb · Wir im Wandel 第 2 季", fields: ["能源", "建筑", "项目"],
+    about: "村里建 Nahwärmenetz（区域供热网）的故事。",
+    links: [["节目", WIW]] },
+  { no: 5, title: "停车楼改建成住宅", src: "bpb · Wir im Wandel 第 2 季", fields: ["建筑"],
+    about: "汉堡一座停车楼改建成住宅，谈建材里的“灰色能源”。",
+    links: [["节目", WIW]] },
+];
+const READ_STEPS = ["① 盲听抓大意", "② 精读：原声逐句、语块注释", "③ 提取：回想语块、默写关键句、跟读", "④ 输出：用语块说自己的工作，Claude 批改"];
+// Where the material comes from, and what was checked and left out.
+const SOURCES = [
+  { h: "首选：bpb 播客", wide: true, p: "德国联邦政治教育中心的播客：真人原声，有完整逐字稿，主题是工作和产业转型。授权 CC BY-NC-ND 4.0：可以为自己做翻译和注释，但不能公开分享改编后的版本，所以精读页面只给自己看，并注明出处（作者 / bpb.de / 授权）。" },
+  { h: "bpb 里还可以用", items: [
+    ["APuZ 播客：专家对谈，每集都有逐字稿，偏学术，挑着用", BPB + "/mediathek/podcasts/apuz-podcast/"],
+    ["Auf Endlagersuche：核废料处置库选址（能源、工程）", BPB + "/mediathek/podcasts/endlagersuche/315813/folge-1-eine-einfuehrung/"],
+    ["Wir im Wandel 第 1 季：骑手与职工参与决定、农场转型等", WIW],
+  ] },
+  { h: "补充：版权保留，只链接原站，我做注释", items: [
+    ["GTAI Weltmarkt 第 15 集：采购与供应链", "https://www.gtai.de/de/trade/service/podcast-weltmarkt/folge-15-beschaffung-und-lieferketten-1074650"],
+    ["Fabrik der Zukunft：制造与物流（完整逐字稿）", "https://podcast.fabrikderzukunft.com/episode/digitale-zwillinge-in-produktion-lieferkette-mit-johannes-fuhrmann-229"],
+    ["VerkehrsRundschau Funk：物流（逐字稿带时间戳）", "https://verkehrsrundschau.podigee.io/370-neue-episode"],
+    ["Systemrelevant（汉斯-伯克勒基金会）：职场与经济，约 300 集 PDF 逐字稿", "https://www.boeckler.de/de/podcasts-22421.htm"],
+    ["Easy German：最地道的日常和职场口语（逐字稿要会员）", "https://www.easygerman.org/podcast"],
+  ] },
+  { h: "查过、不采用", items: [
+    ["DW Top-Thema：B1–B2 的简化文本，到不了 C1"],
+    ["Raumzeit（ESA / DLR 工程师访谈）：授权可以，但没有逐字稿"],
+    ["Spoken Wikipedia：音频文字逐词对齐，但是朗读百科，不是对话"],
+  ] },
+  { h: "还缺", wide: true, p: "医疗、生物、供应链方向，还没找到能整篇放进页面的素材；先用上面的“补充”来源，链接原站。" },
 ];
 const LANGS = { en: { name: "英语" }, de: { name: "德语" } };
 // English lessons keep their original log key (the lesson number) so earlier records still match.
@@ -281,29 +351,88 @@ function render() {
 
     const act = el("div", "act");
     const web = el("a", "btn primary", "网页练习 ↗"); web.href = l.web; web.target = "_blank"; web.rel = "noopener";
-    const logRow = el("div", "log");
-    const seg = el("div", "seg"); seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "学习状态");
-    for (const [k, v] of STATUS) {
-      const b = el("button", null, v); b.type = "button"; b.id = "status-" + key + "-" + k; b.dataset.s = k;
-      b.setAttribute("aria-pressed", String(k === st[0]));
-      b.addEventListener("click", () => { log[key] = { ...rec, status: k }; save(); render(); });
-      seg.append(b);
-    }
-    const rv = el("button", "btn", "今天复习了"); rv.type = "button"; rv.id = "review-" + key;
-    if ((rec.reviews || []).includes(today())) { rv.textContent = "今天已复习 ✓"; rv.disabled = true; }
-    rv.addEventListener("click", () => {
-      const reviews = [...(rec.reviews || []), today()];
-      log[key] = { ...rec, status: rec.status === "todo" || !rec.status ? "doing" : rec.status, reviews };
-      save(); render();
-    });
-    const rs = rec.reviews || [];
-    const dates = el("div", "dates", rs.length ? "复习 " + rs.length + " 次 · 最近 " + rs.slice(-3).reverse().join(" / ") : "还没有复习记录");
-    logRow.append(seg, rv, dates);
-    act.append(web, logRow);
+    act.append(web, logBlock(key, rec, st));
 
     card.append(info, act);
     list.append(card);
   }
+  renderReading();
+}
+
+// Status buttons, "今天复习了" and the review dates of one lesson (or 精读 unit).
+function logBlock(key, rec, st) {
+  const logRow = el("div", "log");
+  const seg = el("div", "seg"); seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "学习状态");
+  for (const [k, v] of STATUS) {
+    const b = el("button", null, v); b.type = "button"; b.id = "status-" + key + "-" + k; b.dataset.s = k;
+    b.setAttribute("aria-pressed", String(k === st[0]));
+    b.addEventListener("click", () => { log[key] = { ...rec, status: k }; save(); render(); });
+    seg.append(b);
+  }
+  const rv = el("button", "btn", "今天复习了"); rv.type = "button"; rv.id = "review-" + key;
+  if ((rec.reviews || []).includes(today())) { rv.textContent = "今天已复习 ✓"; rv.disabled = true; }
+  rv.addEventListener("click", () => {
+    const reviews = [...(rec.reviews || []), today()];
+    log[key] = { ...rec, status: rec.status === "todo" || !rec.status ? "doing" : rec.status, reviews };
+    save(); render();
+  });
+  const rs = rec.reviews || [];
+  const dates = el("div", "dates", rs.length ? "复习 " + rs.length + " 次 · 最近 " + rs.slice(-3).reverse().join(" / ") : "还没有复习记录");
+  logRow.append(seg, rv, dates);
+  return logRow;
+}
+
+function link(text, href) { const a = el("a", null, text); a.href = href; a.target = "_blank"; a.rel = "noopener"; return a; }
+
+// 德语精读: how each unit is practised, the planned units, and where the material comes from.
+function renderReading() {
+  const sec = $("reading");
+  sec.replaceChildren();
+  sec.hidden = langFilter === "en";
+  if (sec.hidden) return;
+  const built = READING.filter((r) => r.web).length;
+  const head = el("div", "sec-h"); const h = el("h2", null, "德语精读"); h.id = "reading-h";
+  head.append(h, el("span", null, "真实播客 · C1 · " + READING.length + " 篇计划" + (built ? "，已做好 " + built + " 篇" : "，筹备中")));
+  const steps = el("div", "steps"); READ_STEPS.forEach((s) => steps.append(el("span", null, s)));
+  sec.append(head, el("p", "intro", "用德国真实播客的原声和逐字稿做精读：每篇取 3–4 段、每段 2 分钟左右，一段就是一次 15–20 分钟的练习。重点不在读懂，而在把好用的语块练到能说出口；语块进语块本，隔天再答对才算掌握。"), steps);
+
+  const list = el("div", "lessons");
+  for (const r of READING) {
+    const key = "read-de-" + r.no;
+    const rec = log[key] || { status: "todo", reviews: [] };
+    const st = STATUS.find(([k]) => k === rec.status) || STATUS[0];
+    const card = el("article", "lesson de");
+    const info = el("div", "info");
+    const top = el("div", "top");
+    top.append(el("span", "no", "精读 " + String(r.no).padStart(2, "0")), el("span", "pill lang-de", "德语"),
+      r.web ? el("span", "pill st " + st[0], st[1]) : el("span", "pill st", "待制作"));
+    const tags = el("div", "tags"); r.fields.forEach((f) => tags.append(el("span", null, f)));
+    const links = el("div", "links"); r.links.forEach(([t, u]) => links.append(link(t + " ↗", u)));
+    info.append(top, el("h2", null, r.title), el("div", "src-line", r.src), el("div", "meta", r.about), tags, links);
+    const act = el("div", "act");
+    if (r.web) {
+      const web = el("a", "btn primary", "精读练习 ↗"); web.href = r.web; web.target = "_blank"; web.rel = "noopener";
+      act.append(web, logBlock(key, rec, st));
+    } else act.append(el("div", "pending", "页面还没做好"));
+    card.append(info, act);
+    list.append(card);
+  }
+  sec.append(list);
+
+  const src = el("div", "sources");
+  for (const s of SOURCES) {
+    const box = el("div", s.wide ? "wide" : null);
+    box.append(el("h3", null, s.h));
+    if (s.p) box.append(el("p", null, s.p));
+    if (s.items) {
+      const ul = el("ul");
+      for (const [t, u] of s.items) { const li = el("li"); li.append(u ? link(t, u) : el("span", "muted", t)); ul.append(li); }
+      box.append(ul);
+    }
+    src.append(box);
+  }
+  const sh = el("div", "sec-h"); sh.append(el("h2", null, "精读语料来源"), el("span", null, "整理于 2026-11-06"));
+  sec.append(sh, src);
 }
 
 render();
