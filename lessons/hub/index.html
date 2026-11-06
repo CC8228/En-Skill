@@ -247,20 +247,21 @@ const BPB = "https://www.bpb.de";
 const WIW = BPB + "/mediathek/podcasts/wir-im-wandel/";
 const READING = [
   { no: 1, title: "给德国邮政研发电动车", src: "bpb · Wir im Wandel 第 2 季第 6 集", fields: ["汽车", "物流", "项目"],
-    about: "低碳配送，以及为德国邮政研发的电动送货车。",
-    links: [["节目", WIW], ["逐字稿 PDF", BPB + "/system/files/dokument_pdf/Podcast_Wir_im_Wandel_Staffel_2_Folge_6_Transkript.pdf"]] },
-  { no: 2, title: "退煤与工业转型", src: "bpb · Wir im Wandel 第 2 季第 4 集", fields: ["能源", "制造"],
-    about: "煤炭退出以后，产业和工作岗位怎么转型。",
-    links: [["节目", WIW], ["逐字稿 PDF", BPB + "/system/files/dokument_pdf/Podcast_Wir_im_Wandel_Staffel_2_Folge_4_Transkript.pdf"]] },
+    about: "工程师 Achim Kampker 讲 StreetScooter 电动投递车：找伙伴、理需求、接下邮政的委托、实地测试、集团与初创公司的磨合。精读 5 段，共 8 分钟原声。",
+    links: [["节目", WIW + "539451/klimafreundlich-ausliefern-achim-entwickelt-ein-e-auto-fuer-die-post/"], ["逐字稿 PDF", BPB + "/system/files/dokument_pdf/Podcast_Wir_im_Wandel_Staffel_2_Folge_6_Transkript.pdf"]],
+    web: "https://claude.ai/artifact/LWRmb5Hcbitzcvm3jNVDse" },
+  { no: 2, title: "退煤后的村庄", src: "bpb · Wir im Wandel 第 2 季第 4 集《Kohleausstieg – Ein gerettetes Dorf will eine Zukunft》", fields: ["能源", "乡村转型", "项目"],
+    about: "莱比锡附近褐煤矿区的 Pödelwitz，村民保住了村子，想把它变成试验未来的模范村；也谈退煤后乡村怎么转型。",
+    links: [["节目", WIW + "521544/kohleausstieg-ein-gerettetes-dorf-will-eine-zukunft/"], ["逐字稿 PDF", BPB + "/system/files/dokument_pdf/Podcast_Wir_im_Wandel_Staffel_2_Folge_4_Transkript.pdf"]] },
   { no: 3, title: "我们的电网有多稳定", src: "bpb · Szenario Blackout 第 2 集《Wie stabil ist unser Stromsystem?》", fields: ["电气", "能源", "现场"],
     about: "嘉宾：达姆施塔特工大教授、输电网运营商 50Hertz 的运行负责人、AG Kritis 发言人。",
     links: [["节目", BPB + "/mediathek/podcasts/581532/wie-stabil-ist-unser-stromsystem/"], ["逐字稿 PDF", BPB + "/system/files/dokument_pdf/Transkript_Szenario_Blackout_Teil_2.pdf"]] },
-  { no: 4, title: "一个村子的区域供热网", src: "bpb · Wir im Wandel 第 2 季", fields: ["能源", "建筑", "项目"],
-    about: "村里建 Nahwärmenetz（区域供热网）的故事。",
-    links: [["节目", WIW]] },
-  { no: 5, title: "停车楼改建成住宅", src: "bpb · Wir im Wandel 第 2 季", fields: ["建筑"],
+  { no: 4, title: "一个村子的区域供热网", src: "bpb · Wir im Wandel 第 2 季第 1 集《Energiewende auf dem Dorf》", fields: ["能源", "建筑", "项目"],
+    about: "Sven 在村里推动建 Nahwärmenetz（区域供热网）的故事。",
+    links: [["节目", WIW + "518878/energiewende-auf-dem-dorf-sven-engagiert-sich-fuer-ein-nahwaermenetz/"]] },
+  { no: 5, title: "停车楼改建成住宅", src: "bpb · Wir im Wandel 第 2 季第 3 集《Vom Parkhaus zum Wohnhaus》", fields: ["建筑"],
     about: "汉堡一座停车楼改建成住宅，谈建材里的“灰色能源”。",
-    links: [["节目", WIW]] },
+    links: [["节目", WIW + "520568/vom-parkhaus-zum-wohnhaus-daria-und-bjoerge-nutzen-graue-energie/"]] },
 ];
 const READ_STEPS = ["① 盲听抓大意", "② 精读：原声逐句、语块注释", "③ 提取：回想语块、默写关键句、跟读", "④ 输出：用语块说自己的工作，Claude 批改"];
 // Where the material comes from, and what was checked and left out.
