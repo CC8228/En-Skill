@@ -27,7 +27,8 @@ import sys
 import urllib.request
 import xml.etree.ElementTree as ET
 
-# (category shown on the page, podcast name, feed URL). All are hosted on Podigee.
+# (category shown on the page, podcast name, feed URL[, seconds to transcribe]). All are hosted on Podigee.
+# Hotel Matze is a long interview with few ~30-word sentences per minute, so it gets a longer window.
 FEEDS = {
     "news": [
         ("新闻", "Handelsblatt Today", "https://handelsblatt-today.podigee.io/feed/mp3"),
@@ -39,7 +40,7 @@ FEEDS = {
         ("专业", "Geschichten aus der Geschichte", "https://geschichten-aus-der-geschichte.podigee.io/feed/mp3"),
     ],
     "fun": [
-        ("娱乐", "Hotel Matze", "https://hotelmatze.podigee.io/feed/mp3"),
+        ("娱乐", "Hotel Matze", "https://hotelmatze.podigee.io/feed/mp3", 600),
     ],
 }
 UA = "Mozilla/5.0 (personal language-learning podcast reader)"
@@ -174,7 +175,8 @@ def main():
     model = load_model()
     cands, report = [], []
     feeds = [f for key in args.feeds.split(",") for f in FEEDS.get(key.strip(), [])]
-    for fi, (source, show, feed) in enumerate(feeds):
+    for fi, (source, show, feed, *own) in enumerate(feeds):
+        window = max(args.window, own[0]) if own else args.window
         try:
             ep = newest_episode(feed)
         except Exception as e:
@@ -184,18 +186,18 @@ def main():
             report.append(f"{show}: no episode")
             continue
         dur = ep["duration"] or 1800
-        span = max(1, dur - args.window - 240)
+        span = max(1, dur - window - 240)
         offset = 120 + (day_no * 337 + fi * 911) % span  # skip the intro; move through the episode day by day
         mp3 = os.path.join(work, f"ep{fi}.mp3")
         try:
             # 24 kB/s covers bitrates up to 192 kbit/s; only the bytes up to the window are fetched.
-            data = fetch(ep["audio"], timeout=180, rng=f"bytes=0-{int((offset + args.window + 30) * 24000)}")
+            data = fetch(ep["audio"], timeout=180, rng=f"bytes=0-{int((offset + window + 30) * 24000)}")
         except Exception as e:
             report.append(f"{show}: audio failed ({e})")
             continue
         open(mp3, "wb").write(data)
         wav = os.path.join(work, f"win{fi}.wav")
-        run(["ffmpeg", "-nostdin", "-loglevel", "error", "-y", "-ss", str(offset), "-t", str(args.window),
+        run(["ffmpeg", "-nostdin", "-loglevel", "error", "-y", "-ss", str(offset), "-t", str(window),
              "-i", mp3, "-ac", "1", "-ar", "16000", wav])
         words = transcribe(model, wav)
         n = 0
