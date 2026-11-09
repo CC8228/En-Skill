@@ -12,8 +12,9 @@ Load ArtifactData with ToolSearch (`select:ArtifactData`). Read the page once wi
 
 ## 1. Scripts
 `jingdu_audio_candidates.py`, `jingdu_build_day.py` and `jingdu_check.py` live in the GitHub repo CC8228/En-Skill under `lessons/tools/`.
-- If that repo is checked out in your working directory: `git fetch origin main claude/youthful-knuth-cmxw7y`, then copy the three files from whichever of `origin/main` and `origin/claude/youthful-knuth-cmxw7y` has `jingdu_audio_candidates.py` (prefer main) with `git show <ref>:lessons/tools/<file> > /tmp/jd/<file>`.
-- Otherwise: `git clone --depth 1 -b main https://github.com/CC8228/En-Skill /tmp/jd/repo`; if main lacks the files, clone `-b claude/youthful-knuth-cmxw7y` instead; copy the three files to /tmp/jd/.
+The repository has no `main` branch; the scripts are on branch `claude/youthful-knuth-cmxw7y`.
+- If that repo is checked out in your working directory: `git fetch origin claude/youthful-knuth-cmxw7y`, then `git show FETCH_HEAD:lessons/tools/<file> > /tmp/jd/<file>` for each of the three files.
+- Otherwise: `git clone --depth 1 -b claude/youthful-knuth-cmxw7y https://github.com/CC8228/En-Skill /tmp/jd/repo` and copy the three files from /tmp/jd/repo/lessons/tools/ to /tmp/jd/.
 
 ## 2. What already exists
 - ArtifactData `get`, collection `meta`, doc_id `index`. Note its `dates` list and `version` (it may not exist yet).
