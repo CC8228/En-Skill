@@ -112,6 +112,21 @@
   .sentence .w.flash { background: var(--accent-soft); }
   .sentence.veiled .w { color: transparent; background: var(--veil); text-decoration: none; }
   .sentence.veiled .w.peek { color: var(--ink); background: var(--accent-soft); }
+  .sentence .w.inrange { background: var(--accent-soft); }
+  .sentence .w.now { background: var(--accent); color: var(--on-accent); }
+  .player { display: grid; gap: 4px; }
+  .seek { position: relative; height: 22px; cursor: pointer; touch-action: none; }
+  .seek-track { position: absolute; left: 0; right: 0; top: 7px; height: 8px; border-radius: 4px; background: var(--field); border: 1px solid var(--line); overflow: hidden; }
+  .seek-range { position: absolute; top: 0; bottom: 0; background: var(--accent-soft); }
+  .seek-ticks i { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
+  .seek-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); opacity: 0.6; }
+  .seek-hint { font-size: 12px; color: var(--muted); }
+  .speed { display: inline-flex; gap: 2px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); padding: 2px; }
+  .speed button { border: 0; background: none; min-height: 28px; padding: 0 8px; border-radius: 6px; cursor: pointer; font: 500 12.5px/1 var(--font-num); color: var(--muted); }
+  .speed button[aria-pressed="true"] { background: var(--surface); color: var(--accent); box-shadow: 0 0 0 1px var(--line); }
+  .range-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 4px 3px 10px; max-width: 100%; }
+  .range-chip b { font-family: var(--font-de); font-weight: 600; }
+  .range-chip button { border: 0; background: var(--surface); border-radius: 999px; padding: 3px 9px; font-size: 12px; cursor: pointer; color: var(--muted); }
   .translation { margin: 0; font-size: 16px; line-height: 1.6; display: flex; gap: 10px; align-items: baseline; }
   .tag { flex: none; font-size: 12px; font-weight: 600; color: var(--muted); }
   .tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding-top: 2px; }
@@ -213,6 +228,8 @@
     .gw:hover { border-color: var(--accent); }
     .sentence .w:hover { background: var(--accent-soft); }
     .sentence.veiled .w:hover { background: var(--veil); }
+    .seek:hover .seek-track { border-color: var(--accent); }
+    .speed button:not([aria-pressed="true"]):hover, .range-chip button:hover { color: var(--accent); }
     .cd.has:not(.sel):hover { background: var(--accent-soft); color: var(--accent); }
     .say .phr .grp[role="button"]:hover { background: var(--accent-soft); }
   }
@@ -256,10 +273,17 @@
         <div class="src-line" id="src-line"></div>
         <p class="sentence" id="sentence" lang="de"></p>
         <p class="translation"><span class="tag">整句</span><span id="translation"></span></p>
+        <div class="player" id="player-row">
+          <div class="seek" id="seek" title="点任意位置，从那里开始播放">
+            <div class="seek-track"><div class="seek-range" id="seek-range"></div><div class="seek-ticks" id="seek-ticks"></div><div class="seek-fill" id="seek-fill"></div></div>
+          </div>
+          <div class="seek-hint">点句中的词：从那个词播到句尾 · 按住 Shift 再点一个词：只放这一段 · 点进度条：从那一刻开始 · 空格：播放 / 停止</div>
+        </div>
         <div class="tools">
-          <button type="button" class="btn" id="play-normal">▶ 原声</button>
-          <button type="button" class="btn" id="play-slow">慢速 0.75×</button>
-          <button type="button" class="btn" id="loop-btn" aria-pressed="false">单句循环</button>
+          <button type="button" class="btn" id="play-btn">▶ 播放</button>
+          <span class="speed" id="speed" role="group" aria-label="速度"><button type="button" id="rate-1" data-rate="1" aria-pressed="true">1×</button><button type="button" id="rate-075" data-rate="0.75" aria-pressed="false">0.75×</button><button type="button" id="rate-05" data-rate="0.5" aria-pressed="false">0.5×</button></span>
+          <button type="button" class="btn" id="loop-btn" aria-pressed="false">循环</button>
+          <span class="range-chip" id="range-chip" hidden><span id="range-text"></span><button type="button" id="range-clear">× 回到整句</button></span>
           <span class="audio-note" id="audio-note" hidden>这天的句子没有原声</span>
           <button type="button" class="btn" id="veil-btn" aria-pressed="false">遮住原句</button>
           <span class="hintkeys"><kbd>←</kbd> <kbd>→</kbd> 换句</span>
@@ -368,8 +392,11 @@ function saveProg() {
 // and the time of every word inside that span ("t").
 const player = new Audio();
 player.preload = "auto";
-let playing = null;         // { kind: "all" | "slow" | "seg", stopAt, node }
-let rafId = 0, loopTimer = 0;
+let playing = null;         // { stopAt, node } while something plays
+let rafId = 0, loopTimer = 0, nowIdx = -1;
+let range = null;           // { a, b }: the stretch of words the player is set to; null = the whole sentence
+let rate = 1;               // 1, 0.75 or 0.5 (pitch is kept)
+let lastPlay = null;        // { t0, t1, node }: what "循环" repeats
 const hasAudio = (s) => { const d = curDay(); return !!(d && d.audioId && s && A(s.clip).length === 2 && A(s.t).length); };
 // The day's file is small (about 300 KB), so it is read once into memory: that makes every
 // sentence, word and sense group seekable no matter how the file is served.
@@ -381,36 +408,60 @@ function dayAudioUrl(id) {
     .catch(() => "/_blob/" + id);
   return dayAudio[id];
 }
+const clipLen = (s) => Number(s.clip[1]) - Number(s.clip[0]);
+function wordAt(rel) {      // index of the word being spoken at `rel` seconds into the sentence
+  const T = A(curSent() && curSent().t);
+  let k = -1;
+  for (let i = 0; i < T.length; i++) if (T[i][0] <= rel + 0.03) k = i;
+  return k;
+}
+function markNow(k) {
+  if (k === nowIdx) return;
+  const old = $("sw-" + nowIdx); if (old) old.classList.remove("now");
+  nowIdx = k;
+  const cur = $("sw-" + k); if (cur) cur.classList.add("now");
+}
+function showPos(rel) {
+  const s = curSent();
+  if (!s || !hasAudio(s)) return;
+  $("seek-fill").style.width = Math.max(0, Math.min(100, rel / clipLen(s) * 100)) + "%";
+}
 function stopAudio() {
   clearTimeout(loopTimer);
   cancelAnimationFrame(rafId);
   player.pause();
   if (playing && playing.node) playing.node.classList.remove("flash");
   playing = null;
+  markNow(-1);
   renderTools();
 }
 function finished() {
-  const kind = playing && playing.kind;
+  const again = loop && playing ? lastPlay : null;
   stopAudio();
-  if (loop && (kind === "all" || kind === "slow")) loopTimer = setTimeout(() => playAll(kind), 900);
+  if (again) {
+    const short = again.t1 != null && again.t1 - again.t0 < 2;
+    loopTimer = setTimeout(() => playRange(again.t0, again.t1, again.node), short ? 500 : 900);
+  }
 }
-// t0 and t1 are seconds within the sentence's own clip.
-async function playRange(t0, t1, rate, kind, node) {
+// t0 and t1 are seconds within the sentence's own clip; t1 = null plays to the end of the sentence.
+async function playRange(t0, t1, node) {
   const d = curDay(), s = curSent();
   if (!d || !s || !hasAudio(s)) return;
   stopAudio();
   const base = Number(s.clip[0]);
-  playing = { kind, stopAt: base + Math.min(t1 == null ? Infinity : t1, s.clip[1] - base), node };
+  const mine = { stopAt: base + Math.min(t1 == null ? Infinity : t1, clipLen(s)), node };
+  playing = mine;
+  lastPlay = { t0, t1, node };
   if (node) node.classList.add("flash");
   renderTools();
   const url = await dayAudioUrl(d.audioId);
-  if (!playing || playing.kind !== kind || curSent() !== s) return;
+  if (playing !== mine || curSent() !== s) return;
   if (player.src !== url) player.src = url;
   player.playbackRate = rate;
   player.preservesPitch = true;
   try {
     if (player.readyState < 1) await new Promise((ok, bad) => { player.addEventListener("loadedmetadata", ok, { once: true }); player.addEventListener("error", bad, { once: true }); });
-    if (!playing || playing.kind !== kind || curSent() !== s) return;
+    if (playing !== mine) return;
     player.currentTime = base + Math.max(0, t0);
     await player.play();
   } catch {
@@ -419,21 +470,58 @@ async function playRange(t0, t1, rate, kind, node) {
     return;
   }
   const tick = () => {
-    if (!playing) return;
-    if (playing.stopAt != null && player.currentTime >= playing.stopAt) { finished(); return; }
+    if (playing !== mine) return;
+    const rel = player.currentTime - base;
+    showPos(rel);
+    markNow(wordAt(rel));
+    if (player.currentTime >= mine.stopAt) { finished(); return; }
     rafId = requestAnimationFrame(tick);
   };
   rafId = requestAnimationFrame(tick);
 }
 player.addEventListener("ended", () => { if (playing) finished(); });
-function playAll(kind) {
-  if (playing && playing.kind === kind) { loop && clearTimeout(loopTimer); stopAudio(); return; }
-  playRange(0, null, kind === "slow" ? 0.75 : 1, kind, null);
+
+// ---- choosing where to start and stop ----
+function spanTimes(a, b) {
+  const T = A(curSent().t), n = T.length;
+  return [a <= 0 ? 0 : Math.max(0, T[a][0] - 0.05), b >= n - 1 ? null : T[b][1] + 0.1];
 }
-function playTokens(a, b, node) {
-  const T = A(curSent() && curSent().t);
-  if (!T[a] || !T[b]) return;
-  playRange(T[a][0] - 0.05, T[b][1] + 0.1, 1, "seg", node);
+function setRange(a, b) {
+  const n = A(curSent() && curSent().t).length;
+  range = (a == null || (a <= 0 && b >= n - 1)) ? null : { a: Math.max(0, a), b: Math.min(n - 1, b) };
+  renderRange();
+}
+function playSelection(node) {
+  const n = A(curSent().t).length;
+  const [t0, t1] = spanTimes(range ? range.a : 0, range ? range.b : n - 1);
+  playRange(t0, t1, node || null);
+}
+function togglePlay() { if (playing) stopAudio(); else playSelection(); }
+function playTokens(a, b, node) { setRange(a, b); playSelection(node); }
+
+function renderRange() {
+  const s = curSent();
+  const T = A(s && s.t), n = T.length;
+  document.querySelectorAll("#sentence .w").forEach((w) => {
+    const i = Number(w.dataset.i);
+    w.classList.toggle("inrange", !!range && i >= range.a && i <= range.b);
+  });
+  const chip = $("range-chip");
+  chip.hidden = !range;
+  if (range && s) {
+    const words = S(s.text).trim().split(/\s+/).map((t) => split(t)[1] || t);
+    const t = $("range-text"); t.replaceChildren();
+    if (range.a === range.b) t.append("只放 ", el("b", null, words[range.a]));
+    else if (range.b === n - 1) t.append("从 ", el("b", null, words[range.a]), " 播到句尾");
+    else t.append("只放 ", el("b", null, words[range.a]), " … ", el("b", null, words[range.b]));
+  }
+  if (s && hasAudio(s)) {
+    const len = clipLen(s);
+    const [t0, t1] = range ? spanTimes(range.a, range.b) : [0, null];
+    const end = t1 == null ? len : t1;
+    $("seek-range").style.left = (t0 / len * 100) + "%";
+    $("seek-range").style.width = (range ? (end - t0) / len * 100 : 0) + "%";
+  }
 }
 
 // ---------- render ----------
@@ -547,6 +635,14 @@ function renderSentence(d, s) {
     if (post) box.append(post);
   });
   $("translation").textContent = S(s.translation);
+  nowIdx = -1;
+  const ticks = $("seek-ticks"); ticks.replaceChildren();
+  if (hasAudio(s)) {
+    const len = clipLen(s);
+    A(s.t).forEach((x, i) => { if (i) { const k = el("i"); k.style.left = (x[0] / len * 100) + "%"; ticks.append(k); } });
+    if (!playing) $("seek-fill").style.width = "0";
+  }
+  renderRange();
   $("veil-btn").setAttribute("aria-pressed", String(veil));
   $("veil-btn").textContent = veil ? "显示原句" : "遮住原句";
   const done = !!prog.done[sid(d, s)];
@@ -556,11 +652,12 @@ function renderSentence(d, s) {
 
 function renderTools() {
   const s = curSent(), a = hasAudio(s);
-  for (const id of ["play-normal", "play-slow", "loop-btn"]) $(id).hidden = !a;
+  for (const id of ["play-btn", "speed", "loop-btn", "player-row"]) $(id).hidden = !a;
+  if (!a) $("range-chip").hidden = true;
   const note = $("audio-note");
   if (!a) { note.hidden = false; note.textContent = "这天的句子没有原声"; } else if (note.textContent === "这天的句子没有原声") note.hidden = true;
-  $("play-normal").textContent = playing && playing.kind === "all" ? "■ 停止" : "▶ 原声";
-  $("play-slow").textContent = playing && playing.kind === "slow" ? "■ 停止" : "慢速 0.75×";
+  $("play-btn").textContent = playing ? "■ 停止" : (range ? "▶ 播放选段" : "▶ 播放");
+  for (const b of document.querySelectorAll("#speed button")) b.setAttribute("aria-pressed", String(Number(b.dataset.rate) === rate));
   $("loop-btn").setAttribute("aria-pressed", String(loop));
   $("gloss-hint").textContent = (a ? "点一个词听原声 · " : "") + "黄底是下面讲到的小词 · 下划线是通常会重读的词，以原声为准";
 }
@@ -665,7 +762,7 @@ function go(i) {
   const d = curDay(); if (!d) return;
   const n = Math.max(0, Math.min(d.sentences.length - 1, i));
   if (n === sIdx) return;
-  sIdx = n; stopAudio(); render();
+  sIdx = n; range = null; stopAudio(); render();
 }
 async function loadDay(date) {
   if (dayCache[date] || !db) return dayCache[date] || null;
@@ -676,7 +773,7 @@ async function loadDay(date) {
 }
 async function selectDay(date) {
   if (!isDate(date)) return;
-  selDate = date; sIdx = 0; veil = false; calOpen = false; calMonth = null;
+  selDate = date; sIdx = 0; veil = false; calOpen = false; calMonth = null; range = null;
   stopAudio();
   if (!dayCache[date]) {
     setState("正在读取" + dayLabel(date) + "的 5 句…", "");
@@ -696,11 +793,31 @@ function setDates(list) {
   if (!dates.length) { setState("今天的 5 句还在准备", "每天柏林时间早上 5 点前会自动放好 5 句带原声的德语原句和完整讲解，到时刷新页面就能看到。"); render(); return; }
   if (!selDate || !dates.includes(selDate)) selectDay(dates[0]); else render();
 }
-function wordAct(node) {
+// In the sentence: a click plays from that word to the end; Shift+click sets where to stop.
+// In the gloss: a click plays just that word.
+function wordAct(node, shift) {
   if (!node) return;
-  if (veil && node.closest("#sentence")) { node.classList.add("peek"); setTimeout(() => node.classList.remove("peek"), 2000); return; }
+  const inSentence = !!node.closest("#sentence");
+  if (veil && inSentence) { node.classList.add("peek"); setTimeout(() => node.classList.remove("peek"), 2000); return; }
   const i = Number(node.dataset.i);
-  if (Number.isInteger(i)) playTokens(i, i, node);
+  const s = curSent();
+  if (!Number.isInteger(i) || !hasAudio(s)) return;
+  const n = A(s.t).length;
+  if (!inSentence) { playTokens(i, i, node); return; }
+  if (shift) { const anchor = range ? range.a : 0; playTokens(Math.min(anchor, i), Math.max(anchor, i), null); return; }
+  playTokens(i, n - 1, null);
+}
+function seekAt(e) {
+  const s = curSent();
+  if (!hasAudio(s)) return;
+  const box = $("seek").getBoundingClientRect();
+  const rel = Math.max(0, Math.min(1, (e.clientX - box.left) / box.width)) * clipLen(s);
+  const n = A(s.t).length;
+  const k = Math.max(0, wordAt(rel));
+  const b = range && range.b >= k ? range.b : n - 1;
+  setRange(k, b);
+  if (!range) { playRange(rel, null, null); return; }
+  playRange(rel, spanTimes(range.a, range.b)[1], null);
 }
 
 $("day-prev").addEventListener("click", () => stepDay(1));
@@ -710,9 +827,11 @@ $("cal-prev").addEventListener("click", () => { const [y, m] = calMonth.split("-
 $("cal-next").addEventListener("click", () => { const [y, m] = calMonth.split("-").map(Number); const d = new Date(y, m, 1); calMonth = d.getFullYear() + "-" + pad(d.getMonth() + 1); render(); });
 $("cal-latest").addEventListener("click", () => { if (dates[0]) selectDay(dates[0]); });
 document.addEventListener("click", (e) => { if (calOpen && !e.target.closest(".daynav")) { calOpen = false; render(); } });
-$("play-normal").addEventListener("click", () => playAll("all"));
-$("play-slow").addEventListener("click", () => playAll("slow"));
+$("play-btn").addEventListener("click", togglePlay);
+for (const b of document.querySelectorAll("#speed button")) b.addEventListener("click", () => { rate = Number(b.dataset.rate); player.playbackRate = rate; renderTools(); });
 $("loop-btn").addEventListener("click", () => { loop = !loop; if (!loop) clearTimeout(loopTimer); renderTools(); });
+$("range-clear").addEventListener("click", () => { setRange(null); if (playing) stopAudio(); renderTools(); });
+$("seek").addEventListener("pointerdown", (e) => { e.preventDefault(); seekAt(e); });
 $("veil-btn").addEventListener("click", () => { veil = !veil; render(); });
 $("done-btn").addEventListener("click", () => {
   const d = curDay(), s = curSent(); if (!d || !s) return;
@@ -720,12 +839,17 @@ $("done-btn").addEventListener("click", () => {
   if (prog.done[id]) delete prog.done[id]; else prog.done[id] = today();
   saveProg(); render();
 });
-$("sentence").addEventListener("click", (e) => wordAct(e.target.closest(".w")));
-$("sentence").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { const w = e.target.closest(".w"); if (w) { e.preventDefault(); wordAct(w); } } });
-$("gloss").addEventListener("click", (e) => wordAct(e.target.closest(".gw")));
+$("sentence").addEventListener("click", (e) => wordAct(e.target.closest(".w"), e.shiftKey));
+$("sentence").addEventListener("mousedown", (e) => { if (e.shiftKey) e.preventDefault(); });  // no text selection on Shift+click
+$("sentence").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { const w = e.target.closest(".w"); if (w) { e.preventDefault(); e.stopPropagation(); wordAct(w, e.shiftKey); } } });
+$("gloss").addEventListener("click", (e) => wordAct(e.target.closest(".gw"), false));
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && calOpen) { calOpen = false; render(); $("cal-btn").focus(); return; }
   if (e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+  if (e.key === " " && !/^(BUTTON|A)$/.test(e.target.tagName) && e.target.getAttribute("role") !== "button") {
+    if (hasAudio(curSent())) { e.preventDefault(); togglePlay(); }
+    return;
+  }
   if (e.key === "ArrowLeft") { go(sIdx - 1); e.preventDefault(); }
   else if (e.key === "ArrowRight") { go(sIdx + 1); e.preventDefault(); }
   else if (/^[1-5]$/.test(e.key)) go(Number(e.key) - 1);
