@@ -56,11 +56,34 @@
   .brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; min-width: 0; }
   h1 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.2; }
   .brand span { font-size: 13px; color: var(--muted); }
-  .daynav { margin-left: auto; display: flex; align-items: center; gap: 4px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
-  .daynav button { width: 34px; height: 32px; border: 0; background: none; border-radius: 7px; cursor: pointer; font-size: 18px; line-height: 1; color: var(--muted); }
-  .daynav button:disabled { opacity: 0.3; cursor: default; }
-  .daynav .label { min-width: 9.5em; text-align: center; font-weight: 600; font-size: 14px; display: inline-flex; gap: 6px; justify-content: center; align-items: center; }
+  .daynav { position: relative; margin-left: auto; display: flex; align-items: center; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+  .daynav > button { height: 32px; border: 0; background: none; border-radius: 7px; cursor: pointer; line-height: 1; }
+  .daynav > .arrow { width: 32px; font-size: 18px; color: var(--muted); }
+  .daynav > button:disabled { opacity: 0.3; cursor: default; }
+  .daynav .label { min-width: 10em; padding: 0 10px; font-weight: 600; font-size: 14px; display: inline-flex; gap: 6px; justify-content: center; align-items: center; }
+  .daynav .label[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
+  .daynav .label .caret { font-size: 10px; color: var(--muted); }
   .chip-today { font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 7px; }
+  .cal { position: absolute; top: calc(100% + 6px); right: 0; z-index: 20; width: 300px; max-width: calc(100vw - 32px); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; box-shadow: 0 12px 32px rgba(20, 16, 40, 0.16); display: grid; gap: 8px; }
+  .cal-head { display: flex; align-items: center; justify-content: space-between; }
+  .cal-head b { font-size: 14px; }
+  .cal-head button { width: 30px; height: 30px; border: 0; background: none; border-radius: 7px; cursor: pointer; font-size: 17px; color: var(--muted); }
+  .cal-head button:disabled { opacity: 0.3; cursor: default; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; text-align: center; }
+  .cal-grid .wd { font-size: 11px; color: var(--muted); padding: 2px 0 4px; }
+  .cd { position: relative; height: 36px; border: 0; border-radius: 8px; background: none; font: 500 13px/1 var(--font-num); font-variant-numeric: tabular-nums; color: var(--muted); opacity: 0.45; }
+  .cd.has { cursor: pointer; color: var(--ink); opacity: 1; background: var(--field); }
+  .cd.has::after { content: ""; position: absolute; left: 50%; bottom: 5px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--line); }
+  .cd.part::after { background: var(--mark-line); }
+  .cd.full::after { background: var(--done); }
+  .cd.today { box-shadow: inset 0 0 0 1px var(--accent); }
+  .cd.sel { background: var(--accent); color: var(--on-accent); }
+  .cd.sel::after { background: var(--on-accent); }
+  .cal-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; }
+  .cal-foot i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: 1px; background: var(--line); }
+  .cal-foot i.part { background: var(--mark-line); }
+  .cal-foot i.full { background: var(--done); }
+  .cal-foot button { margin-left: auto; border: 1px solid var(--line); background: var(--field); border-radius: 7px; padding: 4px 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
 
   /* five sentence tabs */
   .stabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
@@ -97,7 +120,7 @@
   .btn[aria-pressed="true"] { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
   .btn.donebtn { margin-left: auto; }
   .btn.donebtn[aria-pressed="true"] { background: var(--done-soft); color: var(--done); }
-  .hintkeys { font-size: 12px; color: var(--muted); }
+  .hintkeys, .audio-note { font-size: 12px; color: var(--muted); }
   .hintkeys kbd { font: 500 11px/1 var(--font-num); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 2px 5px; background: var(--surface); }
 
   /* 彻底弄懂 */
@@ -152,6 +175,10 @@
   .say .lbl { font-size: 12px; font-weight: 600; color: var(--ink); }
   .say .phr { font-family: var(--font-de); font-size: 14.5px; line-height: 1.7; color: var(--ink); overflow-wrap: break-word; }
   .say .phr .sep { color: var(--accent); font-family: var(--font-num); padding: 0 4px; }
+  .say .phr .grp { padding: 1px 2px; margin: 0 -2px; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .say .phr .grp[role="button"] { cursor: pointer; }
+  .say .phr .grp.flash { background: var(--accent-soft); }
+  .say .lbl small { font-weight: 400; color: var(--muted); }
   .say .phr b { font-weight: 600; text-decoration: underline 2px var(--accent); text-underline-offset: 4px; }
   .say ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
   .say li { font-size: 12.5px; color: var(--muted); }
@@ -186,6 +213,8 @@
     .gw:hover { border-color: var(--accent); }
     .sentence .w:hover { background: var(--accent-soft); }
     .sentence.veiled .w:hover { background: var(--veil); }
+    .cd.has:not(.sel):hover { background: var(--accent-soft); color: var(--accent); }
+    .say .phr .grp[role="button"]:hover { background: var(--accent-soft); }
   }
   @media (prefers-reduced-motion: no-preference) {
     .stab, .btn, .gw, .sentence .w { transition: background-color .15s, color .15s, border-color .15s, box-shadow .15s; }
@@ -198,12 +227,21 @@
       <header class="top">
         <div class="brand">
           <h1>精读训练</h1>
-          <span>德语 · B2–C1 · 每天 5 句真实原句</span>
+          <span>德语 · B2–C1 · 每天 5 句真人原声</span>
         </div>
         <div class="daynav" role="group" aria-label="切换日期">
-          <button type="button" id="day-prev" aria-label="前一天">‹</button>
-          <span class="label" id="day-label">今天</span>
-          <button type="button" id="day-next" aria-label="后一天">›</button>
+          <button type="button" class="arrow" id="day-prev" aria-label="前一组">‹</button>
+          <button type="button" class="label" id="cal-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="cal"><span id="day-label">今天</span><span class="caret">▼</span></button>
+          <button type="button" class="arrow" id="day-next" aria-label="后一组">›</button>
+          <div class="cal" id="cal" role="dialog" aria-label="选择日期" hidden>
+            <div class="cal-head">
+              <button type="button" id="cal-prev" aria-label="上个月">‹</button>
+              <b id="cal-title"></b>
+              <button type="button" id="cal-next" aria-label="下个月">›</button>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+            <div class="cal-foot"><span><i></i>有句子</span><span><i class="part"></i>练了一部分</span><span><i class="full"></i>5 句练完</span><button type="button" id="cal-latest">最新一天</button></div>
+          </div>
         </div>
       </header>
 
@@ -211,7 +249,7 @@
 
       <div class="state" id="state">
         <b id="state-title">正在读取今天的 5 句…</b>
-        <p id="state-text">句子和讲解每天柏林时间早上 5 点前准备好，打开页面就能练。</p>
+        <p id="state-text">句子、原声和讲解每天柏林时间早上 5 点前准备好，打开页面就能练。</p>
       </div>
 
       <article class="sent" id="sent" hidden>
@@ -219,8 +257,10 @@
         <p class="sentence" id="sentence" lang="de"></p>
         <p class="translation"><span class="tag">整句</span><span id="translation"></span></p>
         <div class="tools">
-          <button type="button" class="btn" id="play-normal">▶ 朗读</button>
-          <button type="button" class="btn" id="play-slow">慢速</button>
+          <button type="button" class="btn" id="play-normal">▶ 原声</button>
+          <button type="button" class="btn" id="play-slow">慢速 0.75×</button>
+          <button type="button" class="btn" id="loop-btn" aria-pressed="false">单句循环</button>
+          <span class="audio-note" id="audio-note" hidden>这天的句子没有原声</span>
           <button type="button" class="btn" id="veil-btn" aria-pressed="false">遮住原句</button>
           <span class="hintkeys"><kbd>←</kbd> <kbd>→</kbd> 换句</span>
           <button type="button" class="btn donebtn" id="done-btn" aria-pressed="false">这句练完了</button>
@@ -233,7 +273,7 @@
           <span>先自己读，再对照下面每一项</span>
         </div>
         <div class="block">
-          <h3>每个词 <small>点一个词听发音 · 黄底是下面讲到的小词 · 下划线是重读</small></h3>
+          <h3>每个词 <small id="gloss-hint">点一个词听原声 · 黄底是下面讲到的小词 · 下划线是重读</small></h3>
           <div class="gloss" id="gloss"></div>
         </div>
         <div class="cols">
@@ -268,7 +308,7 @@
       </ol>
       <p class="dims">口语重点：<em>发音</em> · <em>语调</em> · <em>语流</em>；其次语气；语速不重要。</p>
       <p class="rule">学语言的最小单位是句子，永远不要单独背一个词。介词、语气词（如 <span class="de" lang="de">an</span>、<span class="de" lang="de">zu</span>）放进不同句子，意思就不同。</p>
-      <p class="foot">句子每天柏林时间 5 点前更新，原句来自 ZDFheute、taz、ingenieur.de、FILMSTARTS。系统朗读只用来对照单词发音，语调以原声为准。</p>
+      <p class="foot">每天柏林时间 5 点前更新。句子和原声来自德语播客 Handelsblatt Today、taz Bundestalk、OMR Podcast、Methodisch inkorrekt、Geschichten aus der Geschichte 和 Hotel Matze；文字由语音识别转写，个别词可能有出入，以原声为准。</p>
       <p class="sync" id="sync"></p>
     </aside>
   </div>
@@ -285,28 +325,31 @@ const today = () => fmt(new Date());
 const norm = (w) => S(w).toLowerCase().replace(/[^\p{L}\p{N}]/gu, "");
 const split = (tok) => { const m = S(tok).match(/^([^\p{L}\p{N}]*)(.*?)([^\p{L}\p{N}]*)$/u); return m ? [m[1], m[2], m[3]] : ["", S(tok), ""]; };
 const wordSet = (list) => new Set(A(list).flatMap((w) => S(w).split(/\s+/)).map(norm).filter(Boolean));
+const isDate = (d) => /^\d{4}-\d{2}-\d{2}$/.test(S(d));
 
 // ---------- state ----------
-let days = [];            // newest first, as stored by the daily task
-let selDate = null;       // the day being shown
-let sIdx = 0;             // which of the five
-let veil = false, playing = null, loaded = false;
+let db = null;
+let dates = [];             // every day that has a set, newest first
+const dayCache = {};        // date -> day
+let selDate = null, sIdx = 0, veil = false, loop = false;
+let calOpen = false, calMonth = null;   // "YYYY-MM" shown in the calendar
 const LS = "jingdu-de-progress";
 let prog = { done: {}, updated: 0 };   // done: { "<date>-<n>": "<date it was marked>" }
 try { const p = JSON.parse(localStorage.getItem(LS) || "null"); if (p && p.done && typeof p.done === "object") prog = p; } catch {}
 let progRef = null, chain = Promise.resolve();
 
-const dayIdx = () => Math.max(0, days.findIndex((d) => d.date === selDate));
-const curDay = () => days[dayIdx()] || null;
+const curDay = () => dayCache[selDate] || null;
 const curSent = () => { const d = curDay(); return d ? d.sentences[Math.min(sIdx, d.sentences.length - 1)] : null; };
 const sid = (d, s) => d.date + "-" + s.n;
+const doneOn = (date) => Object.keys(prog.done).filter((k) => k.startsWith(date + "-")).length;
 
 function cleanDay(raw) {
   if (!raw || typeof raw !== "object") return null;
   const date = S(raw.date);
   const sentences = A(raw.sentences).filter((s) => s && S(s.text).trim()).map((s, i) => ({ ...s, n: Number(s.n) || i + 1 }));
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !sentences.length) return null;
-  return { date, sentences };
+  if (!isDate(date) || !sentences.length) return null;
+  const audioId = /^[0-9a-f]{32}$/.test(S(raw.audioId)) ? S(raw.audioId) : "";
+  return { date, sentences, audioId };
 }
 
 // ---------- saving progress: this browser first, then the viewer's account ----------
@@ -320,51 +363,95 @@ function saveProg() {
     () => { $("sync").textContent = "这次没同步上，记录先存在本浏览器"; });
 }
 
-// ---------- speech (the browser's built-in German voice) ----------
-const synth = window.speechSynthesis;
-const canSpeak = !!(synth && window.SpeechSynthesisUtterance);
-let voice = null;
-function pickVoice() {
-  if (!canSpeak) return;
-  const vs = synth.getVoices().filter((v) => /^de([-_]|$)/i.test(v.lang));
-  const rank = (v) => (/de[-_]DE/i.test(v.lang) ? 0 : 10) + (/(natural|neural|premium|enhanced|google|anna|helena|katja|conrad|markus|petra|yannick|seraphina|florian|amala|vicki)/i.test(v.name) ? 0 : 5) + (v.localService ? 0 : 1);
-  voice = vs.sort((a, b) => rank(a) - rank(b))[0] || null;
+// ---------- audio: the speakers' own voices, cut from the podcasts ----------
+// Each day has one MP3 in the page's file store; a sentence knows its span in it ("clip")
+// and the time of every word inside that span ("t").
+const player = new Audio();
+player.preload = "auto";
+let playing = null;         // { kind: "all" | "slow" | "seg", stopAt, node }
+let rafId = 0, loopTimer = 0;
+const hasAudio = (s) => { const d = curDay(); return !!(d && d.audioId && s && A(s.clip).length === 2 && A(s.t).length); };
+// The day's file is small (about 300 KB), so it is read once into memory: that makes every
+// sentence, word and sense group seekable no matter how the file is served.
+const dayAudio = {};        // audioId -> Promise<url>
+function dayAudioUrl(id) {
+  if (!dayAudio[id]) dayAudio[id] = fetch("/_blob/" + id)
+    .then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.blob(); })
+    .then((b) => URL.createObjectURL(b))
+    .catch(() => "/_blob/" + id);
+  return dayAudio[id];
 }
-if (canSpeak) { pickVoice(); synth.addEventListener?.("voiceschanged", pickVoice); }
-function speak(text, rate, onend) {
-  if (!canSpeak) return;
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = voice ? voice.lang : "de-DE";
-  if (voice) u.voice = voice;
-  u.rate = rate;
-  u.onend = u.onerror = () => onend && onend();
-  synth.speak(u);
+function stopAudio() {
+  clearTimeout(loopTimer);
+  cancelAnimationFrame(rafId);
+  player.pause();
+  if (playing && playing.node) playing.node.classList.remove("flash");
+  playing = null;
+  renderTools();
 }
-function stopSpeech() { if (canSpeak) synth.cancel(); playing = null; }
-function play(kind) {
-  const s = curSent();
-  if (!s) return;
-  if (playing === kind) { stopSpeech(); renderTools(); return; }
-  playing = kind; renderTools();
-  speak(S(s.text), kind === "slow" ? 0.68 : 0.95, () => { if (playing === kind) { playing = null; renderTools(); } });
+function finished() {
+  const kind = playing && playing.kind;
+  stopAudio();
+  if (loop && (kind === "all" || kind === "slow")) loopTimer = setTimeout(() => playAll(kind), 900);
+}
+// t0 and t1 are seconds within the sentence's own clip.
+async function playRange(t0, t1, rate, kind, node) {
+  const d = curDay(), s = curSent();
+  if (!d || !s || !hasAudio(s)) return;
+  stopAudio();
+  const base = Number(s.clip[0]);
+  playing = { kind, stopAt: base + Math.min(t1 == null ? Infinity : t1, s.clip[1] - base), node };
+  if (node) node.classList.add("flash");
+  renderTools();
+  const url = await dayAudioUrl(d.audioId);
+  if (!playing || playing.kind !== kind || curSent() !== s) return;
+  if (player.src !== url) player.src = url;
+  player.playbackRate = rate;
+  player.preservesPitch = true;
+  try {
+    if (player.readyState < 1) await new Promise((ok, bad) => { player.addEventListener("loadedmetadata", ok, { once: true }); player.addEventListener("error", bad, { once: true }); });
+    if (!playing || playing.kind !== kind || curSent() !== s) return;
+    player.currentTime = base + Math.max(0, t0);
+    await player.play();
+  } catch {
+    stopAudio();
+    $("audio-note").hidden = false; $("audio-note").textContent = "这句的原声没读到，刷新页面再试";
+    return;
+  }
+  const tick = () => {
+    if (!playing) return;
+    if (playing.stopAt != null && player.currentTime >= playing.stopAt) { finished(); return; }
+    rafId = requestAnimationFrame(tick);
+  };
+  rafId = requestAnimationFrame(tick);
+}
+player.addEventListener("ended", () => { if (playing) finished(); });
+function playAll(kind) {
+  if (playing && playing.kind === kind) { loop && clearTimeout(loopTimer); stopAudio(); return; }
+  playRange(0, null, kind === "slow" ? 0.75 : 1, kind, null);
+}
+function playTokens(a, b, node) {
+  const T = A(curSent() && curSent().t);
+  if (!T[a] || !T[b]) return;
+  playRange(T[a][0] - 0.05, T[b][1] + 0.1, 1, "seg", node);
 }
 
 // ---------- render ----------
 function dayLabel(date) {
   const [y, m, d] = date.split("-").map(Number);
-  const wd = "日一二三四五六"[new Date(y, m - 1, d).getDay()];
-  return m + "月" + d + "日 周" + wd;
+  return m + "月" + d + "日 周" + "日一二三四五六"[new Date(y, m - 1, d).getDay()];
 }
+function setState(title, text) { $("state-title").textContent = title; $("state-text").textContent = text; }
 
 function render() {
   const d = curDay();
-  const i = dayIdx();
-  $("day-prev").disabled = !d || i >= days.length - 1;
-  $("day-next").disabled = !d || i <= 0;
+  const i = dates.indexOf(selDate);
+  $("day-prev").disabled = i < 0 || i >= dates.length - 1;
+  $("day-next").disabled = i <= 0;
   const lab = $("day-label"); lab.replaceChildren();
-  if (d) { lab.append(dayLabel(d.date)); if (d.date === today()) lab.append(el("span", "chip-today", "今天")); }
-  else lab.append("今天");
+  if (selDate) { lab.append(dayLabel(selDate)); if (selDate === today()) lab.append(" ", el("span", "chip-today", "今天")); }
+  else lab.append("选择日期");
+  renderCal();
 
   const ready = !!d;
   $("state").hidden = ready;
@@ -376,11 +463,45 @@ function render() {
 
   sIdx = Math.min(sIdx, d.sentences.length - 1);
   const s = curSent();
+  if (d.audioId) dayAudioUrl(d.audioId);
   renderTabs(d);
   renderSentence(d, s);
   renderTools();
   if (!veil) renderBreakdown(s);
   renderSay(s);
+}
+
+function renderCal() {
+  $("cal").hidden = !calOpen;
+  $("cal-btn").setAttribute("aria-expanded", String(calOpen));
+  if (!calOpen) return;
+  if (!calMonth) calMonth = (selDate || today()).slice(0, 7);
+  const [y, m] = calMonth.split("-").map(Number);
+  $("cal-title").textContent = y + "年" + m + "月";
+  const months = dates.map((x) => x.slice(0, 7));
+  $("cal-prev").disabled = !months.some((x) => x < calMonth);
+  $("cal-next").disabled = !months.some((x) => x > calMonth);
+  const grid = $("cal-grid"); grid.replaceChildren();
+  "一二三四五六日".split("").forEach((w) => grid.append(el("span", "wd", w)));
+  const lead = (new Date(y, m - 1, 1).getDay() + 6) % 7;
+  for (let k = 0; k < lead; k++) grid.append(el("span"));
+  const have = new Set(dates);
+  const last = new Date(y, m, 0).getDate();
+  for (let day = 1; day <= last; day++) {
+    const date = y + "-" + pad(m) + "-" + pad(day);
+    const b = el("button", "cd", String(day));
+    b.type = "button"; b.id = "cd-" + date;
+    if (have.has(date)) {
+      const n = doneOn(date);
+      b.classList.add("has");
+      if (n >= 5) b.classList.add("full"); else if (n > 0) b.classList.add("part");
+      b.setAttribute("aria-label", dayLabel(date) + (n ? "，练完 " + n + " 句" : ""));
+      b.addEventListener("click", () => selectDay(date));
+    } else { b.disabled = true; b.setAttribute("aria-label", dayLabel(date) + "，没有句子"); }
+    if (date === today()) b.classList.add("today");
+    if (date === selDate) { b.classList.add("sel"); b.setAttribute("aria-current", "date"); }
+    grid.append(b);
+  }
 }
 
 function renderTabs(d) {
@@ -401,10 +522,10 @@ function renderSentence(d, s) {
   const line = $("src-line"); line.replaceChildren();
   line.append(el("span", "pill", S(s.source) || "原句"));
   const url = S(s.url);
-  if (/^https:\/\//.test(url)) {
-    const a = el("a", null, (S(s.outlet) ? s.outlet + " · " : "") + (S(s.title) || "原文") + " ↗");
-    a.href = url; a.target = "_blank"; a.rel = "noopener"; line.append(a);
-  } else line.append(el("span", null, S(s.outlet)));
+  const label = (S(s.outlet) ? s.outlet + " · " : "") + (S(s.title) || "原文");
+  if (/^https:\/\//.test(url)) { const a = el("a", null, label + " ↗"); a.href = url; a.target = "_blank"; a.rel = "noopener"; line.append(a); }
+  else line.append(el("span", null, label));
+  if (Number(s.at) > 0) line.append(el("span", "num", "约 " + Math.floor(s.at / 60) + ":" + pad(Math.floor(s.at % 60)) + " 处"));
   if (S(s.published)) line.append(el("span", "num", s.published));
   const wc = Number(s.words) || S(s.text).split(/\s+/).filter((t) => /[\p{L}\p{N}]/u.test(t)).length;
   line.append(el("span", "num", wc + " 词"));
@@ -420,7 +541,7 @@ function renderSentence(d, s) {
     if (pre) box.append(pre);
     if (core) {
       const w = el("span", "w" + (stress.has(norm(core)) ? " stress" : ""), core);
-      w.id = "sw-" + i; w.tabIndex = 0; w.setAttribute("role", "button"); w.dataset.word = core;
+      w.id = "sw-" + i; w.tabIndex = 0; w.setAttribute("role", "button"); w.dataset.i = i;
       box.append(w);
     }
     if (post) box.append(post);
@@ -434,13 +555,17 @@ function renderSentence(d, s) {
 }
 
 function renderTools() {
-  $("play-normal").textContent = playing === "normal" ? "■ 停止" : "▶ 朗读";
-  $("play-slow").textContent = playing === "slow" ? "■ 停止" : "慢速";
-  $("play-normal").disabled = $("play-slow").disabled = !canSpeak;
+  const s = curSent(), a = hasAudio(s);
+  for (const id of ["play-normal", "play-slow", "loop-btn"]) $(id).hidden = !a;
+  const note = $("audio-note");
+  if (!a) { note.hidden = false; note.textContent = "这天的句子没有原声"; } else if (note.textContent === "这天的句子没有原声") note.hidden = true;
+  $("play-normal").textContent = playing && playing.kind === "all" ? "■ 停止" : "▶ 原声";
+  $("play-slow").textContent = playing && playing.kind === "slow" ? "■ 停止" : "慢速 0.75×";
+  $("loop-btn").setAttribute("aria-pressed", String(loop));
+  $("gloss-hint").textContent = (a ? "点一个词听原声 · " : "") + "黄底是下面讲到的小词 · 下划线是重读";
 }
 
 function renderBreakdown(s) {
-  // The daily task flags the exact tokens it discusses with "s"; older days fall back to matching the word.
   const flagged = A(s.gloss).some((g) => g && "s" in g);
   const smallSet = wordSet(A(s.small).map((x) => x && x.word));
   const stress = wordSet(s.stress);
@@ -450,7 +575,7 @@ function renderBreakdown(s) {
     const core = split(g.w)[1] || S(g.w);
     const isSmall = flagged ? g.s === true : smallSet.has(norm(core));
     const b = el("button", "gw" + (isSmall ? " small" : "") + (stress.has(norm(core)) ? " stress" : ""));
-    b.type = "button"; b.id = "gw-" + i; b.dataset.word = core;
+    b.type = "button"; b.id = "gw-" + i; b.dataset.i = i;
     const w = el("span", "w", S(g.w)); w.lang = "de";
     b.append(w, el("span", "g", S(g.g)));
     if (S(g.f)) b.append(el("span", "f", S(g.f)));
@@ -482,16 +607,30 @@ function renderBreakdown(s) {
 function renderSay(s) {
   const box = $("say"); box.replaceChildren();
   const stress = wordSet(s.stress);
+  const audio = hasAudio(s);
   if (S(s.phrasing)) {
-    box.append(el("span", "lbl", "这句的意群和重读"));
+    const lbl = el("span", "lbl", "这句的意群和重读");
+    if (audio) lbl.append(" ", el("small", null, "点一段听原声跟读"));
+    box.append(lbl);
     const p = el("div", "phr"); p.lang = "de";
+    let k = 0;
     S(s.phrasing).split("|").map((x) => x.trim()).filter(Boolean).forEach((part, i) => {
       if (i) p.append(el("span", "sep", "|"));
-      part.split(/\s+/).forEach((tok, j) => {
-        if (j) p.append(" ");
+      const toks = part.split(/\s+/);
+      const g = el("span", "grp");
+      if (audio) {
+        g.id = "grp-" + i; g.tabIndex = 0; g.setAttribute("role", "button");
+        const a = k, b = k + toks.length - 1, act = () => playTokens(a, b, g);
+        g.addEventListener("click", act);
+        g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(); } });
+      }
+      toks.forEach((tok, j) => {
+        if (j) g.append(" ");
         const [pre, core, post] = split(tok);
-        if (core && stress.has(norm(core))) p.append(pre, el("b", null, core), post); else p.append(tok);
+        if (core && stress.has(norm(core))) g.append(pre, el("b", null, core), post); else g.append(tok);
       });
+      k += toks.length;
+      p.append(g);
     });
     box.append(p);
   }
@@ -521,37 +660,60 @@ function renderProgress() {
   box.append(s);
 }
 
-function setState(title, text) {
-  $("state-title").textContent = title;
-  $("state-text").textContent = text;
-}
-
 // ---------- actions ----------
 function go(i) {
   const d = curDay(); if (!d) return;
   const n = Math.max(0, Math.min(d.sentences.length - 1, i));
   if (n === sIdx) return;
-  sIdx = n; stopSpeech(); render();
+  sIdx = n; stopAudio(); render();
 }
-function goDay(delta) {
-  const i = dayIdx() + delta;
-  if (i < 0 || i >= days.length) return;
-  selDate = days[i].date; sIdx = 0; veil = false; stopSpeech(); render();
+async function loadDay(date) {
+  if (dayCache[date] || !db) return dayCache[date] || null;
+  const snap = await db.collection("days").doc(date).get();
+  const d = snap.exists ? cleanDay(snap.data()) : null;
+  if (d) dayCache[date] = d;
+  return d;
+}
+async function selectDay(date) {
+  if (!isDate(date)) return;
+  selDate = date; sIdx = 0; veil = false; calOpen = false; calMonth = null;
+  stopAudio();
+  if (!dayCache[date]) {
+    setState("正在读取" + dayLabel(date) + "的 5 句…", "");
+    render();
+    try { await loadDay(date); } catch {}
+    if (selDate !== date) return;
+    if (!dayCache[date]) setState("这天的句子没读到", "刷新页面再试。");
+  }
+  render();
+}
+function stepDay(delta) {
+  const i = dates.indexOf(selDate) + delta;
+  if (i >= 0 && i < dates.length) selectDay(dates[i]);
+}
+function setDates(list) {
+  dates = [...new Set(A(list).filter(isDate))].sort().reverse();
+  if (!dates.length) { setState("今天的 5 句还在准备", "每天柏林时间早上 5 点前会自动放好 5 句带原声的德语原句和完整讲解，到时刷新页面就能看到。"); render(); return; }
+  if (!selDate || !dates.includes(selDate)) selectDay(dates[0]); else render();
 }
 function wordAct(node) {
   if (!node) return;
   if (veil && node.closest("#sentence")) { node.classList.add("peek"); setTimeout(() => node.classList.remove("peek"), 2000); return; }
-  if (!canSpeak) return;
-  playing = null; renderTools();
-  node.classList.add("flash");
-  speak(node.dataset.word, 0.8, () => node.classList.remove("flash"));
+  const i = Number(node.dataset.i);
+  if (Number.isInteger(i)) playTokens(i, i, node);
 }
 
-$("day-prev").addEventListener("click", () => goDay(1));
-$("day-next").addEventListener("click", () => goDay(-1));
-$("play-normal").addEventListener("click", () => play("normal"));
-$("play-slow").addEventListener("click", () => play("slow"));
-$("veil-btn").addEventListener("click", () => { veil = !veil; stopSpeech(); render(); });
+$("day-prev").addEventListener("click", () => stepDay(1));
+$("day-next").addEventListener("click", () => stepDay(-1));
+$("cal-btn").addEventListener("click", () => { calOpen = !calOpen; calMonth = null; render(); });
+$("cal-prev").addEventListener("click", () => { const [y, m] = calMonth.split("-").map(Number); const d = new Date(y, m - 2, 1); calMonth = d.getFullYear() + "-" + pad(d.getMonth() + 1); render(); });
+$("cal-next").addEventListener("click", () => { const [y, m] = calMonth.split("-").map(Number); const d = new Date(y, m, 1); calMonth = d.getFullYear() + "-" + pad(d.getMonth() + 1); render(); });
+$("cal-latest").addEventListener("click", () => { if (dates[0]) selectDay(dates[0]); });
+document.addEventListener("click", (e) => { if (calOpen && !e.target.closest(".daynav")) { calOpen = false; render(); } });
+$("play-normal").addEventListener("click", () => playAll("all"));
+$("play-slow").addEventListener("click", () => playAll("slow"));
+$("loop-btn").addEventListener("click", () => { loop = !loop; if (!loop) clearTimeout(loopTimer); renderTools(); });
+$("veil-btn").addEventListener("click", () => { veil = !veil; render(); });
 $("done-btn").addEventListener("click", () => {
   const d = curDay(), s = curSent(); if (!d || !s) return;
   const id = sid(d, s);
@@ -562,6 +724,7 @@ $("sentence").addEventListener("click", (e) => wordAct(e.target.closest(".w")));
 $("sentence").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { const w = e.target.closest(".w"); if (w) { e.preventDefault(); wordAct(w); } } });
 $("gloss").addEventListener("click", (e) => wordAct(e.target.closest(".gw")));
 document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && calOpen) { calOpen = false; render(); $("cal-btn").focus(); return; }
   if (e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
   if (e.key === "ArrowLeft") { go(sIdx - 1); e.preventDefault(); }
   else if (e.key === "ArrowRight") { go(sIdx + 1); e.preventDefault(); }
@@ -570,21 +733,24 @@ document.addEventListener("keydown", (e) => {
 
 render();
 
-// ---------- data: the day's sentences (shared) and the viewer's own progress ----------
+// ---------- data: the list of days, each day's sentences, and the viewer's own progress ----------
 (async () => {
-  const fail = (t, x) => { if (!loaded) { setState(t, x); render(); } };
+  let answered = false;
+  const fail = (t, x) => { if (!answered) { setState(t, x); render(); } };
   if (!window.claude || !window.claude.use) { fail("在 claude.ai 里打开这个页面", "每天的句子保存在页面的数据库里，需要在 claude.ai 登录后打开才能读取。"); return; }
   const timer = setTimeout(() => fail("读取超时", "暂时没连上页面的数据库，刷新页面再试。"), 10000);
   try {
-    const [db, user] = await Promise.all([claude.use("db"), claude.use("user")]);
-    if (!db) { clearTimeout(timer); fail("在 claude.ai 登录后打开", "每天的句子保存在页面的数据库里，登录后才能读取。"); return; }
-    db.collection("days").orderBy("date", "desc").limit(30).onSnapshot((snap) => {
-      clearTimeout(timer);
-      loaded = true;
-      days = snap.docs.map((x) => cleanDay(x.data())).filter(Boolean);
-      if (!days.some((d) => d.date === selDate)) { selDate = days[0] ? days[0].date : null; sIdx = 0; }
-      if (!days.length) setState("今天的 5 句还在准备", "每天柏林时间早上 5 点前会自动放好 5 句德语原句和完整讲解，到时刷新页面就能看到。");
-      render();
+    const [store, user] = await Promise.all([claude.use("db"), claude.use("user")]);
+    if (!store) { clearTimeout(timer); fail("在 claude.ai 登录后打开", "每天的句子保存在页面的数据库里，登录后才能读取。"); return; }
+    db = store;
+    db.collection("meta").doc("index").onSnapshot(async (snap) => {
+      clearTimeout(timer); answered = true;
+      const list = snap.exists ? A(snap.data().dates) : null;
+      if (list) { setDates(list); return; }
+      // no index yet: fall back to the newest days themselves
+      const q = await db.collection("days").orderBy("date", "desc").limit(30).get();
+      q.docs.forEach((x) => { const d = cleanDay(x.data()); if (d) dayCache[d.date] = d; });
+      setDates(Object.keys(dayCache));
     }, () => { clearTimeout(timer); fail("没读到句子", "页面的数据库暂时不可用，刷新页面再试。"); });
 
     const uid = user ? await user.id() : null;

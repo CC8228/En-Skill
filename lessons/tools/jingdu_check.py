@@ -4,6 +4,8 @@
 Usage:
     python3 jingdu_check.py day.json [--cands cands.json]
 
+Works for both kinds of day: text sentences, and spoken sentences with audio
+(then the day needs "audioId", and every sentence word timings "t" and its "clip" span).
 Exits 0 and prints "OK" when the file is fit to publish; otherwise lists every
 problem and exits 1. With --cands, each sentence must match a collected
 candidate exactly, so a sentence can never drift from its source.
@@ -28,6 +30,8 @@ def check(day, cands=None):
         errs.append("date must be YYYY-MM-DD")
     if day.get("lang") != "de":
         errs.append('lang must be "de"')
+    if day.get("audio") and not str(day.get("audioId", "")).strip():
+        errs.append("audioId is empty: upload the day's .mp4 and rebuild with --audio-id")
     sents = day.get("sentences")
     if not isinstance(sents, list) or len(sents) != 5:
         return errs + ["sentences must be a list of exactly 5"]
@@ -86,6 +90,17 @@ def check(day, cands=None):
                 errs.append(p + f"stress word {w!r} is not in the sentence")
         if not str(s.get("url", "")).startswith("https://"):
             errs.append(p + "url must start with https://")
+        if "t" in s or day.get("audio"):
+            t = s.get("t")
+            if not isinstance(t, list) or len(t) != len(tokens):
+                errs.append(p + f"t needs one [start, end] per token ({len(tokens)})")
+            elif any(not (isinstance(x, list) and len(x) == 2 and 0 <= x[0] <= x[1]) for x in t):
+                errs.append(p + "every t entry must be [start, end] with start <= end")
+            clip = s.get("clip")
+            if not (isinstance(clip, list) and len(clip) == 2 and 0 <= clip[0] < clip[1]):
+                errs.append(p + "clip must be [start, end] of this sentence inside the day's audio file")
+            elif isinstance(t, list) and t and t[-1][1] > clip[1] - clip[0] + 0.5:
+                errs.append(p + "word timings run past the end of the clip")
     return errs
 
 
