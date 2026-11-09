@@ -73,12 +73,15 @@ def small_flags(s):
     return [norm(g.get("w", "")) in small for g in gloss]
 
 
-def render_html(day, lean=False):
-    """lean: bare tags only. Otherwise inline styles that Gmail and Apple Mail keep."""
+def render_html(day, lean=False, attached=False):
+    """lean: bare tags with one wrapper style. Otherwise inline styles that Gmail and Apple Mail keep.
+    attached: the day's recording travels with the mail, so say where each sentence starts in it."""
     has_audio = bool(day.get("audio"))
     S = (lambda css: "") if lean else (lambda css: f' style="{css}"')
     h = []
-    if not lean:
+    if lean:
+        h.append(f'<div style="font-family:{SANS};font-size:15px;line-height:1.6;color:#1b1b26;max-width:680px;">')
+    else:
         h.append(f'<div style="margin:0;padding:12px 8px;background:#f4f3f8;">'
                  f'<div style="max-width:660px;margin:0 auto;background:#ffffff;border-radius:12px;padding:22px 24px;'
                  f'font-family:{SANS};color:#1b1b26;font-size:15px;line-height:1.65;">')
@@ -87,7 +90,7 @@ def render_html(day, lean=False):
     h.append(f'<p{S(f"margin:0 0 6px;color:{MUTED};font-size:13.5px;")}>德语 · B2–C1 · 今天 5 句'
              + ("真人原声" if has_audio else "原句")
              + f' · <a href="{PAGE}"{S(f"color:{ACCENT};font-weight:600;")}>{listen} →</a></p>')
-    if has_audio:
+    if has_audio and attached:
         marks = " · ".join(f"第 {s['n']} 句 {mmss(s['clip'][0])}" for s in day["sentences"] if s.get("clip"))
         h.append(f'<p{S(f"margin:0 0 4px;color:{MUTED};font-size:12.5px;")}>附件里的录音是 5 句连播：{marks}</p>')
 
@@ -157,8 +160,7 @@ def render_html(day, lean=False):
     h.append(f'<p{S(f"margin:0;color:{MUTED};font-size:12.5px;")}><b>精读五步</b>　1 读好 → 2 彻底弄懂（上面逐项列好）→ 3 说出来（约 2 天：发音、语调、语流）'
              f'→ 4 脱稿（没练好之前不要背）→ 5 找人说。黄底是讲到的小词，下划线是通常重读的词，以原声为准。'
              f'文字由语音识别转写，个别词可能有出入。</p>')
-    if not lean:
-        h.append("</div></div>")
+    h.append("</div>" if lean else "</div></div>")
     return "\n".join(h)
 
 
@@ -184,7 +186,8 @@ def as_mp3(path, workdir):
 
 
 def send_resend(day, to, audio=None, sender=SENDER):
-    body = {"from": sender, "to": [to], "subject": subject(day), "html": render_html(day), "text": render_text(day)}
+    body = {"from": sender, "to": [to], "subject": subject(day), "html": render_html(day, attached=bool(audio)),
+            "text": render_text(day)}
     if audio:
         mp3 = as_mp3(audio, os.path.dirname(os.path.abspath(audio)))
         body["attachments"] = [{"filename": f"精读-{day['date']}.mp3",
