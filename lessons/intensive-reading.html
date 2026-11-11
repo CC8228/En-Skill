@@ -4,67 +4,81 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Serif:ital,wght@0,400;0,600;1,400&family=Noto+Sans+SC:wght@400;500;700&display=swap">
 <style>
-  /* Layout, built for a 13" MacBook Air (1440×900 default, about 1440×800 inside the browser):
-     the day's sentence is the hero on the left, with its full breakdown ("彻底弄懂") listed directly underneath;
-     a quiet column on the right carries the five-step reminders. Narrower windows stack the column below.
-     Colors follow the course pages; German purple is the accent. */
+  /* Layout: the day's sentence is a stage that stays in view on the left (sentence, translation, player);
+     the five steps of 精读 run down the right as a numbered walkthrough, each step holding its own material
+     and controls. Every piece of the breakdown that is a stretch of the sentence is wired to the stage:
+     pointing at it marks its place in the sentence, clicking plays just that stretch.
+     Narrow windows stack to one column and dock a small player at the bottom once the stage scrolls away.
+     Colour roles: violet = what you can play or is playing, amber = the small words, green = finished,
+     red pen = the viewer's own pronunciation marks (letters crossed out as swallowed, how a word is really said). */
   :root {
-    --bg: #f4f3f8;
+    --bg: #f5f4fa;
     --surface: #ffffff;
-    --field: #f8f7fb;
-    --ink: #1b1b26;
-    --muted: #5e5d70;
-    --line: #e1dfea;
+    --sunk: #eceaf4;
+    --ink: #1b1a28;
+    --ink-2: #474660;
+    --muted: #68667f;
+    --line: #e0deeb;
+    --line-2: #cbc8dc;
     --accent: #5b3fa6;
-    --accent-soft: #ede8f8;
+    --accent-soft: #ebe5fa;
     --on-accent: #ffffff;
+    --mark: #fdecb5;
+    --mark-line: #dea526;
     --done: #1d7a4c;
-    --done-soft: #e5f4ec;
-    --mark: #fcebc0;
-    --mark-line: #d9a03c;
-    --veil: #d9d6e4;
+    --done-soft: #e1f3e8;
+    --pen: #c0392b;
+    --pen-soft: #fbe8e5;
+    --veil: #d8d5e6;
+    --shadow: 0 1px 2px rgba(27, 26, 40, 0.05), 0 10px 28px rgba(27, 26, 40, 0.07);
     --font-ui: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "IBM Plex Sans", sans-serif;
     --font-de: "IBM Plex Serif", Georgia, "Times New Roman", serif;
     --font-num: "IBM Plex Mono", ui-monospace, Menlo, monospace;
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-      --bg: #121219; --surface: #1b1b25; --field: #16161f; --ink: #ebeaf3; --muted: #a09fb3; --line: #2d2c3a;
-      --accent: #b9a5f0; --accent-soft: #2a2442; --on-accent: #15121f; --done: #5cc690; --done-soft: #16302a;
-      --mark: #4a3813; --mark-line: #d39a3a; --veil: #363447; color-scheme: dark;
+      --bg: #111018; --surface: #1b1a26; --sunk: #242332; --ink: #eceaf6; --ink-2: #c9c7dc; --muted: #9f9db6;
+      --line: #2c2b3b; --line-2: #403e54; --accent: #b8a6f3; --accent-soft: #2c2748; --on-accent: #151221;
+      --mark: #4f3c12; --mark-line: #dba63f; --done: #5cc690; --done-soft: #16302a; --pen: #ff8d7e; --pen-soft: #3b1d1a; --veil: #383649;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.35); color-scheme: dark;
     }
   }
   :root[data-theme="dark"] {
-    --bg: #121219; --surface: #1b1b25; --field: #16161f; --ink: #ebeaf3; --muted: #a09fb3; --line: #2d2c3a;
-    --accent: #b9a5f0; --accent-soft: #2a2442; --on-accent: #15121f; --done: #5cc690; --done-soft: #16302a;
-    --mark: #4a3813; --mark-line: #d39a3a; --veil: #363447; color-scheme: dark;
+    --bg: #111018; --surface: #1b1a26; --sunk: #242332; --ink: #eceaf6; --ink-2: #c9c7dc; --muted: #9f9db6;
+    --line: #2c2b3b; --line-2: #403e54; --accent: #b8a6f3; --accent-soft: #2c2748; --on-accent: #151221;
+    --mark: #4f3c12; --mark-line: #dba63f; --done: #5cc690; --done-soft: #16302a; --pen: #ff8d7e; --pen-soft: #3b1d1a; --veil: #383649;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px rgba(0, 0, 0, 0.35); color-scheme: dark;
   }
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
   html { -webkit-text-size-adjust: 100%; }
-  body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 15px; line-height: 1.6; -webkit-tap-highlight-color: transparent; }
+  body { background: var(--bg); color: var(--ink); font-family: var(--font-ui); font-size: 14.5px; line-height: 1.6; -webkit-tap-highlight-color: transparent; }
   button { font: inherit; color: inherit; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .de { font-family: var(--font-de); }
+  kbd { font: 500 11px/1 var(--font-num); border: 1px solid var(--line-2); border-bottom-width: 2px; border-radius: 4px; padding: 2px 5px; background: var(--surface); color: var(--ink-2); }
+  .ic { width: 14px; height: 14px; flex: none; display: block; }
 
-  .wrap { max-width: 1440px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 16px 40px; }
-  .layout { display: grid; gap: 20px; }
-  .main { display: grid; gap: 14px; align-content: start; min-width: 0; }
+  .wrap { max-width: 1480px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 14px 40px; display: grid; gap: 14px; }
+  .wrap.docked { padding-bottom: 112px; }
 
-  /* header: name, day switcher */
-  .top { display: flex; align-items: center; gap: 12px 20px; flex-wrap: wrap; }
+  /* ---------- header: name, progress, day switcher ---------- */
+  .top { display: flex; align-items: center; gap: 8px 18px; flex-wrap: wrap; }
   .brand { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; min-width: 0; }
-  h1 { margin: 0; font-size: 20px; font-weight: 700; line-height: 1.2; }
-  .brand span { font-size: 13px; color: var(--muted); }
-  .daynav { position: relative; margin-left: auto; display: flex; align-items: center; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
+  h1 { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.2; }
+  .brand span { font-size: 12.5px; color: var(--muted); }
+  .status { margin-left: auto; display: flex; gap: 14px; font-size: 12.5px; color: var(--muted); }
+  .status b { font: 500 14px/1 var(--font-num); color: var(--ink); font-variant-numeric: tabular-nums; }
+  .status .all b { color: var(--done); }
+  .daynav { position: relative; display: flex; align-items: center; gap: 2px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 3px; }
   .daynav > button { height: 32px; border: 0; background: none; border-radius: 7px; cursor: pointer; line-height: 1; }
   .daynav > .arrow { width: 32px; font-size: 18px; color: var(--muted); }
   .daynav > button:disabled { opacity: 0.3; cursor: default; }
-  .daynav .label { min-width: 10em; padding: 0 10px; font-weight: 600; font-size: 14px; display: inline-flex; gap: 6px; justify-content: center; align-items: center; }
+  .daynav .label { min-width: 9.5em; padding: 0 10px; font-weight: 600; font-size: 13.5px; display: inline-flex; gap: 6px; justify-content: center; align-items: center; }
   .daynav .label[aria-expanded="true"] { background: var(--accent-soft); color: var(--accent); }
-  .daynav .label .caret { font-size: 10px; color: var(--muted); }
+  .daynav .label .caret { font-size: 9px; color: var(--muted); }
   .chip-today { font-size: 11px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 2px 7px; }
-  .cal { position: absolute; top: calc(100% + 6px); right: 0; z-index: 20; width: 300px; max-width: calc(100vw - 32px); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; box-shadow: 0 12px 32px rgba(20, 16, 40, 0.16); display: grid; gap: 8px; }
+  .cal { position: absolute; top: calc(100% + 6px); right: 0; z-index: 40; width: 300px; max-width: calc(100vw - 32px); background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 12px; box-shadow: var(--shadow); display: grid; gap: 8px; }
   .cal-head { display: flex; align-items: center; justify-content: space-between; }
   .cal-head b { font-size: 14px; }
   .cal-head button { width: 30px; height: 30px; border: 0; background: none; border-radius: 7px; cursor: pointer; font-size: 17px; color: var(--muted); }
@@ -72,269 +86,562 @@
   .cal-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 2px; text-align: center; }
   .cal-grid .wd { font-size: 11px; color: var(--muted); padding: 2px 0 4px; }
   .cd { position: relative; height: 36px; border: 0; border-radius: 8px; background: none; font: 500 13px/1 var(--font-num); font-variant-numeric: tabular-nums; color: var(--muted); opacity: 0.45; }
-  .cd.has { cursor: pointer; color: var(--ink); opacity: 1; background: var(--field); }
-  .cd.has::after { content: ""; position: absolute; left: 50%; bottom: 5px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--line); }
+  .cd.has { cursor: pointer; color: var(--ink); opacity: 1; background: var(--sunk); }
+  .cd.has::after { content: ""; position: absolute; left: 50%; bottom: 5px; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: var(--line-2); }
   .cd.part::after { background: var(--mark-line); }
   .cd.full::after { background: var(--done); }
   .cd.today { box-shadow: inset 0 0 0 1px var(--accent); }
   .cd.sel { background: var(--accent); color: var(--on-accent); }
   .cd.sel::after { background: var(--on-accent); }
   .cal-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 11.5px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 8px; }
-  .cal-foot i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: 1px; background: var(--line); }
+  .cal-foot i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; vertical-align: 1px; background: var(--line-2); }
   .cal-foot i.part { background: var(--mark-line); }
   .cal-foot i.full { background: var(--done); }
-  .cal-foot button { margin-left: auto; border: 1px solid var(--line); background: var(--field); border-radius: 7px; padding: 4px 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .cal-foot button { margin-left: auto; border: 1px solid var(--line-2); background: var(--surface); border-radius: 7px; padding: 4px 8px; font-size: 12px; font-weight: 600; cursor: pointer; }
 
-  /* five sentence tabs */
-  .stabs { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
-  .stab { display: grid; gap: 2px; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; cursor: pointer; min-width: 0; }
-  .stab[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
-  .stab .r1 { display: flex; align-items: center; gap: 8px; font-size: 13px; min-width: 0; }
-  .stab .n { font: 500 13px/1 var(--font-num); color: var(--accent); }
-  .stab .src { font-weight: 600; flex: none; }
-  .stab .ok { margin-left: auto; color: var(--done); font-size: 13px; font-weight: 700; }
-  .stab .t { font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  /* ---------- the day's five sentences ---------- */
+  .stabs { display: grid; grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); gap: 6px; }
+  .stab { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 10px; align-items: center; text-align: left; background: none; border: 1px solid var(--line); border-radius: 11px; padding: 8px 12px; cursor: pointer; min-width: 0; }
+  .stab .badge { grid-row: span 2; width: 26px; height: 26px; border-radius: 50%; font: 500 13px/26px var(--font-num); text-align: center; background: var(--sunk); color: var(--ink-2); }
+  .stab .topic { font-size: 13.5px; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+  .stab .src { font-size: 12px; line-height: 1.35; color: var(--muted); }
+  .stab[aria-pressed="true"] { background: var(--surface); border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+  .stab[aria-pressed="true"] .badge { background: var(--accent); color: var(--on-accent); }
+  .stab.done .badge { background: var(--done-soft); color: var(--done); }
 
-  .state { background: var(--surface); border: 1px dashed var(--line); border-radius: 12px; padding: 28px 24px; display: grid; gap: 6px; }
+  .state { background: var(--surface); border: 1px dashed var(--line-2); border-radius: 14px; padding: 28px 24px; display: grid; gap: 6px; }
   .state b { font-size: 16px; }
   .state p { margin: 0; color: var(--muted); font-size: 14px; max-width: 60ch; }
 
-  /* the sentence */
-  .sent { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 22px; display: grid; gap: 10px; min-width: 0; }
-  .src-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; font-size: 12.5px; color: var(--muted); min-width: 0; }
-  .src-line a { color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
-  .src-line a:hover { text-decoration: underline; }
-  .src-line .pill { font-size: 11.5px; font-weight: 600; border-radius: 999px; padding: 2px 8px; background: var(--accent-soft); color: var(--accent); }
-  .src-line .num { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
-  .sentence { margin: 0; font-family: var(--font-de); font-size: 26px; line-height: 1.65; overflow-wrap: break-word; }
-  .sentence .w { cursor: pointer; border-radius: 4px; }
+  .work { display: grid; gap: 22px; align-items: start; min-width: 0; }
+
+  /* ---------- the stage: sentence, translation, player ---------- */
+  .stage { container-type: inline-size; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow); padding: 18px 22px; display: grid; gap: 14px; min-width: 0; }
+  .stage-top { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 9px; font-size: 12.5px; color: var(--muted); min-width: 0; }
+  .meta .nth { font-weight: 700; color: var(--ink); }
+  .meta .pill { font-size: 11.5px; font-weight: 600; border-radius: 999px; padding: 1px 8px; background: var(--sunk); color: var(--ink-2); }
+  .meta .num { font-family: var(--font-num); font-size: 12px; font-variant-numeric: tabular-nums; }
+  .check { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 7px; min-height: 32px; padding: 0 12px 0 8px; border-radius: 999px; border: 1px solid var(--line-2); background: none; font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+  .check .ring { width: 17px; height: 17px; border-radius: 50%; border: 1.5px solid currentColor; display: grid; place-items: center; }
+  .check .ring .ic { width: 11px; height: 11px; visibility: hidden; }
+  .check[aria-pressed="true"] { background: var(--done-soft); border-color: transparent; color: var(--done); }
+  .check[aria-pressed="true"] .ring { background: var(--done); border-color: var(--done); color: var(--surface); }
+  .check[aria-pressed="true"] .ring .ic { visibility: visible; }
+
+  .sentence { margin: 0; font-family: var(--font-de); font-size: 23px; font-size: clamp(21px, 2.6cqi + 10px, 27px); line-height: 1.62; overflow-wrap: break-word; }
+  .sentence .w { cursor: pointer; border-radius: 4px; padding: 1px 2px; margin: -1px -2px; }
   .sentence .w.stress { text-decoration: underline 2px var(--accent); text-underline-offset: 6px; }
-  .sentence .w.flash { background: var(--accent-soft); }
-  .sentence.veiled .w { color: transparent; background: var(--veil); text-decoration: none; }
-  .sentence.veiled .w.peek { color: var(--ink); background: var(--accent-soft); }
+  .sentence .w.hl { background: var(--accent-soft); box-shadow: inset 0 -2px 0 var(--accent); }
   .sentence .w.inrange { background: var(--accent-soft); }
-  .sentence .w.now { background: var(--accent); color: var(--on-accent); }
-  .player { display: grid; gap: 4px; }
-  .seek { position: relative; height: 22px; cursor: pointer; touch-action: none; }
-  .seek-track { position: absolute; left: 0; right: 0; top: 7px; height: 8px; border-radius: 4px; background: var(--field); border: 1px solid var(--line); overflow: hidden; }
-  .seek-range { position: absolute; top: 0; bottom: 0; background: var(--accent-soft); }
-  .seek-ticks i { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--line); }
-  .seek-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); opacity: 0.6; }
-  .seek-hint { font-size: 12px; color: var(--muted); }
-  .speed { display: inline-flex; gap: 2px; border: 1px solid var(--line); border-radius: 8px; background: var(--field); padding: 2px; }
-  .speed button { border: 0; background: none; min-height: 28px; padding: 0 8px; border-radius: 6px; cursor: pointer; font: 500 12.5px/1 var(--font-num); color: var(--muted); }
-  .speed button[aria-pressed="true"] { background: var(--surface); color: var(--accent); box-shadow: 0 0 0 1px var(--line); }
-  .range-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 4px 3px 10px; max-width: 100%; }
-  .range-chip b { font-family: var(--font-de); font-weight: 600; }
-  .range-chip button { border: 0; background: var(--surface); border-radius: 999px; padding: 3px 9px; font-size: 12px; cursor: pointer; color: var(--muted); }
-  .translation { margin: 0; font-size: 16px; line-height: 1.6; display: flex; gap: 10px; align-items: baseline; }
-  .tag { flex: none; font-size: 12px; font-weight: 600; color: var(--muted); }
-  .tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding-top: 2px; }
-  .btn { display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 0 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--field); font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .sentence .w.now { background: var(--accent); color: var(--on-accent); transition: none; }
+  .sentence.veiled .w { color: transparent; background: var(--veil); text-decoration: none; box-shadow: none; }
+  .sentence.veiled .w.inrange { box-shadow: inset 0 -2px 0 var(--accent); }
+  .sentence.veiled .w.now { background: var(--accent); }
+  .sentence.veiled .w.peek { color: var(--ink); background: var(--accent-soft); }
+  /* the viewer's red pen: a letter crossed out is swallowed in the recording */
+  .cut { color: color-mix(in srgb, currentColor 45%, transparent); text-decoration: line-through 1.5px var(--pen); }
+  .sentence.veiled .w:not(.peek) .cut { text-decoration: none; }
+  .translation { margin: 0; font-size: 15px; line-height: 1.7; color: var(--ink-2); display: flex; gap: 10px; align-items: baseline; }
+  .translation .link { margin-left: 0; flex: none; }
+  /* a passage of 100+ words: smaller type on the stage, and the stage gets half the width */
+  .stage.long .sentence { font-size: 18px; font-size: clamp(17px, 1.3cqi + 10px, 20px); line-height: 1.8; }
+  .stage.long .translation { font-size: 14px; }
+  .tag { flex: none; font-size: 11.5px; font-weight: 600; line-height: 1.5; color: var(--muted); border: 1px solid var(--line-2); border-radius: 5px; padding: 0 5px; }
+
+  .player { display: grid; gap: 8px; }
+  .seek { position: relative; height: 20px; cursor: pointer; touch-action: none; }
+  .seek-track { position: absolute; left: 0; right: 0; top: 7px; height: 6px; border-radius: 3px; background: var(--sunk); overflow: hidden; }
+  .seek-range { position: absolute; top: 0; bottom: 0; background: var(--line-2); }
+  .seek-fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: var(--accent); }
+  .seek-ticks i { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--surface); }
+  .controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 36px; padding: 0 13px; border-radius: 9px; border: 1px solid var(--line-2); background: var(--surface); font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
   .btn:disabled { opacity: 0.5; cursor: default; }
-  .btn[aria-pressed="true"] { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
-  .btn.donebtn { margin-left: auto; }
-  .btn.donebtn[aria-pressed="true"] { background: var(--done-soft); color: var(--done); }
-  .hintkeys, .audio-note { font-size: 12px; color: var(--muted); }
-  .hintkeys kbd { font: 500 11px/1 var(--font-num); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 2px 5px; background: var(--surface); }
+  .btn[aria-pressed="true"], .btn.flash { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); min-width: 6.4em; }
+  .btn.good[aria-pressed="true"] { background: var(--done-soft); color: var(--done); }
+  .btn.sm { min-height: 30px; padding: 0 10px; font-size: 12.5px; border-radius: 8px; }
+  .btn.pen[aria-pressed="true"] { background: var(--pen-soft); color: var(--pen); }
+  .i-stop, .is-playing .i-play { display: none; }
+  .is-playing .i-stop { display: block; }
+  .speed { display: inline-flex; gap: 2px; border: 1px solid var(--line-2); border-radius: 9px; padding: 2px; }
+  .speed button { border: 0; background: none; min-height: 30px; padding: 0 8px; border-radius: 6px; cursor: pointer; font: 500 12.5px/1 var(--font-num); color: var(--muted); }
+  .speed button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .range-chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 3px 4px 3px 11px; max-width: 100%; min-width: 0; }
+  .range-chip > span { min-width: 0; overflow-wrap: anywhere; }
+  .range-chip b { font-family: var(--font-de); font-weight: 600; }
+  .range-chip button { flex: none; border: 0; background: var(--surface); border-radius: 999px; padding: 3px 9px; font-size: 12px; cursor: pointer; color: var(--muted); }
+  .hint-row { display: flex; align-items: center; min-height: 30px; min-width: 0; }
+  .hint, .audio-note { margin: 0; font-size: 12px; line-height: 1.9; color: var(--muted); }
+  .cite { margin: 0; padding-top: 12px; border-top: 1px solid var(--line); font-size: 12.5px; line-height: 1.6; color: var(--muted); display: flex; flex-wrap: wrap; gap: 2px 10px; min-width: 0; }
+  .cite a { color: var(--accent); text-decoration: none; overflow-wrap: anywhere; }
+  .cite a:hover { text-decoration: underline; }
+  .cite i { font-family: var(--font-de); }
+  .cite .num { font-family: var(--font-num); font-size: 12px; font-variant-numeric: tabular-nums; }
 
-  /* 彻底弄懂 */
-  .und { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 22px 20px; display: grid; gap: 16px; min-width: 0; }
-  .und-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
-  .und-head h2 { margin: 0; font-size: 17px; font-weight: 700; }
-  .und-head span { font-size: 12.5px; color: var(--muted); }
-  .block { display: grid; gap: 8px; min-width: 0; align-content: start; }
-  .block h3 { margin: 0; font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.02em; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
-  .block h3 small { font-weight: 400; font-size: 12px; color: var(--muted); letter-spacing: 0; }
-  .gloss { display: flex; flex-wrap: wrap; gap: 6px 4px; }
-  .gw { display: grid; gap: 1px; align-content: start; text-align: left; border: 1px solid transparent; background: var(--field); border-radius: 7px; padding: 4px 7px 5px; cursor: pointer; max-width: 15em; min-width: 0; }
-  .gw .w { font-family: var(--font-de); font-size: 17px; line-height: 1.3; }
-  .gw .g { font-size: 12.5px; line-height: 1.35; }
-  .gw .f { font-size: 11px; line-height: 1.35; color: var(--muted); }
-  .gw.small { background: var(--mark); box-shadow: inset 0 -2px 0 var(--mark-line); }
-  .gw.stress .w { text-decoration: underline 2px var(--accent); text-underline-offset: 4px; }
-  .gw.flash { border-color: var(--accent); }
-  .cols { display: grid; gap: 16px 28px; }
-  .col { display: grid; gap: 16px; align-content: start; min-width: 0; }
-  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-  .list li { font-size: 14px; line-height: 1.55; min-width: 0; }
-  .list .k { font-family: var(--font-de); font-weight: 600; font-size: 15px; color: var(--accent); }
-  .list .k.mk { color: var(--ink); background: var(--mark); box-shadow: inset 0 -2px 0 var(--mark-line); border-radius: 3px; padding: 0 4px; }
+  /* ---------- the five steps ---------- */
+  .steps { container-type: inline-size; container-name: steps; list-style: none; margin: 0; padding: 0; display: grid; min-width: 0; }
+  .step { display: grid; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); min-width: 0; }
+  .step:first-child { border-top: 0; padding-top: 2px; }
+  .step-head { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; }
+  .step-head .num { align-self: start; width: 28px; height: 28px; border-radius: 50%; font: 500 13px/28px var(--font-num); text-align: center; background: var(--accent-soft); color: var(--accent); }
+  .step-title { min-width: 0; }
+  .step-title h2 { margin: 0; font-size: 16px; font-weight: 700; line-height: 1.5; display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+  .step-title h2 small { font-size: 12px; font-weight: 600; color: var(--accent); }
+  .step-title p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted); }
+  .step-acts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .fold { display: inline-flex; align-items: center; gap: 4px; min-height: 32px; padding: 0 8px 0 10px; border: 0; background: none; border-radius: 8px; font-size: 12.5px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+  .fold .ic { transition: none; }
+  .fold[aria-expanded="false"] .ic { transform: rotate(-90deg); }
+  .step-body { display: grid; gap: 20px; min-width: 0; }
+  .steps.veiled .dim { opacity: 0.5; }
+  .veil-note { margin: 0; font-size: 14px; line-height: 1.7; background: var(--accent-soft); border-radius: 10px; padding: 10px 14px; }
+
+  /* step 2 goes down in three layers: the words, how the sentence is built, why it is said this way */
+  .layer-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+  .layer-nav button { display: inline-flex; align-items: center; gap: 7px; border: 1px solid var(--line-2); background: none; border-radius: 999px; padding: 4px 12px 4px 5px; font-size: 12.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; }
+  .layer-nav b, .layer-h .ln { font: 500 11.5px/1.5 var(--font-num); color: var(--accent); background: var(--accent-soft); border-radius: 999px; padding: 1px 7px; }
+  .layer { scroll-margin-top: 14px; display: grid; gap: 18px; min-width: 0; padding-top: 18px; border-top: 1px dashed var(--line-2); }
+  .layer-h { margin: 0; font-size: 15px; font-weight: 700; line-height: 1.5; display: flex; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; }
+  .layer-h small { font-size: 12.5px; font-weight: 400; color: var(--muted); }
+  .block { display: grid; gap: 10px; min-width: 0; align-content: start; }
+  .block-head { display: flex; align-items: baseline; gap: 4px 12px; flex-wrap: wrap; }
+  .block h3, .block h4 { margin: 0; font-size: 13px; font-weight: 700; color: var(--ink-2); letter-spacing: 0.04em; }
+  .legend { font-size: 12px; color: var(--muted); display: inline-flex; gap: 4px 12px; flex-wrap: wrap; align-items: baseline; }
+  .legend .lg { display: inline-flex; align-items: baseline; gap: 5px; }
+  .legend .lg-small { font-family: var(--font-de); color: var(--ink); background: var(--mark); box-shadow: inset 0 -2px 0 var(--mark-line); border-radius: 3px; padding: 0 4px; }
+  .legend .lg-stress { font-family: var(--font-de); color: var(--ink); text-decoration: underline 2px var(--accent); text-underline-offset: 3px; }
+  .link { margin-left: auto; border: 0; background: none; padding: 2px 0; font-size: 12px; color: var(--accent); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .how { margin: 0; font-size: 12.5px; line-height: 1.7; color: var(--muted); }
+  .tri { display: inline-block; width: 0; height: 0; border-left: 6px solid var(--accent); border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+
+  /* each word, set like an interlinear gloss: the word, its meaning underneath */
+  .gloss-wrap { position: relative; min-width: 0; }
+  .gloss { display: flex; flex-wrap: wrap; gap: 8px 2px; }
+  .gw { display: grid; gap: 2px; align-content: start; justify-items: start; text-align: left; border: 0; background: none; border-radius: 8px; padding: 4px 6px 5px; cursor: pointer; max-width: 10.5em; min-width: 0; }
+  .gw .w { font-family: var(--font-de); font-size: 18px; line-height: 1.35; }
+  .gw .g { font-size: 12.5px; line-height: 1.4; color: var(--ink-2); }
+  .gw .f { display: none; font-size: 11px; line-height: 1.4; color: var(--muted); }
+  .gloss.forms .gw { max-width: 13em; }
+  .gloss.forms .gw .f { display: block; }
+  .gw.small .w span { background: var(--mark); box-shadow: inset 0 -2px 0 var(--mark-line); border-radius: 3px; padding: 0 3px; margin: 0 -3px; }
+  .gw.stress .w span { text-decoration: underline 2px var(--accent); text-underline-offset: 4px; }
+  .gw.on, .gw.flash { background: var(--accent-soft); }
+  .pop { position: absolute; z-index: 5; width: max-content; max-width: min(23em, 100%); background: var(--ink); color: var(--bg); border-radius: 9px; padding: 7px 11px 8px; font-size: 12.5px; line-height: 1.55; pointer-events: none; box-shadow: var(--shadow); }
+  .pop b { font-family: var(--font-de); font-size: 14.5px; font-weight: 600; margin-right: 8px; }
+
+  .cols { display: grid; gap: 22px; }
+  .list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .list li { position: relative; padding-left: 14px; font-size: 14px; line-height: 1.6; min-width: 0; }
+  .list .k { font-family: var(--font-de); font-weight: 600; font-size: 15.5px; color: var(--ink); }
+  .list .k.mk { background: var(--mark); box-shadow: inset 0 -2px 0 var(--mark-line); border-radius: 3px; padding: 0 4px; }
+  .list .m { margin-left: 12px; }
   .list .note { display: block; font-size: 12.5px; color: var(--muted); }
-  .list .ctx { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 8px; margin-top: 2px; font-size: 13.5px; }
-  .list .ctx i { font-style: normal; font-size: 12px; color: var(--muted); }
-  .segs { display: grid; gap: 8px; }
-  .seg { display: grid; grid-template-columns: 7em minmax(0, 1fr); gap: 2px 10px; align-items: baseline; }
-  .seg .role { font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); border-radius: 6px; padding: 1px 6px; justify-self: start; }
-  .seg .de { font-size: 15px; }
-  .seg .note { grid-column: 2; font-size: 12.5px; color: var(--muted); }
-  .para { margin: 0; font-size: 14px; line-height: 1.65; }
+  .list .ctx { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; margin-top: 3px; font-size: 13.5px; }
+  .list .ctx i { font-style: normal; font-size: 11.5px; line-height: 1.9; color: var(--muted); white-space: nowrap; }
+  .segs { container-type: inline-size; display: grid; gap: 10px; }
+  .seg { display: grid; grid-template-columns: minmax(0, 8em) minmax(0, 1fr); gap: 2px 12px; align-items: baseline; }
+  .seg .role { font-size: 12px; font-weight: 600; line-height: 1.5; color: var(--ink-2); background: var(--sunk); border-radius: 6px; padding: 1px 7px; justify-self: start; }
+  .seg .de { font-size: 15.5px; line-height: 1.55; }
+  .seg > div { padding-left: 14px; min-width: 0; }
+  .seg .note { grid-column: 2; padding-left: 14px; font-size: 12.5px; color: var(--muted); }
+  .seg .zh { grid-column: 2; padding-left: 14px; font-size: 13.5px; line-height: 1.65; color: var(--ink-2); }
+  .gbreak { flex-basis: 100%; height: 4px; }
+  @container (max-width: 380px) { .seg { grid-template-columns: minmax(0, 1fr); } .seg .note { grid-column: 1; } }
+  .para { margin: 0; font-size: 14px; line-height: 1.75; max-width: 68ch; }
+  /* building the sentence up, one addition at a time */
+  .build { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: b; }
+  .build li { counter-increment: b; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start; }
+  .build li::before { content: counter(b); width: 22px; height: 22px; margin-top: 2px; border: 1px solid var(--line-2); border-radius: 50%; font: 500 11.5px/20px var(--font-num); text-align: center; color: var(--ink-2); }
+  .build li > div { padding-left: 14px; min-width: 0; }
+  .build .de { font-size: 15.5px; line-height: 1.65; }
+  .build .note { display: block; font-size: 12.5px; line-height: 1.6; color: var(--muted); max-width: 70ch; }
+  mark.add { background: var(--sunk); color: inherit; font-weight: 600; border-radius: 3px; padding: 1px 3px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+  .list .pt { display: block; font-weight: 700; }
+  .list .rule { display: block; font-size: 13.5px; color: var(--ink-2); }
+  .list .q { display: block; font-weight: 600; }
+  .list .a { display: block; font-size: 13.5px; line-height: 1.7; color: var(--ink-2); }
+  .list .alt { display: block; font-family: var(--font-de); font-size: 15px; line-height: 1.6; }
+  .list .bad, .list .good { position: relative; display: block; padding-left: 20px; font-family: var(--font-de); font-size: 15px; line-height: 1.6; }
+  .list .bad { color: var(--muted); }
+  .list .bad::before, .list .good::before { position: absolute; left: 0; font-family: var(--font-ui); font-weight: 700; }
+  .list .bad::before { content: "✗"; color: var(--pen); }
+  .list .good::before { content: "✓"; color: var(--done); }
 
-  /* reminders */
-  .side { min-width: 0; display: grid; gap: 16px; align-content: start; padding: 4px 2px; }
-  .prog { display: flex; align-items: center; gap: 8px 14px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
-  .prog b { font: 500 15px/1 var(--font-num); color: var(--ink); font-variant-numeric: tabular-nums; }
-  .dots { display: inline-flex; gap: 4px; }
-  .dots i { width: 18px; height: 6px; border-radius: 3px; background: var(--line); }
-  .dots i.on { background: var(--done); }
-  .side h2 { margin: 0; font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; }
-  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: s; }
-  .steps > li { counter-increment: s; display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 2px 8px; font-size: 13.5px; line-height: 1.55; }
-  .steps > li::before { content: counter(s); grid-row: span 3; font: 500 12px/22px var(--font-num); width: 22px; height: 22px; text-align: center; border-radius: 50%; background: var(--accent-soft); color: var(--accent); }
-  .steps > li.here::before { background: var(--accent); color: var(--on-accent); }
-  .steps > li > b { font-size: 14px; display: flex; gap: 8px; align-items: baseline; }
-  .steps > li > b i { font-style: normal; font-weight: 600; font-size: 11.5px; color: var(--accent); }
-  .steps > li > span { color: var(--muted); }
-  .say { display: grid; gap: 6px; margin-top: 4px; padding-left: 10px; border-left: 2px solid var(--line); }
-  .say:empty { display: none; }
-  .say .lbl { font-size: 12px; font-weight: 600; color: var(--ink); }
-  .say .phr { font-family: var(--font-de); font-size: 14.5px; line-height: 1.7; color: var(--ink); overflow-wrap: break-word; }
-  .say .phr .sep { color: var(--accent); font-family: var(--font-num); padding: 0 4px; }
-  .say .phr .grp { padding: 1px 2px; margin: 0 -2px; border-radius: 4px; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-  .say .phr .grp[role="button"] { cursor: pointer; }
-  .say .phr .grp.flash { background: var(--accent-soft); }
-  .say .lbl small { font-weight: 400; color: var(--muted); }
-  .say .phr b { font-weight: 600; text-decoration: underline 2px var(--accent); text-underline-offset: 4px; }
-  .say ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
-  .say li { font-size: 12.5px; color: var(--muted); }
-  .say li .de { color: var(--ink); font-weight: 600; font-size: 13.5px; }
-  .dims { margin: 0; font-size: 12.5px; color: var(--muted); }
+  /* a stretch of the sentence you can point at and play */
+  .lk { position: relative; cursor: pointer; border-radius: 5px; padding: 1px 4px; margin: -1px -4px; }
+  .lk::before { content: ""; position: absolute; left: -10px; top: calc(0.75em - 3px); width: 0; height: 0; border-left: 6px solid var(--accent); border-top: 4px solid transparent; border-bottom: 4px solid transparent; }
+  .lk.on, .lk.flash { background: var(--accent-soft); }
+  .steps.noaudio .lk { cursor: default; }
+  .steps.noaudio .lk::before { display: none; }
+
+  /* ---------- the reading score (step 3): one sense group per line, built up in the four steps of reading aloud ---------- */
+  .score-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+  .rsteps { display: flex; flex-wrap: wrap; gap: 3px; padding: 3px; border: 1px solid var(--line-2); border-radius: 11px; }
+  .rsteps button { flex: 1 1 auto; display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; border-radius: 8px; padding: 5px 10px 5px 6px; font-size: 12.5px; font-weight: 600; color: var(--muted); cursor: pointer; white-space: nowrap; }
+  .rsteps b { width: 19px; height: 19px; flex: none; border-radius: 50%; font: 500 11px/19px var(--font-num); text-align: center; background: var(--sunk); color: var(--muted); }
+  .rsteps button.lit { color: var(--ink-2); }
+  .rsteps button.lit b { background: var(--accent-soft); color: var(--accent); }
+  .rsteps button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .rsteps button[aria-pressed="true"] b { background: var(--accent); color: var(--on-accent); }
+  .score-acts { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+  .tog { display: inline-flex; align-items: center; gap: 7px; min-height: 30px; padding: 0 10px 0 6px; border: 1px solid var(--line-2); border-radius: 8px; background: none; font-size: 12.5px; font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap; }
+  .tog .sw { position: relative; width: 26px; height: 15px; border-radius: 999px; background: var(--line-2); }
+  .tog .sw::after { content: ""; position: absolute; left: 2px; top: 2px; width: 11px; height: 11px; border-radius: 50%; background: var(--surface); }
+  .tog[aria-pressed="true"] { color: var(--pen); border-color: var(--pen); }
+  .tog[aria-pressed="true"] .sw { background: var(--pen); }
+  .tog[aria-pressed="true"] .sw::after { left: 13px; }
+  .rstep-how { margin: 0; font-size: 13px; line-height: 1.7; color: var(--ink-2); background: var(--sunk); border-radius: 9px; padding: 8px 12px; max-width: 72ch; }
+  .rstep-how b { color: var(--ink); }
+
+  .groups { list-style: none; margin: 0; padding: 0; display: grid; }
+  .groups > li + li { border-top: 1px dashed var(--line); }
+  .groups > li.after-end { border-top: 1.5px solid var(--line-2); margin-top: 6px; padding-top: 6px; }
+  .grp { position: relative; display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 2px 12px; align-items: start; border: 1px solid transparent; border-radius: 10px; padding: 9px 12px 10px 8px; margin: 1px 0; cursor: pointer; font-family: var(--font-de); font-size: 19px; line-height: 1.6; color: var(--ink); }
+  .grp .gn { width: 22px; height: 22px; margin-top: 6px; border-radius: 50%; font: 500 11.5px/22px var(--font-num); text-align: center; background: var(--accent-soft); color: var(--accent); }
+  .steps.noaudio .grp { cursor: default; }
+  .gbody { min-width: 0; display: grid; gap: 4px; }
+  .gtext { overflow-wrap: break-word; min-width: 0; }
+  .brk { margin-left: 8px; font: 600 15px/1 var(--font-ui); color: var(--accent); }
+  .grp.on { background: var(--surface); border-color: var(--accent); }
+  .grp.flash { background: var(--accent-soft); }
+  .grp.flash .gn { background: var(--accent); color: var(--on-accent); }
+  .grp rt, .ed-word rt { font: 500 11.5px/1.5 var(--font-ui); color: var(--pen); text-align: center; letter-spacing: 0; }
+  .gt.now { background: var(--accent); color: var(--on-accent); border-radius: 3px; }
+  /* 2: the stressed words */
+  .groups.r-stress .gt.st { font-weight: 600; text-decoration: underline 3px var(--accent); text-underline-offset: 6px; text-decoration-skip-ink: none; }
+  /* 3: stressed words big and slow, the rest small and quick */
+  .groups.r-tempo .gt { font-size: 0.82em; color: var(--ink-2); }
+  .groups.r-tempo .gt.st { font-size: 1.18em; letter-spacing: 0.07em; color: var(--ink); }
+  .groups.r-tempo .gt.now { color: var(--on-accent); }
+  .rhythm { display: none; align-items: center; height: 9px; max-width: 100%; }
+  .groups.r-tempo .rhythm { display: flex; }
+  .rs { flex-shrink: 0; min-width: 2px; height: 3px; margin-right: 1px; border-radius: 2px; background: var(--line-2); }
+  .rs.st { height: 8px; background: var(--accent); }
+  .rs.gap { background: none; }
+  .rs.now { background: var(--ink); }
+  /* 4: a whole sense group read as one word, tied together */
+  .tie { display: none; }
+  .groups.r-tie .sp { display: none; }
+  .groups.r-tie .tie { display: inline-block; width: 0.42em; height: 0.3em; margin: 0 1px; vertical-align: -0.12em; border: 1.5px solid var(--accent); border-top: 0; border-radius: 0 0 0.5em 0.5em; }
+  /* the pause to repeat a group during 逐段跟读 */
+  .grp .tp { grid-column: 3; align-self: center; display: none; font: 600 11.5px/1 var(--font-ui); color: var(--bg); background: var(--ink); border-radius: 999px; padding: 5px 9px; white-space: nowrap; }
+  .grp.turn { border-color: var(--ink); background: var(--surface); }
+  .grp.turn .tp { display: inline-block; }
+  .grp .tbar { position: absolute; left: 12px; right: 12px; bottom: 3px; height: 2px; border-radius: 1px; background: var(--ink); transform-origin: left; transform: scaleX(0); }
+  .grp.turn .tbar { transform: scaleX(1); }
+  @keyframes drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+  @media (prefers-reduced-motion: no-preference) { .grp.turn .tbar { animation: drain var(--wait, 3s) linear forwards; } }
+  /* the viewer may hide the red pen */
+  .no-pen .cut { color: inherit; text-decoration: none; }
+  .no-pen .grp rt { display: none; }
+  .block-head .btn { margin-left: auto; }
+  /* marking: each word becomes something to click */
+  button.gt { font: inherit; color: inherit; background: none; border: 0; border-bottom: 1px dashed var(--line-2); border-radius: 4px 4px 0 0; padding: 1px 2px; margin: 0 -2px; cursor: pointer; }
+  button.gt.editing { background: var(--pen-soft); border-bottom: 1px solid var(--pen); }
+  .mark-ed { scroll-margin: 16px 0 104px; margin: 4px 0 10px; border: 1px solid var(--line-2); border-radius: 12px; background: var(--surface); box-shadow: var(--shadow); padding: 12px 14px 14px; display: grid; gap: 12px; min-width: 0; }
+  .ed-top { display: flex; align-items: flex-end; gap: 8px 12px; flex-wrap: wrap; }
+  .ed-word { font-family: var(--font-de); font-size: 24px; line-height: 1.3; font-weight: 600; margin-right: auto; overflow-wrap: anywhere; min-width: 0; }
+  .ed-plays { display: flex; gap: 6px; flex-wrap: wrap; }
+  .ed-row { display: grid; gap: 6px; min-width: 0; }
+  .ed-lab { font-size: 12.5px; color: var(--muted); }
+  .letters { display: flex; flex-wrap: wrap; gap: 4px; }
+  .lt { min-width: 34px; height: 40px; padding: 0 6px; border: 1px solid var(--line-2); border-radius: 8px; background: none; font-family: var(--font-de); font-size: 20px; line-height: 1; color: var(--ink); cursor: pointer; }
+  .lt[aria-pressed="true"] { background: var(--pen-soft); border-color: var(--pen); color: var(--muted); text-decoration: line-through 2px var(--pen); }
+  .ed-note { width: 100%; min-width: 0; height: 40px; padding: 0 12px; border: 1px solid var(--line-2); border-radius: 9px; background: var(--bg); color: var(--ink); font: 16px/1.2 var(--font-ui); }
+  .ed-note::placeholder { color: var(--muted); }
+  .ed-foot { display: flex; align-items: center; gap: 12px; }
+  .ed-foot .link { margin-left: 0; color: var(--muted); }
+  .ed-foot .btn { margin-left: auto; }
+  .dims { margin: 0; font-size: 13px; color: var(--muted); }
   .dims em { font-style: normal; color: var(--ink); font-weight: 600; }
-  .rule { margin: 0; font-size: 13px; line-height: 1.6; padding-top: 14px; border-top: 1px solid var(--line); }
-  .rule .de { font-style: italic; }
-  .foot { margin: 0; font-size: 12px; color: var(--muted); }
-  .sync { margin: 0; font-size: 12px; color: var(--muted); }
 
-  /* ---------- tablet and narrow windows ---------- */
-  @media (max-width: 899px) {
-    .stabs { grid-template-columns: repeat(5, minmax(128px, 1fr)); overflow-x: auto; padding-bottom: 4px; }
-    .sentence { font-size: 22px; }
-    .sent, .und { padding: 16px; }
-    .btn.donebtn { margin-left: 0; }
+  .foot { display: grid; gap: 8px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .foot p { margin: 0; font-size: 12px; line-height: 1.7; color: var(--muted); max-width: 90ch; }
+  .foot .rule { font-size: 13.5px; color: var(--ink-2); }
+  .foot .rule .de { font-style: italic; }
+
+  /* ---------- docked player: appears when the stage is out of view ---------- */
+  .dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; pointer-events: none; padding: 0 max(12px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px)); }
+  .dock-in { pointer-events: auto; position: relative; overflow: hidden; max-width: 720px; margin: 0 auto; background: var(--surface); border: 1px solid var(--line-2); border-radius: 14px; box-shadow: var(--shadow); display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto auto; align-items: center; gap: 6px; padding: 9px 10px 8px; }
+  .dock-play { width: 40px; height: 40px; border-radius: 50%; border: 0; background: var(--accent); color: var(--on-accent); display: grid; place-items: center; cursor: pointer; }
+  .dock-text { min-width: 0; padding: 0 4px; font-size: 13px; line-height: 1.4; color: var(--ink-2); max-height: 2.8em; overflow: hidden; }
+  .dock-text.de { font-family: var(--font-de); font-size: 14.5px; color: var(--ink); }
+  .dock-text b { color: var(--ink); margin-right: 6px; }
+  .dock-text .now { background: var(--accent); color: var(--on-accent); border-radius: 3px; padding: 0 2px; margin: 0 -2px; }
+  .dock-btn { min-width: 38px; height: 36px; padding: 0 8px; border-radius: 9px; border: 1px solid var(--line-2); background: none; display: grid; place-items: center; font: 500 12.5px/1 var(--font-num); color: var(--ink-2); cursor: pointer; }
+  .dock-btn[aria-pressed="true"] { background: var(--accent-soft); border-color: transparent; color: var(--accent); }
+  .dock-bar { position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--sunk); }
+  .dock-bar i { display: block; height: 100%; width: 0; background: var(--accent); }
+
+  /* ---------- widths ---------- */
+  @container steps (min-width: 560px) { .step-body { padding-left: 40px; } }
+  @container steps (min-width: 680px) {
+    .cols { display: block; columns: 2; column-gap: 36px; }
+    .cols > .block { break-inside: avoid; margin-bottom: 24px; }
+    .cols > .block:last-child { margin-bottom: 0; }
   }
-  @media (min-width: 900px) {
-    .wrap { padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); padding-block: 20px 48px; }
-    .cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  @media (max-width: 719px) {
+    .brand span { display: none; }
+    .status { order: 3; flex-basis: 100%; margin-left: 0; }
+    .daynav { margin-left: auto; }
+    .stab { grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 3px; padding: 7px 4px; }
+    .rsteps { display: grid; grid-template-columns: 1fr 1fr; width: 100%; }
+    .score-acts { margin-left: 0; }
+    .grp { font-size: 18px; padding-right: 8px; grid-template-columns: 22px minmax(0, 1fr); }
+    .grp .tp { grid-column: 2; justify-self: start; }
+    .stab .badge { grid-row: auto; }
+    .stab .topic { display: none; }
+    .stabs.few .stab { grid-template-columns: auto minmax(0, 1fr); justify-items: start; gap: 0 10px; padding: 8px 12px; }
+    .stabs.few .stab .badge { grid-row: span 2; }
+    .stabs.few .stab .topic { display: -webkit-box; }
+    .stage { padding: 14px 16px 16px; }
+    .step-head { grid-template-columns: 28px minmax(0, 1fr); }
+    .step-acts, .fold { grid-column: 2; justify-self: start; justify-content: flex-start; }
+    .fold { padding-left: 0; }
   }
-  /* ---------- laptop: MacBook Air 13 and up ---------- */
-  @media (min-width: 1180px) {
-    .wrap { padding-left: max(28px, env(safe-area-inset-left, 0px)); padding-right: max(28px, env(safe-area-inset-right, 0px)); }
-    .layout { grid-template-columns: minmax(0, 1fr) 300px; gap: 28px; align-items: start; }
-    .side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 20px); max-height: calc(100vh - 40px); overflow-y: auto; padding-top: 6px; }
+  @media (min-width: 720px) {
+    .wrap { padding-left: max(24px, env(safe-area-inset-left, 0px)); padding-right: max(24px, env(safe-area-inset-right, 0px)); padding-block: 18px 48px; }
   }
+  /* laptop and up: the stage stays in view while the steps scroll */
+  @media (min-width: 1080px) {
+    .work { grid-template-columns: minmax(0, 43fr) minmax(0, 57fr); gap: 36px; }
+    .work.long { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .stage { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 16px); max-height: calc(100vh - 32px); overflow-y: auto; }
+  }
+  @media (hover: none) { .kbd-only { display: none; } }
   @media (hover: hover) and (pointer: fine) {
-    .daynav button:not(:disabled):hover, .btn:not(:disabled):hover { color: var(--accent); }
+    .daynav button:not(:disabled):hover, .btn:not(.primary):not(:disabled):hover, .check:hover, .fold:hover, .dock-btn:hover { color: var(--accent); border-color: var(--accent); }
+    .btn.primary:hover, .dock-play:hover { filter: brightness(1.1); }
     .stab:not([aria-pressed="true"]):hover { border-color: var(--accent); }
-    .gw:hover { border-color: var(--accent); }
+    .gw:hover, .grp:hover, .steps:not(.noaudio) .lk:hover { background: var(--accent-soft); }
+    .layer-nav button:hover { color: var(--accent); border-color: var(--accent); }
+    .groups.marking .grp:hover { background: none; }
+    .rsteps button:not([aria-pressed="true"]):hover { color: var(--accent); }
+    .tog:hover { border-color: var(--pen); }
+    button.gt:hover { background: var(--pen-soft); border-bottom-color: var(--pen); }
+    .lt:hover { border-color: var(--pen); }
     .sentence .w:hover { background: var(--accent-soft); }
     .sentence.veiled .w:hover { background: var(--veil); }
-    .seek:hover .seek-track { border-color: var(--accent); }
+    .seek:hover .seek-track { box-shadow: 0 0 0 1px var(--accent); }
     .speed button:not([aria-pressed="true"]):hover, .range-chip button:hover { color: var(--accent); }
     .cd.has:not(.sel):hover { background: var(--accent-soft); color: var(--accent); }
-    .say .phr .grp[role="button"]:hover { background: var(--accent-soft); }
   }
   @media (prefers-reduced-motion: no-preference) {
-    .stab, .btn, .gw, .sentence .w { transition: background-color .15s, color .15s, border-color .15s, box-shadow .15s; }
+    .stab, .btn, .check, .gw, .grp, .lk, .sentence .w, .dock-btn { transition: background-color .15s, color .15s, border-color .15s, box-shadow .15s; }
+    .fold .ic { transition: transform .15s; }
   }
 </style>
 
-<div class="wrap">
-  <div class="layout">
-    <main class="main">
-      <header class="top">
-        <div class="brand">
-          <h1>精读训练</h1>
-          <span>德语 · B2–C1 · 每天 5 句真人原声</span>
+<div class="wrap" id="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>精读训练</h1>
+      <span>德语 · B2–C1 · 每天 2 段真人原声</span>
+    </div>
+    <div class="status" id="prog"></div>
+    <div class="daynav" role="group" aria-label="切换日期">
+      <button type="button" class="arrow" id="day-prev" aria-label="前一组">‹</button>
+      <button type="button" class="label" id="cal-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="cal"><span id="day-label">今天</span><span class="caret">▼</span></button>
+      <button type="button" class="arrow" id="day-next" aria-label="后一组">›</button>
+      <div class="cal" id="cal" role="dialog" aria-label="选择日期" hidden>
+        <div class="cal-head">
+          <button type="button" id="cal-prev" aria-label="上个月">‹</button>
+          <b id="cal-title"></b>
+          <button type="button" id="cal-next" aria-label="下个月">›</button>
         </div>
-        <div class="daynav" role="group" aria-label="切换日期">
-          <button type="button" class="arrow" id="day-prev" aria-label="前一组">‹</button>
-          <button type="button" class="label" id="cal-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="cal"><span id="day-label">今天</span><span class="caret">▼</span></button>
-          <button type="button" class="arrow" id="day-next" aria-label="后一组">›</button>
-          <div class="cal" id="cal" role="dialog" aria-label="选择日期" hidden>
-            <div class="cal-head">
-              <button type="button" id="cal-prev" aria-label="上个月">‹</button>
-              <b id="cal-title"></b>
-              <button type="button" id="cal-next" aria-label="下个月">›</button>
-            </div>
-            <div class="cal-grid" id="cal-grid"></div>
-            <div class="cal-foot"><span><i></i>有句子</span><span><i class="part"></i>练了一部分</span><span><i class="full"></i>5 句练完</span><button type="button" id="cal-latest">最新一天</button></div>
-          </div>
-        </div>
-      </header>
-
-      <nav class="stabs" id="stabs" aria-label="这天的 5 句" hidden></nav>
-
-      <div class="state" id="state">
-        <b id="state-title">正在读取今天的 5 句…</b>
-        <p id="state-text">句子、原声和讲解每天柏林时间早上 5 点前准备好，打开页面就能练。</p>
+        <div class="cal-grid" id="cal-grid"></div>
+        <div class="cal-foot"><span><i></i>有句子</span><span><i class="part"></i>练了一部分</span><span><i class="full"></i>全部练完</span><button type="button" id="cal-latest">最新一天</button></div>
       </div>
+    </div>
+  </header>
 
-      <article class="sent" id="sent" hidden>
-        <div class="src-line" id="src-line"></div>
-        <p class="sentence" id="sentence" lang="de"></p>
-        <p class="translation"><span class="tag">整句</span><span id="translation"></span></p>
-        <div class="player" id="player-row">
-          <div class="seek" id="seek" title="点任意位置，从那里开始播放">
-            <div class="seek-track"><div class="seek-range" id="seek-range"></div><div class="seek-ticks" id="seek-ticks"></div><div class="seek-fill" id="seek-fill"></div></div>
-          </div>
-          <div class="seek-hint">点句中的词：从那个词播到句尾 · 按住 Shift 再点一个词：只放这一段 · 点进度条：从那一刻开始 · 空格：播放 / 停止</div>
+  <nav class="stabs" id="stabs" aria-label="这天的练习" hidden></nav>
+
+  <div class="state" id="state">
+    <b id="state-title">正在读取今天的练习…</b>
+    <p id="state-text">原文、原声和讲解每天柏林时间早上 5 点前准备好，打开页面就能练。</p>
+  </div>
+
+  <div class="work" id="work" hidden>
+    <article class="stage" id="stage" aria-label="原句">
+      <div class="stage-top">
+        <div class="meta" id="meta"></div>
+        <button type="button" class="check" id="done-btn" aria-pressed="false"><span class="ring"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M3.5 8.5l3 3 6-7"/></svg></span><span id="done-label">练完了</span></button>
+      </div>
+      <p class="sentence" id="sentence" lang="de"></p>
+      <p class="translation"><span class="tag" id="zh-tag">整句</span><span id="translation"></span><button type="button" class="link" id="zh-btn" hidden>显示整段翻译</button></p>
+      <div class="player" id="player">
+        <div class="seek" id="seek" title="点任意位置，从那里开始播放">
+          <div class="seek-track"><div class="seek-range" id="seek-range"></div><div class="seek-fill" id="seek-fill"></div><div class="seek-ticks" id="seek-ticks"></div></div>
         </div>
-        <div class="tools">
-          <button type="button" class="btn" id="play-btn">▶ 播放</button>
+        <div class="controls">
+          <button type="button" class="btn primary" id="play-btn">
+            <svg class="ic i-play" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M4.5 2.6v10.8L13 8z"/></svg>
+            <svg class="ic i-stop" viewBox="0 0 16 16" aria-hidden="true"><rect fill="currentColor" x="3.5" y="3.5" width="9" height="9" rx="1.6"/></svg>
+            <span id="play-label">播放</span>
+          </button>
           <span class="speed" id="speed" role="group" aria-label="速度"><button type="button" id="rate-1" data-rate="1" aria-pressed="true">1×</button><button type="button" id="rate-075" data-rate="0.75" aria-pressed="false">0.75×</button><button type="button" id="rate-05" data-rate="0.5" aria-pressed="false">0.5×</button></span>
-          <button type="button" class="btn" id="loop-btn" aria-pressed="false">循环</button>
-          <span class="range-chip" id="range-chip" hidden><span id="range-text"></span><button type="button" id="range-clear">× 回到整句</button></span>
-          <span class="audio-note" id="audio-note" hidden>这天的句子没有原声</span>
+          <button type="button" class="btn" id="loop-btn" aria-pressed="false"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M2.5 7.5a4 4 0 0 1 4-4h6M10 1l2.5 2.5L10 6M13.5 8.5a4 4 0 0 1-4 4h-6M6 15l-2.5-2.5L6 10"/></svg>循环</button>
           <button type="button" class="btn" id="veil-btn" aria-pressed="false">遮住原句</button>
-          <span class="hintkeys"><kbd>←</kbd> <kbd>→</kbd> 换句</span>
-          <button type="button" class="btn donebtn" id="done-btn" aria-pressed="false">这句练完了</button>
         </div>
-      </article>
+        <div class="hint-row">
+          <p class="hint" id="hint">点一个词，从它播到最后<span class="kbd-only"> · <kbd>Shift</kbd> 再点，只放这一段 · <kbd>空格</kbd> 播放 / 停止 · <kbd>←</kbd> <kbd>→</kbd> 换句</span></p>
+          <p class="hint" id="hint-veil" hidden>卡住时点一个词，偷看 2 秒<span class="kbd-only"> · <kbd>空格</kbd> 听原声对照</span></p>
+          <span class="range-chip" id="range-chip" hidden><span id="range-text"></span><button type="button" id="range-clear">× 回到整句</button></span>
+        </div>
+      </div>
+      <p class="audio-note" id="audio-note" hidden>这天的句子没有原声</p>
+      <p class="cite" id="cite"></p>
+    </article>
 
-      <section class="und" id="und" hidden aria-labelledby="und-title">
-        <div class="und-head">
-          <h2 id="und-title">彻底弄懂</h2>
-          <span>先自己读，再对照下面每一项</span>
+    <ol class="steps" id="steps" aria-label="精读五步">
+      <li class="step" id="step-1">
+        <div class="step-head">
+          <span class="num">1</span>
+          <div class="step-title"><h2>读好</h2><p>先出声把原文读顺。</p></div>
+          <div class="step-acts"><button type="button" class="btn" id="listen-btn">先听一遍原声</button></div>
         </div>
-        <div class="block">
-          <h3>每个词 <small id="gloss-hint">点一个词听原声 · 黄底是下面讲到的小词 · 下划线是通常会重读的词，以原声为准</small></h3>
-          <div class="gloss" id="gloss"></div>
+      </li>
+
+      <li class="step dim" id="step-2">
+        <div class="step-head">
+          <span class="num">2</span>
+          <div class="step-title"><h2>彻底弄懂</h2><p>先自己读，再一层一层对照：先看懂字面，再弄透结构和背后的规则，最后弄明白为什么这么说。</p></div>
+          <button type="button" class="fold" id="fold-2" aria-expanded="true" aria-controls="body-2"><span>收起</span><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 6l4 4 4-4"/></svg></button>
         </div>
-        <div class="cols">
-          <div class="col">
-            <div class="block"><h3>每个词组</h3><ul class="list" id="chunks"></ul></div>
-            <div class="block"><h3>不起眼的小介词、小词</h3><ul class="list" id="small"></ul></div>
+        <div class="step-body" id="body-2">
+          <nav class="layer-nav" aria-label="弄懂的三层">
+            <button type="button" data-go="layer-1"><b>2.1</b>字面</button><span aria-hidden="true">→</span>
+            <button type="button" data-go="layer-2"><b>2.2</b>结构和原理</button><span aria-hidden="true">→</span>
+            <button type="button" data-go="layer-3"><b>2.3</b>为什么这么说</button>
+          </nav>
+          <p class="how" id="how">每个词和带 <span class="tri"></span> 的词组都连着原声：指上去，原句里会标出它在哪；点一下，只听这一段。</p>
+
+          <section class="layer" id="layer-1" aria-labelledby="layer-1-h">
+            <h3 class="layer-h" id="layer-1-h"><span class="ln">2.1</span>字面<small>每个词、每个词组在这里是什么意思</small></h3>
+            <div class="block">
+              <div class="block-head">
+                <h4>每个词</h4>
+                <span class="legend"><span class="lg"><span class="lg-small">ja</span>下面讲到的小词</span><span class="lg"><span class="lg-stress">Frage</span>通常重读，以原声为准</span></span>
+                <button type="button" class="link" id="forms-btn" aria-pressed="false">展开全部词形</button>
+              </div>
+              <div class="gloss-wrap"><div class="gloss" id="gloss"></div><div class="pop" id="pop" hidden></div></div>
+            </div>
+            <div class="cols">
+              <div class="block"><h4>每个词组</h4><ul class="list" id="chunks"></ul></div>
+              <div class="block"><h4>词组合后在这个语境里的意思</h4><ul class="list" id="context"></ul></div>
+              <div class="block"><h4>不起眼的小介词、小词</h4><ul class="list" id="small"></ul></div>
+            </div>
+          </section>
+
+          <section class="layer" id="layer-2" aria-labelledby="layer-2-h">
+            <h3 class="layer-h" id="layer-2-h"><span class="ln">2.2</span>结构和原理<small id="layer-2-sub">这句话是怎么搭起来的，每一处背后是哪条规则</small></h3>
+            <div class="block" id="build-block">
+              <div class="block-head"><h4 id="build-h">一步步搭出这句话</h4><span class="legend"><span class="lg"><mark class="add">加粗带底色</mark>是这一步新加上去的</span></span></div>
+              <ol class="build" id="build"></ol>
+            </div>
+            <div class="cols">
+              <div class="block"><h4 id="struct-h">词和词之间是什么关系</h4><div class="segs" id="structure"></div><p class="para" id="relations"></p></div>
+              <div class="block" id="grammar-block"><h4>背后的语法原理</h4><ul class="list" id="grammar"></ul></div>
+            </div>
+          </section>
+
+          <section class="layer" id="layer-3" aria-labelledby="layer-3-h">
+            <h3 class="layer-h" id="layer-3-h"><span class="ln">2.3</span>为什么这么说<small>说话人为什么选这个词、这个语序；换个说法差在哪</small></h3>
+            <div class="cols">
+              <div class="block" id="why-block"><h4>为什么这么说</h4><ul class="list" id="why"></ul></div>
+              <div class="block" id="rewrite-block"><h4>换一种说法对比</h4><ul class="list" id="rewrite"></ul></div>
+              <div class="block"><h4 id="mean-h">这句话的所有含义</h4><p class="para" id="meanings"></p></div>
+              <div class="block" id="pitfalls-block"><h4>自己说的时候容易错的地方</h4><ul class="list" id="pitfalls"></ul></div>
+            </div>
+          </section>
+        </div>
+      </li>
+
+      <li class="step dim" id="step-3">
+        <div class="step-head">
+          <span class="num">3</span>
+          <div class="step-title"><h2>说出来 <small>约 2 天</small></h2><p>先自己练，包括发音；练到和母语者的说话节奏一致；模仿哪里强调、哪里起伏。</p></div>
+          <button type="button" class="fold" id="fold-3" aria-expanded="true" aria-controls="body-3"><span>收起</span><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M4 6l4 4 4-4"/></svg></button>
+        </div>
+        <div class="step-body" id="body-3">
+          <div class="block" id="groups-block">
+            <div class="block-head">
+              <h3>朗读谱</h3>
+              <span class="legend" id="groups-hint">点一行，听这一段原声；开着「循环」会一直重复这一段<span class="kbd-only"> · <kbd>Shift</kbd> + <kbd>←</kbd> <kbd>→</kbd> 换一段</span></span>
+            </div>
+            <div class="score-bar">
+              <div class="rsteps" id="rsteps" role="group" aria-label="练到第几步">
+                <button type="button" data-r="1" aria-pressed="false"><b>1</b>划分意群</button>
+                <button type="button" data-r="2" aria-pressed="false"><b>2</b>找重读</button>
+                <button type="button" data-r="3" aria-pressed="false"><b>3</b>重慢轻快</button>
+                <button type="button" data-r="4" aria-pressed="false"><b>4</b>连成一个词</button>
+              </div>
+              <div class="score-acts">
+                <button type="button" class="btn sm" id="drill-btn">逐段跟读</button>
+                <button type="button" class="tog" id="pen-btn" aria-pressed="true" hidden><span class="sw"></span>吞音标记</button>
+                <button type="button" class="btn sm pen" id="mark-btn" aria-pressed="false"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M2.8 13.2l.7-3L10.7 3l2.3 2.3-7.2 7.2zM9.2 4.5l2.3 2.3"/></svg><span id="mark-label">标记吞音和读法</span></button>
+              </div>
+            </div>
+            <p class="rstep-how" id="rstep-how"></p>
+            <p class="how" id="mark-how" hidden>听到哪里吞音、哪里读得和写的不一样，就点那个词：划掉吞掉的字母，写上实际怎么读。标记是红色的，原句里也会划掉；点词以外的地方照常听这一段。</p>
+            <ol class="groups" id="groups"></ol>
+            <ul id="ed-home" hidden>
+              <li class="mark-ed" id="mark-ed">
+                <div class="ed-top">
+                  <span class="ed-word" id="ed-word" lang="de"></span>
+                  <span class="ed-plays" id="ed-plays"><button type="button" class="btn sm" id="ed-play">听这个词</button><button type="button" class="btn sm" id="ed-play3">带上前后词</button></span>
+                </div>
+                <div class="ed-row"><span class="ed-lab">点字母，划掉吞掉的音</span><div class="letters" id="ed-letters"></div></div>
+                <label class="ed-row" for="ed-note"><span class="ed-lab">实际怎么读（会写在这个词上面）</span><input type="text" class="ed-note" id="ed-note" maxlength="40" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="例如：ham；和后面的词连着读"></label>
+                <div class="ed-foot"><button type="button" class="link" id="ed-clear">清除这个词的标记</button><button type="button" class="btn sm primary" id="ed-done">完成</button></div>
+              </li>
+            </ul>
           </div>
-          <div class="col">
-            <div class="block"><h3>词和词之间是什么关系</h3><div class="segs" id="structure"></div><p class="para" id="relations"></p></div>
-            <div class="block"><h3>词组合后在这个语境里的意思</h3><ul class="list" id="context"></ul></div>
-            <div class="block"><h3>这句话的所有含义</h3><p class="para" id="meanings"></p></div>
-          </div>
+          <div class="block" id="pron-block"><h3>发音难点</h3><ul class="list" id="pron"></ul></div>
+          <p class="dims">口语重点：<em>发音</em> · <em>语调</em> · <em>语流</em>；其次语气；语速不重要。</p>
         </div>
-      </section>
+      </li>
 
-      <section class="und" id="veil-note" hidden>
-        <div class="und-head"><h2>脱稿中</h2><span>看着中文意思，把德语整句说出来，中间不停顿。卡住时点一个词，可以偷看 2 秒。</span></div>
-      </section>
-    </main>
+      <li class="step" id="step-4">
+        <div class="step-head">
+          <span class="num">4</span>
+          <div class="step-title"><h2>脱稿</h2><p>没练好之前不要背。不看原句说出来，对着墙说，中间不停顿。</p></div>
+          <div class="step-acts"><button type="button" class="btn" id="veil-btn-2" aria-pressed="false">遮住原句</button></div>
+        </div>
+        <p class="veil-note" id="veil-note" hidden>脱稿中：看着中文意思，把德语原文说出来，中间不停顿。卡住时点一个词，可以偷看 2 秒。段落长的话，先按第 3 步的朗读谱一行一行脱稿，再整段连起来说。讲解先收起来了，显示原文后恢复。</p>
+      </li>
 
-    <aside class="side" aria-label="精读五步提醒">
-      <div class="prog" id="prog"></div>
-      <h2>精读五步</h2>
-      <ol class="steps">
-        <li><b>读好</b><span>先出声把整句读顺。</span></li>
-        <li class="here"><b>彻底弄懂</b><span>左边已经逐项列好：每个词、每个词组、整句、所有含义、词和词的关系、语境里的意思、小介词。</span></li>
-        <li><b>说出来 <i>约 2 天</i></b><span>先自己练，包括发音；练到和母语者的说话节奏一致；模仿哪里强调、哪里起伏。</span>
-          <div class="say" id="say"></div>
-        </li>
-        <li><b>脱稿</b><span>没练好之前不要背。不看原句说出来，对着墙说，中间不停顿。</span></li>
-        <li><b>找人说</b><span>说给一个人听。</span></li>
-      </ol>
-      <p class="dims">口语重点：<em>发音</em> · <em>语调</em> · <em>语流</em>；其次语气；语速不重要。</p>
-      <p class="rule">学语言的最小单位是句子，永远不要单独背一个词。介词、语气词（如 <span class="de" lang="de">an</span>、<span class="de" lang="de">zu</span>）放进不同句子，意思就不同。</p>
-      <p class="foot">每天柏林时间 5 点前更新。句子和原声来自德语播客 Handelsblatt Today、taz Bundestalk、OMR Podcast、Methodisch inkorrekt、Geschichten aus der Geschichte 和 Hotel Matze；文字由语音识别转写，个别词可能有出入，以原声为准。</p>
-      <p class="sync" id="sync"></p>
-    </aside>
+      <li class="step" id="step-5">
+        <div class="step-head">
+          <span class="num">5</span>
+          <div class="step-title"><h2>找人说</h2><p>说给一个人听。</p></div>
+          <div class="step-acts"><button type="button" class="btn good" id="done-btn-2" aria-pressed="false">这句练完了</button><button type="button" class="btn primary" id="next-btn" hidden>下一句 →</button></div>
+        </div>
+      </li>
+    </ol>
+  </div>
+
+  <footer class="foot">
+    <p class="rule">学语言的最小单位是句子，永远不要单独背一个词。介词、语气词（如 <span class="de" lang="de">an</span>、<span class="de" lang="de">zu</span>）放进不同句子，意思就不同。</p>
+    <p>每天柏林时间 5 点前更新。句子和原声来自德语播客 Handelsblatt Today、taz Bundestalk、OMR Podcast、Methodisch inkorrekt、Geschichten aus der Geschichte 和 Hotel Matze；文字由语音识别转写，个别词可能有出入，以原声为准。</p>
+    <p id="sync"></p>
+  </footer>
+</div>
+
+<div class="dock" id="dock" hidden>
+  <div class="dock-in">
+    <div class="dock-bar"><i id="dock-fill"></i></div>
+    <button type="button" class="dock-play" id="dock-play" aria-label="播放">
+      <svg class="ic i-play" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M4.5 2.6v10.8L13 8z"/></svg>
+      <svg class="ic i-stop" viewBox="0 0 16 16" aria-hidden="true"><rect fill="currentColor" x="3.5" y="3.5" width="9" height="9" rx="1.6"/></svg>
+    </button>
+    <div class="dock-text" id="dock-text"></div>
+    <button type="button" class="dock-btn" id="dock-rate" aria-label="速度">1×</button>
+    <button type="button" class="dock-btn" id="dock-loop" aria-pressed="false" aria-label="循环"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M2.5 7.5a4 4 0 0 1 4-4h6M10 1l2.5 2.5L10 6M13.5 8.5a4 4 0 0 1-4 4h-6M6 15l-2.5-2.5L6 10"/></svg></button>
+    <button type="button" class="dock-btn" id="dock-top" aria-label="回到原句"><svg class="ic" viewBox="0 0 16 16" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M8 13V3.5M4 7.5l4-4 4 4"/></svg></button>
   </div>
 </div>
 
@@ -361,9 +668,29 @@ const LS = "jingdu-de-progress";
 let prog = { done: {}, updated: 0 };   // done: { "<date>-<n>": "<date it was marked>" }
 try { const p = JSON.parse(localStorage.getItem(LS) || "null"); if (p && p.done && typeof p.done === "object") prog = p; } catch {}
 let progRef = null, chain = Promise.resolve();
+// how this viewer likes the page laid out: which steps are folded, whether every word shows its form
+const UI = "jingdu-de-ui";
+let ui = { fold: {}, forms: false, rstep: 4, pen: true, zh: false };   // rstep: how far the reading score is built up (1–4); pen: show the red-pen marks
+try {
+  const u = JSON.parse(localStorage.getItem(UI) || "null");
+  if (u && typeof u === "object") ui = { fold: u.fold && typeof u.fold === "object" ? u.fold : {}, forms: !!u.forms, rstep: [1, 2, 3, 4].includes(u.rstep) ? u.rstep : 4, pen: u.pen !== false, zh: !!u.zh };
+} catch {}
+const saveUi = () => { try { localStorage.setItem(UI, JSON.stringify(ui)); } catch {} };
+// the viewer's own pronunciation marks, kept per day: { "<date>": { s: { "<n>": { "<word index>": { c, n } } }, updated } }
+// c marks the swallowed letters of the word ("00011" = the last two), n says how the word is really said
+const MK = "jingdu-de-marks";
+let marks = {};
+try { const m = JSON.parse(localStorage.getItem(MK) || "null"); if (m && typeof m === "object") marks = m; } catch {}
+let uid = null;             // the viewer's id, once known: marks and progress follow the account
+let markMode = false, editing = null;   // marking on/off; the word whose marks are being edited
 
 const curDay = () => dayCache[selDate] || null;
 const curSent = () => { const d = curDay(); return d ? d.sentences[Math.min(sIdx, d.sentences.length - 1)] : null; };
+// a day is five sentences (until 11 Nov 2026) or two passages of 100+ words; the page speaks of 句 or 段 accordingly
+const longDay = (d) => !!d && d.unit === "passage";
+const U = () => (longDay(curDay()) ? "段" : "句");
+let counts = {};            // date -> how many items that day has, from the index
+const totalOn = (date) => Number(counts[date]) || (dayCache[date] ? dayCache[date].sentences.length : date > "2026-11-11" ? 2 : 5);
 const sid = (d, s) => d.date + "-" + s.n;
 const doneOn = (date) => Object.keys(prog.done).filter((k) => k.startsWith(date + "-")).length;
 
@@ -373,7 +700,39 @@ function cleanDay(raw) {
   const sentences = A(raw.sentences).filter((s) => s && S(s.text).trim()).map((s, i) => ({ ...s, n: Number(s.n) || i + 1 }));
   if (!isDate(date) || !sentences.length) return null;
   const audioId = /^[0-9a-f]{32}$/.test(S(raw.audioId)) ? S(raw.audioId) : "";
-  return { date, sentences, audioId };
+  const unit = raw.unit === "passage" || sentences.some((s) => (Number(s.words) || 0) > 60) ? "passage" : "sentence";
+  return { date, sentences, audioId, unit };
+}
+
+// ---------- the current sentence as tokens, so any stretch of it can be found, marked and played ----------
+let model = null;           // { toks, idx, cn, groups: [{ a, b, text }] }
+function buildModel(s) {
+  const toks = S(s.text).trim().split(/\s+/).filter(Boolean);
+  const idx = [], cn = [];  // tokens that carry letters or digits: their positions and normalised forms
+  toks.forEach((t, i) => { const n = norm(t); if (n) { idx.push(i); cn.push(n); } });
+  const groups = [];
+  let k = 0;
+  S(s.phrasing).split("|").map((x) => x.trim()).filter(Boolean).forEach((part) => {
+    const n = part.split(/\s+/).length;
+    if (k < toks.length) groups.push({ a: k, b: Math.min(toks.length - 1, k + n - 1), text: part });
+    k += n;
+  });
+  return { toks, idx, cn, groups, stress: wordSet(s.stress) };
+}
+// Where a phrase sits in the sentence, as token positions; null when it is not there word for word
+// (dictionary forms such as "jdn. drängen" are not).
+function spanOf(phrase, from) {
+  if (!model) return null;
+  const want = S(phrase).split(/\s+/).map(norm).filter(Boolean);
+  if (!want.length) return null;
+  const { idx, cn } = model;
+  for (let p = 0; p + want.length <= cn.length; p++) {
+    if (idx[p] < (from || 0)) continue;
+    let ok = true;
+    for (let j = 0; j < want.length; j++) if (cn[p + j] !== want[j]) { ok = false; break; }
+    if (ok) return { a: idx[p], b: idx[p + want.length - 1] };
+  }
+  return null;
 }
 
 // ---------- saving progress: this browser first, then the viewer's account ----------
@@ -387,8 +746,97 @@ function saveProg() {
     () => { $("sync").textContent = "这次没同步上，记录先存在本浏览器"; });
 }
 
+// ---------- the viewer's pronunciation marks ----------
+const chars = (w) => Array.from(S(w));
+const sentMarks = (s) => { const d = curDay(), m = d && marks[d.date]; return (m && m.s && s && m.s[s.n]) || {}; };
+function markOf(s, i) {
+  const x = sentMarks(s)[i];
+  return x && typeof x === "object" ? { c: S(x.c), n: S(x.n) } : null;
+}
+const maskFor = (core, c) => { const n = chars(core).length; return S(c).length === n ? S(c) : "0".repeat(n); };
+const markSaves = {};       // date -> timer: typing a note saves once it pauses
+function setMark(i, patch) {
+  const d = curDay(), s = curSent();
+  if (!d || !s) return;
+  const day = marks[d.date] && marks[d.date].s ? marks[d.date] : (marks[d.date] = { s: {}, updated: 0 });
+  const row = day.s[s.n] || (day.s[s.n] = {});
+  const next = { ...(markOf(s, i) || { c: "", n: "" }), ...patch };
+  if (!next.c.includes("1")) next.c = "";
+  if (!next.c && !next.n.trim()) delete row[i]; else row[i] = next;
+  if (!Object.keys(row).length) delete day.s[s.n];
+  day.updated = Date.now();
+  saveMarks(d.date);
+}
+function saveMarks(date) {
+  const keys = Object.keys(marks).sort();
+  while (keys.length > 200) delete marks[keys.shift()];
+  try { localStorage.setItem(MK, JSON.stringify(marks)); } catch {}
+  if (!db || !uid) return;
+  clearTimeout(markSaves[date]);
+  markSaves[date] = setTimeout(() => {
+    const body = JSON.parse(JSON.stringify({ date, ...marks[date] }));
+    chain = chain.then(() => db.doc("data/users/" + uid + "/marks-" + date).set(body)).then(
+      () => { $("sync").textContent = "练习记录和发音标记已同步到你的账号"; },
+      () => { $("sync").textContent = "这次没同步上，标记先存在本浏览器"; });
+  }, 700);
+}
+const marksRead = {};       // date -> true once the account's copy was looked at
+async function syncMarks(date) {
+  if (!db || !uid || !isDate(date) || marksRead[date]) return;
+  marksRead[date] = true;
+  try {
+    const snap = await db.doc("data/users/" + uid + "/marks-" + date).get();
+    const remote = snap.exists ? snap.data() : null;
+    const local = marks[date];
+    if (remote && remote.s && typeof remote.s === "object" && (remote.updated || 0) >= ((local && local.updated) || 0)) {
+      marks[date] = { s: remote.s, updated: remote.updated || 0 };
+      try { localStorage.setItem(MK, JSON.stringify(marks)); } catch {}
+      if (selDate === date) { closeEditor(); render(); }
+    } else if (local && local.updated) saveMarks(date);
+  } catch { marksRead[date] = false; }
+}
+// a word with its marks: swallowed letters crossed out
+function fillLetters(node, core, m) {
+  node.replaceChildren();
+  const cs = chars(core), mask = maskFor(core, m && m.c);
+  let k = 0;
+  while (k < cs.length) {
+    let j = k;
+    while (j < cs.length && mask[j] === mask[k]) j++;
+    const piece = cs.slice(k, j).join("");
+    node.append(mask[k] === "1" ? el("s", "cut", piece) : piece);
+    k = j;
+  }
+}
+// the same word as it stands in a sense group: stress, crossed-out letters, and how it is said above it
+function wordWithMarks(i) {
+  const s = curSent(), core = split(model.toks[i])[1], m = markOf(s, i);
+  const base = el("span");
+  fillLetters(base, core, m);
+  if (!m || !m.n.trim()) return base;
+  const r = el("ruby"); r.append(base, el("rt", null, m.n.trim()));
+  return r;
+}
+// repaint every place that shows marks, without rebuilding the lists (the editor may be open in them)
+function paintMarks() {
+  const s = curSent();
+  if (!s || !model) return;
+  document.querySelectorAll("#sentence .w").forEach((w) => { const i = Number(w.dataset.i); fillLetters(w, split(model.toks[i])[1], markOf(s, i)); });
+  document.querySelectorAll("#groups .gt").forEach((g) => {
+    const i = Number(g.dataset.t), [pre, , post] = split(model.toks[i]);
+    g.replaceChildren(pre, wordWithMarks(i), post);
+    g.classList.toggle("editing", editing === i);
+  });
+  if (editing != null) ed.word.replaceChildren(wordWithMarks(editing));
+  const n = Object.keys(sentMarks(s)).length;
+  $("mark-label").textContent = markMode ? "标记完了" : (n ? "标记吞音和读法 · 已标 " + n + " 处" : "标记吞音和读法");
+  $("pen-btn").hidden = !n || markMode;
+  $("pen-btn").setAttribute("aria-pressed", String(ui.pen));
+  $("wrap").classList.toggle("no-pen", !ui.pen && !markMode);
+}
+
 // ---------- audio: the speakers' own voices, cut from the podcasts ----------
-// Each day has one MP3 in the page's file store; a sentence knows its span in it ("clip")
+// Each day has one audio file in the page's file store; a sentence knows its span in it ("clip")
 // and the time of every word inside that span ("t").
 const player = new Audio();
 player.preload = "auto";
@@ -397,6 +845,7 @@ let rafId = 0, loopTimer = 0, nowIdx = -1;
 let range = null;           // { a, b }: the stretch of words the player is set to; null = the whole sentence
 let rate = 1;               // 1, 0.75 or 0.5 (pitch is kept)
 let lastPlay = null;        // { t0, t1, node }: what "循环" repeats
+const NO_AUDIO = "这天的句子没有原声";
 const hasAudio = (s) => { const d = curDay(); return !!(d && d.audioId && s && A(s.clip).length === 2 && A(s.t).length); };
 // The day's file is small (about 300 KB), so it is read once into memory: that makes every
 // sentence, word and sense group seekable no matter how the file is served.
@@ -417,14 +866,17 @@ function wordAt(rel) {      // index of the word being spoken at `rel` seconds i
 }
 function markNow(k) {
   if (k === nowIdx) return;
-  const old = $("sw-" + nowIdx); if (old) old.classList.remove("now");
+  for (const pre of ["sw-", "gt-", "rs-"]) { const old = $(pre + nowIdx); if (old) old.classList.remove("now"); }
   nowIdx = k;
-  const cur = $("sw-" + k); if (cur) cur.classList.add("now");
+  for (const pre of ["sw-", "gt-", "rs-"]) { const cur = $(pre + k); if (cur) cur.classList.add("now"); }
+  if (!$("dock").hidden) renderDockText();
 }
 function showPos(rel) {
   const s = curSent();
   if (!s || !hasAudio(s)) return;
-  $("seek-fill").style.width = Math.max(0, Math.min(100, rel / clipLen(s) * 100)) + "%";
+  const w = Math.max(0, Math.min(100, rel / clipLen(s) * 100)) + "%";
+  $("seek-fill").style.width = w;
+  $("dock-fill").style.width = w;
 }
 function stopAudio() {
   clearTimeout(loopTimer);
@@ -435,7 +887,35 @@ function stopAudio() {
   markNow(-1);
   renderTools();
 }
+// 逐段跟读: play one sense group, leave a pause about as long as it to repeat it, then the next one.
+let drill = null, drillTimer = 0;      // drill: { i, node } — the group being played or repeated
+function groupLen(g) { const T = A(curSent() && curSent().t); return T[g.a] && T[g.b] ? T[g.b][1] - T[g.a][0] : 2; }
+function drillPlay(i) {
+  clearTimeout(drillTimer);
+  document.querySelectorAll("#groups .turn").forEach((x) => x.classList.remove("turn"));
+  if (!model || i >= model.groups.length || !hasAudio(curSent())) { cancelDrill(); return; }
+  const g = model.groups[i], node = $("grp-" + i);
+  drill = { i, node };
+  node.scrollIntoView({ block: "nearest", behavior: calm() ? "auto" : "smooth" });
+  playTokens(g.a, g.b, node);
+}
+function cancelDrill() {
+  clearTimeout(drillTimer);
+  document.querySelectorAll("#groups .turn").forEach((x) => x.classList.remove("turn"));
+  if (!drill) return;
+  drill = null;
+  renderTools();
+}
 function finished() {
+  if (drill && playing && playing.node === drill.node) {   // the group was heard: now it is the learner's turn
+    const d = drill, wait = groupLen(model.groups[d.i]) / rate * 1.25 + 0.8;
+    stopAudio();
+    d.node.style.setProperty("--wait", wait + "s");
+    d.node.classList.add("turn");
+    renderTools();
+    drillTimer = setTimeout(() => { d.node.classList.remove("turn"); drillPlay(d.i + 1); }, wait * 1000);
+    return;
+  }
   const again = loop && playing ? lastPlay : null;
   stopAudio();
   if (again) {
@@ -447,6 +927,7 @@ function finished() {
 async function playRange(t0, t1, node) {
   const d = curDay(), s = curSent();
   if (!d || !s || !hasAudio(s)) return;
+  if (drill && node !== drill.node) cancelDrill();          // anything else the learner plays ends 逐段跟读
   stopAudio();
   const base = Number(s.clip[0]);
   const mine = { stopAt: base + Math.min(t1 == null ? Infinity : t1, clipLen(s)), node };
@@ -466,7 +947,7 @@ async function playRange(t0, t1, node) {
     await player.play();
   } catch {
     stopAudio();
-    $("audio-note").hidden = false; $("audio-note").textContent = "这句的原声没读到，刷新页面再试";
+    $("audio-note").hidden = false; $("audio-note").textContent = "原声没读到，刷新页面再试";
     return;
   }
   const tick = () => {
@@ -496,8 +977,18 @@ function playSelection(node) {
   const [t0, t1] = spanTimes(range ? range.a : 0, range ? range.b : n - 1);
   playRange(t0, t1, node || null);
 }
-function togglePlay() { if (playing) stopAudio(); else playSelection(); }
+function togglePlay() { if (drill) { cancelDrill(); stopAudio(); return; } if (playing) stopAudio(); else playSelection(); }
 function playTokens(a, b, node) { setRange(a, b); playSelection(node); }
+function clearRange() { cancelDrill(); setRange(null); if (playing) stopAudio(); renderTools(); }
+// the next or the previous sense group, for shadowing one stretch after another
+function stepGroup(delta) {
+  const s = curSent();
+  if (!model || !model.groups.length || !hasAudio(s) || veil) return;
+  const G = model.groups;
+  let i = range ? G.findIndex((g) => g.a === range.a && g.b === range.b) : -1;
+  i = i < 0 ? (delta > 0 ? 0 : G.length - 1) : Math.max(0, Math.min(G.length - 1, i + delta));
+  playTokens(G[i].a, G[i].b, $("grp-" + i));
+}
 
 function renderRange() {
   const s = curSent();
@@ -506,13 +997,18 @@ function renderRange() {
     const i = Number(w.dataset.i);
     w.classList.toggle("inrange", !!range && i >= range.a && i <= range.b);
   });
+  document.querySelectorAll("#steps [data-a]").forEach((x) => {
+    x.classList.toggle("on", !!range && Number(x.dataset.a) === range.a && Number(x.dataset.b) === range.b);
+  });
   const chip = $("range-chip");
   chip.hidden = !range;
+  $("hint").hidden = !!range || veil;
+  $("hint-veil").hidden = !!range || !veil;
   if (range && s) {
     const words = S(s.text).trim().split(/\s+/).map((t) => split(t)[1] || t);
     const t = $("range-text"); t.replaceChildren();
     if (range.a === range.b) t.append("只放 ", el("b", null, words[range.a]));
-    else if (range.b === n - 1) t.append("从 ", el("b", null, words[range.a]), " 播到句尾");
+    else if (range.b === n - 1) t.append("从 ", el("b", null, words[range.a]), " 到最后");
     else t.append("只放 ", el("b", null, words[range.a]), " … ", el("b", null, words[range.b]));
   }
   if (s && hasAudio(s)) {
@@ -543,20 +1039,21 @@ function render() {
 
   const ready = !!d;
   $("state").hidden = ready;
-  $("stabs").hidden = $("sent").hidden = !ready;
-  $("und").hidden = !ready || veil;
-  $("veil-note").hidden = !ready || !veil;
+  $("stabs").hidden = $("work").hidden = !ready;
   renderProgress();
-  if (!ready) { $("say").replaceChildren(); return; }
+  if (!ready) { model = null; updateDock(); return; }
 
   sIdx = Math.min(sIdx, d.sentences.length - 1);
   const s = curSent();
+  model = buildModel(s);
   if (d.audioId) dayAudioUrl(d.audioId);
   renderTabs(d);
-  renderSentence(d, s);
+  renderStage(d, s);
+  renderSteps(d, s);
+  paintMarks();
   renderTools();
-  if (!veil) renderBreakdown(s);
-  renderSay(s);
+  renderRange();
+  updateDock();
 }
 
 function renderCal() {
@@ -582,8 +1079,8 @@ function renderCal() {
     if (have.has(date)) {
       const n = doneOn(date);
       b.classList.add("has");
-      if (n >= 5) b.classList.add("full"); else if (n > 0) b.classList.add("part");
-      b.setAttribute("aria-label", dayLabel(date) + (n ? "，练完 " + n + " 句" : ""));
+      if (n >= totalOn(date)) b.classList.add("full"); else if (n > 0) b.classList.add("part");
+      b.setAttribute("aria-label", dayLabel(date) + (n ? "，练完 " + n + "/" + totalOn(date) : ""));
       b.addEventListener("click", () => selectDay(date));
     } else { b.disabled = true; b.setAttribute("aria-label", dayLabel(date) + "，没有句子"); }
     if (date === today()) b.classList.add("today");
@@ -594,36 +1091,33 @@ function renderCal() {
 
 function renderTabs(d) {
   const box = $("stabs"); box.replaceChildren();
+  box.style.setProperty("--n", d.sentences.length);
+  box.classList.toggle("few", d.sentences.length <= 3);
   d.sentences.forEach((s, i) => {
-    const b = el("button", "stab"); b.type = "button"; b.id = "stab-" + (i + 1);
+    const done = !!prog.done[sid(d, s)];
+    const b = el("button", "stab" + (done ? " done" : "")); b.type = "button"; b.id = "stab-" + (i + 1);
     b.setAttribute("aria-pressed", String(i === sIdx));
-    const r1 = el("span", "r1");
-    r1.append(el("span", "n", String(i + 1)), el("span", "src", S(s.source) || "原句"), el("span", "t", S(s.outlet)));
-    if (prog.done[sid(d, s)]) r1.append(el("span", "ok", "✓"));
-    b.append(r1, el("span", "t", S(s.topic) || S(s.title)));
+    const topic = S(s.topic) || S(s.title), src = S(s.source) || "原句";
+    b.setAttribute("aria-label", "第 " + (i + 1) + " " + U() + "，" + src + (topic ? "，" + topic : "") + (done ? "，已练完" : ""));
+    b.append(el("span", "badge", done ? "✓" : String(i + 1)), el("span", "topic", topic), el("span", "src", src));
     b.addEventListener("click", () => go(i));
     box.append(b);
   });
 }
 
-function renderSentence(d, s) {
-  const line = $("src-line"); line.replaceChildren();
-  line.append(el("span", "pill", S(s.source) || "原句"));
-  const url = S(s.url);
-  const label = (S(s.outlet) ? s.outlet + " · " : "") + (S(s.title) || "原文");
-  if (/^https:\/\//.test(url)) { const a = el("a", null, label + " ↗"); a.href = url; a.target = "_blank"; a.rel = "noopener"; line.append(a); }
-  else line.append(el("span", null, label));
-  if (Number(s.at) > 0) line.append(el("span", "num", "约 " + Math.floor(s.at / 60) + ":" + pad(Math.floor(s.at % 60)) + " 处"));
-  if (S(s.published)) line.append(el("span", "num", s.published));
+function renderStage(d, s) {
+  const meta = $("meta"); meta.replaceChildren();
+  meta.append(el("span", "nth", "第 " + s.n + " " + U()), el("span", "pill", S(s.source) || "原句"));
+  if (S(s.level)) meta.append(el("span", "num", s.level));
   const wc = Number(s.words) || S(s.text).split(/\s+/).filter((t) => /[\p{L}\p{N}]/u.test(t)).length;
-  line.append(el("span", "num", wc + " 词"));
-  if (S(s.level)) line.append(el("span", null, s.level));
+  meta.append(el("span", "num", wc + " 词"));
+  if (S(s.topic)) meta.append(el("span", null, s.topic));
 
   const stress = wordSet(s.stress);
   const box = $("sentence");
   box.className = "sentence" + (veil ? " veiled" : "");
   box.replaceChildren();
-  S(s.text).trim().split(/\s+/).forEach((tok, i) => {
+  model.toks.forEach((tok, i) => {
     if (i) box.append(" ");
     const [pre, core, post] = split(tok);
     if (pre) box.append(pre);
@@ -634,66 +1128,216 @@ function renderSentence(d, s) {
     }
     if (post) box.append(post);
   });
+  // a passage's translation is long: it folds away until asked for, and shows while the text is veiled
+  const long = longDay(d), zhOpen = !long || ui.zh || veil;
+  $("stage").classList.toggle("long", long);
+  $("work").classList.toggle("long", long);
+  $("zh-tag").textContent = long ? "整段" : "整句";
   $("translation").textContent = S(s.translation);
+  $("translation").hidden = !zhOpen;
+  $("zh-btn").hidden = !long || veil;
+  $("zh-btn").textContent = zhOpen ? "收起翻译" : "显示整段翻译";
   nowIdx = -1;
+
+  // the seek bar is cut where the sense groups meet
   const ticks = $("seek-ticks"); ticks.replaceChildren();
   if (hasAudio(s)) {
-    const len = clipLen(s);
-    A(s.t).forEach((x, i) => { if (i) { const k = el("i"); k.style.left = (x[0] / len * 100) + "%"; ticks.append(k); } });
-    if (!playing) $("seek-fill").style.width = "0";
+    const len = clipLen(s), T = A(s.t);
+    model.groups.slice(1).forEach((g) => { if (T[g.a]) { const k = el("i"); k.style.left = (T[g.a][0] / len * 100) + "%"; ticks.append(k); } });
+    if (!playing) { $("seek-fill").style.width = "0"; $("dock-fill").style.width = "0"; }
   }
-  renderRange();
-  $("veil-btn").setAttribute("aria-pressed", String(veil));
-  $("veil-btn").textContent = veil ? "显示原句" : "遮住原句";
+
+  // where the sentence comes from, set under it like the source of a quotation
+  const cite = $("cite"); cite.replaceChildren();
+  const url = S(s.url);
+  const src = /^https:\/\//.test(url) ? el("a") : el("span");
+  if (src.tagName === "A") { src.href = url; src.target = "_blank"; src.rel = "noopener"; }
+  if (S(s.outlet)) src.append(s.outlet + " · ");
+  const ti = el("i", null, S(s.title) || "原文"); ti.lang = "de"; src.append(ti);
+  if (src.tagName === "A") src.append(" ↗");
+  cite.append(src);
+  if (S(s.published)) cite.append(el("span", "num", s.published));
+  if (Number(s.at) > 0) cite.append(el("span", "num", "约 " + Math.floor(s.at / 60) + ":" + pad(Math.floor(s.at % 60)) + " 处"));
+
   const done = !!prog.done[sid(d, s)];
-  $("done-btn").setAttribute("aria-pressed", String(done));
-  $("done-btn").textContent = done ? "已练完 ✓" : "这句练完了";
+  for (const id of ["done-btn", "done-btn-2"]) $(id).setAttribute("aria-pressed", String(done));
+  $("done-label").textContent = done ? "已练完" : "练完了";
+  $("done-btn-2").textContent = done ? "已练完 ✓" : "这" + U() + "练完了";
+  $("next-btn").textContent = "下一" + U() + " →";
+  $("next-btn").hidden = !done || sIdx >= d.sentences.length - 1;
+  for (const id of ["veil-btn", "veil-btn-2"]) { $(id).setAttribute("aria-pressed", String(veil)); $(id).textContent = veil ? "显示原文" : "遮住原文"; }
 }
 
 function renderTools() {
   const s = curSent(), a = hasAudio(s);
-  for (const id of ["play-btn", "speed", "loop-btn", "player-row"]) $(id).hidden = !a;
+  $("player").hidden = !a;
+  $("listen-btn").hidden = !a;
   if (!a) $("range-chip").hidden = true;
   const note = $("audio-note");
-  if (!a) { note.hidden = false; note.textContent = "这天的句子没有原声"; } else if (note.textContent === "这天的句子没有原声") note.hidden = true;
-  $("play-btn").textContent = playing ? "■ 停止" : (range ? "▶ 播放选段" : "▶ 播放");
+  if (!a) { note.hidden = false; note.textContent = NO_AUDIO; } else if (note.textContent === NO_AUDIO) note.hidden = true;
+  $("play-label").textContent = playing ? "停止" : (range ? "播放选段" : "播放");
+  for (const id of ["play-btn", "dock-play"]) $(id).classList.toggle("is-playing", !!playing);
+  $("dock-play").setAttribute("aria-label", playing ? "停止" : "播放");
   for (const b of document.querySelectorAll("#speed button")) b.setAttribute("aria-pressed", String(Number(b.dataset.rate) === rate));
-  $("loop-btn").setAttribute("aria-pressed", String(loop));
-  $("gloss-hint").textContent = (a ? "点一个词听原声 · " : "") + "黄底是下面讲到的小词 · 下划线是通常会重读的词，以原声为准";
+  $("dock-rate").textContent = rate + "×";
+  for (const id of ["loop-btn", "dock-loop"]) $(id).setAttribute("aria-pressed", String(loop));
+  $("drill-btn").hidden = !a;
+  $("drill-btn").setAttribute("aria-pressed", String(!!drill));
+  $("drill-btn").textContent = drill ? "停止跟读" : "逐段跟读";
+  if (!$("dock").hidden) renderDockText();
+}
+
+// ---- the five steps: what has to be rebuilt only when the sentence changes ----
+let shown = "";             // which sentence the breakdown on screen belongs to
+let shownGroups = "";       // ... and the sense groups, which are also rebuilt when marking is switched on or off
+function renderSteps(d, s) {
+  const a = hasAudio(s);
+  const box = $("steps");
+  box.classList.toggle("veiled", veil);
+  box.classList.toggle("noaudio", !a);
+  const key = d.date + "#" + s.n + "#" + (a ? 1 : 0);
+  if (key !== shown) { shown = key; hidePop(); renderBreakdown(s); renderSay(s); }
+  if (key + "#" + markMode !== shownGroups) { shownGroups = key + "#" + markMode; cancelDrill(); closeEditor(); renderGroups(); }
+  renderScore();
+  $("groups").classList.toggle("marking", markMode);
+  $("mark-btn").setAttribute("aria-pressed", String(markMode));
+  $("mark-how").hidden = !markMode;
+  $("ed-plays").hidden = !a;
+  for (const n of [2, 3]) {
+    const open = !ui.fold[n], btn = $("fold-" + n);
+    $("body-" + n).hidden = !open || veil;
+    btn.hidden = veil;
+    btn.setAttribute("aria-expanded", String(open));
+    btn.firstElementChild.textContent = open ? "收起" : "展开";
+  }
+  $("how").hidden = !a;
+  $("groups-hint").hidden = !a || markMode;
+  $("gloss").classList.toggle("forms", ui.forms);
+  $("forms-btn").setAttribute("aria-pressed", String(ui.forms));
+  $("forms-btn").textContent = ui.forms ? "收起词形" : "展开全部词形";
+  $("veil-note").hidden = !veil;
+}
+
+// Which words of one building step were not in the step before (longest common run of words, the rest is new).
+function addedTokens(prev, cur) {
+  const a = prev.map(norm), b = cur.map(norm), n = a.length, m = b.length;
+  const L = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) for (let j = m - 1; j >= 0; j--) L[i][j] = a[i] === b[j] ? L[i + 1][j + 1] + 1 : Math.max(L[i + 1][j], L[i][j + 1]);
+  const added = new Array(m).fill(true);
+  for (let i = 0, j = 0; i < n && j < m;) {
+    if (a[i] === b[j]) { added[j] = false; i++; j++; }
+    else if (L[i + 1][j] >= L[i][j + 1]) i++; else j++;
+  }
+  return added;
+}
+// a piece of German from the breakdown; when it is a stretch of the sentence it can be pointed at and played
+function term(text, cls, sp) {
+  const k = el("span", cls, S(text)); k.lang = "de";
+  if (!sp) return k;
+  const b = el("span", "lk"); b.tabIndex = 0; b.setAttribute("role", "button");
+  b.dataset.a = sp.a; b.dataset.b = sp.b;
+  b.append(k);
+  return b;
 }
 
 function renderBreakdown(s) {
+  const long = longDay(curDay());
+  $("layer-2-sub").textContent = long ? "这段话是怎么一句句接起来的，每一处背后是哪条规则" : "这句话是怎么搭起来的，每一处背后是哪条规则";
+  $("build-h").textContent = long ? "一步步搭出这段里最难的一句" : "一步步搭出这句话";
+  $("struct-h").textContent = long ? "这段话是怎么一句句接起来的" : "词和词之间是什么关系";
+  $("mean-h").textContent = long ? "这段话的所有含义" : "这句话的所有含义";
   const flagged = A(s.gloss).some((g) => g && "s" in g);
   const smallSet = wordSet(A(s.small).map((x) => x && x.word));
   const stress = wordSet(s.stress);
+  const aligned = A(s.gloss).length === model.toks.length;   // one gloss per word of the sentence
   const gloss = $("gloss"); gloss.replaceChildren();
   A(s.gloss).forEach((g, i) => {
     if (!g) return;
-    const core = split(g.w)[1] || S(g.w);
+    const [pre, core0, post] = split(g.w);
+    const core = core0 || S(g.w);
     const isSmall = flagged ? g.s === true : smallSet.has(norm(core));
     const b = el("button", "gw" + (isSmall ? " small" : "") + (stress.has(norm(core)) ? " stress" : ""));
-    b.type = "button"; b.id = "gw-" + i; b.dataset.i = i;
-    const w = el("span", "w", S(g.w)); w.lang = "de";
+    b.type = "button"; b.id = "gw-" + i; b.dataset.g = i;
+    if (aligned) { b.dataset.a = i; b.dataset.b = i; }
+    const w = el("span", "w"); w.lang = "de";
+    if (core0) w.append(pre, el("span", null, core0), post); else w.append(el("span", null, core));
     b.append(w, el("span", "g", S(g.g)));
     if (S(g.f)) b.append(el("span", "f", S(g.f)));
     gloss.append(b);
+    if (long && i < A(s.gloss).length - 1 && /[.!?]["“”»«’)]*$/.test(S(g.w))) gloss.append(el("span", "gbreak"));
   });
 
-  const de = (text, cls) => { const k = el("span", cls, S(text)); k.lang = "de"; return k; };
   const list = (id, items, fill) => { const ul = $(id); ul.replaceChildren(); A(items).forEach((x) => { if (!x) return; const li = el("li"); fill(li, x); ul.append(li); }); };
-  list("chunks", s.chunks, (li, x) => { li.append(de(x.text, "k"), "　" + S(x.meaning)); if (S(x.note)) li.append(el("span", "note", x.note)); });
-  list("small", s.small, (li, x) => { li.append(de(x.word, "k mk"), "　" + S(x.role)); });
+  list("chunks", s.chunks, (li, x) => { li.append(term(x.text, "k", spanOf(x.text)), el("span", "m", S(x.meaning))); if (S(x.note)) li.append(el("span", "note", x.note)); });
+  // a small word points at the place the gloss marks, when it marks one
+  const smallSpan = (word) => {
+    const n = norm(word);
+    const i = aligned ? A(s.gloss).findIndex((g) => g && g.s === true && norm(g.w) === n) : -1;
+    return i >= 0 ? { a: i, b: i } : spanOf(word);
+  };
+  list("small", s.small, (li, x) => { li.append(term(x.word, "k mk", smallSpan(x.word)), el("span", "m", S(x.role))); });
   list("context", s.context, (li, x) => {
-    li.append(de(x.text, "k"));
+    li.append(term(x.text, "k", spanOf(x.text)));
     const c = el("div", "ctx");
     c.append(el("i", null, "这里"), el("span", null, S(x.here)), el("i", null, "换个搭配"), el("span", null, S(x.elsewhere)));
     li.append(c);
   });
+  // 2.2: the sentence built up step by step; what each step adds is marked
+  const stepsUp = A(s.build).filter((x) => x && S(x.text).trim());
+  const bl = $("build"); bl.replaceChildren();
+  let prev = null;
+  stepsUp.forEach((x) => {
+    const toks = S(x.text).trim().split(/\s+/);
+    const added = prev ? addedTokens(prev, toks) : toks.map(() => false);
+    const de = el("span", "de"); de.lang = "de";
+    for (let k = 0; k < toks.length;) {
+      let j = k;
+      while (j < toks.length && added[j] === added[k]) j++;
+      const run = toks.slice(k, j).join(" ");
+      if (k) de.append(" ");
+      de.append(added[k] ? el("mark", "add", run) : run);
+      k = j;
+    }
+    const sp = spanOf(x.text);
+    let head = de;
+    if (sp) { head = el("span", "lk"); head.tabIndex = 0; head.setAttribute("role", "button"); head.dataset.a = sp.a; head.dataset.b = sp.b; head.append(de); }
+    const body = el("div"); body.append(head);
+    if (S(x.note)) body.append(el("span", "note", x.note));
+    const li = el("li"); li.append(body); bl.append(li);
+    prev = toks;
+  });
+  $("build-block").hidden = !stepsUp.length;
+  list("grammar", s.grammar, (li, x) => {
+    li.append(el("span", "pt", S(x.point)));
+    if (S(x.rule)) li.append(el("span", "rule", x.rule));
+    const c = el("div", "ctx");
+    if (S(x.here)) c.append(el("i", null, "这里"), el("span", null, x.here));
+    if (S(x.example)) c.append(el("i", null, "再看一例"), el("span", null, x.example));
+    if (c.childNodes.length) li.append(c);
+  });
+  $("grammar-block").hidden = !$("grammar").childNodes.length;
+  // 2.3: the speaker's choices
+  list("why", s.why, (li, x) => { li.append(el("span", "q", S(x.q)), el("span", "a", S(x.a))); });
+  $("why-block").hidden = !$("why").childNodes.length;
+  list("rewrite", s.rewrite, (li, x) => { const t = el("span", "alt", S(x.text)); t.lang = "de"; li.append(t); if (S(x.note)) li.append(el("span", "note", x.note)); });
+  $("rewrite-block").hidden = !$("rewrite").childNodes.length;
+  list("pitfalls", s.pitfalls, (li, x) => {
+    const bad = el("span", "bad", S(x.wrong)), good = el("span", "good", S(x.right)); bad.lang = good.lang = "de";
+    li.append(bad, good);
+    if (S(x.why)) li.append(el("span", "note", x.why));
+  });
+  $("pitfalls-block").hidden = !$("pitfalls").childNodes.length;
+
   const st = $("structure"); st.replaceChildren();
+  let at = 0;               // the segments cover the sentence in order
   A(s.structure).forEach((x) => {
     if (!x) return;
+    const sp = spanOf(x.text, at) || spanOf(x.text);
+    if (sp) at = sp.b + 1;
     const row = el("div", "seg");
-    row.append(el("span", "role", S(x.role)), de(x.text, "de"));
+    const de = el("div"); de.append(term(x.text, "de", sp));
+    row.append(el("span", "role", S(x.role)), de);
+    if (S(x.zh)) row.append(el("span", "zh", x.zh));
     if (S(x.note)) row.append(el("span", "note", x.note));
     st.append(row);
   });
@@ -702,53 +1346,144 @@ function renderBreakdown(s) {
 }
 
 function renderSay(s) {
-  const box = $("say"); box.replaceChildren();
-  const stress = wordSet(s.stress);
-  const audio = hasAudio(s);
-  if (S(s.phrasing)) {
-    const lbl = el("span", "lbl", "这句的意群和重读");
-    if (audio) lbl.append(" ", el("small", null, "点一段听原声跟读"));
-    box.append(lbl);
-    const p = el("div", "phr"); p.lang = "de";
-    let k = 0;
-    S(s.phrasing).split("|").map((x) => x.trim()).filter(Boolean).forEach((part, i) => {
-      if (i) p.append(el("span", "sep", "|"));
-      const toks = part.split(/\s+/);
-      const g = el("span", "grp");
-      if (audio) {
-        g.id = "grp-" + i; g.tabIndex = 0; g.setAttribute("role", "button");
-        const a = k, b = k + toks.length - 1, act = () => playTokens(a, b, g);
-        g.addEventListener("click", act);
-        g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(); } });
-      }
-      toks.forEach((tok, j) => {
-        if (j) g.append(" ");
-        const [pre, core, post] = split(tok);
-        if (core && stress.has(norm(core))) g.append(pre, el("b", null, core), post); else g.append(tok);
-      });
-      k += toks.length;
-      p.append(g);
-    });
-    box.append(p);
-  }
   const pr = A(s.pron).filter((x) => x && S(x.word));
-  if (pr.length) {
-    box.append(el("span", "lbl", "发音难点"));
-    const ul = el("ul");
-    pr.forEach((x) => { const li = el("li"); const w = el("span", "de", S(x.word)); w.lang = "de"; li.append(w, "　" + S(x.tip)); ul.append(li); });
-    box.append(ul);
-  }
+  const ul = $("pron"); ul.replaceChildren();
+  pr.forEach((x) => { const li = el("li"); li.append(term(x.word, "k", spanOf(x.word)), el("span", "m", S(x.tip))); ul.append(li); });
+  $("pron-block").hidden = !pr.length;
 }
+// The reading score: one sense group per row. A row plays its stretch; while marking, each word is a button
+// that opens the editor for it. The four steps only switch classes on the list, so the rows are built once.
+function renderGroups() {
+  const s = curSent(), box = $("groups"); box.replaceChildren();
+  const T = A(s && s.t), audio = hasAudio(s);
+  const longest = Math.max(0.5, ...model.groups.map(groupLen));
+  model.groups.forEach((g, i) => {
+    const row = el("div", "grp"); row.id = "grp-" + i; row.lang = "de";
+    row.tabIndex = 0; row.setAttribute("role", "button");
+    row.dataset.a = g.a; row.dataset.b = g.b;
+    const text = el("span", "gtext");
+    for (let k = g.a; k <= g.b; k++) {
+      if (k > g.a) { const j = el("span"); j.append(el("span", "sp", " "), el("span", "tie"), document.createElement("wbr")); text.append(j); }
+      const word = !!split(model.toks[k])[1];
+      const w = el(markMode && word ? "button" : "span", word ? "gt" : null);
+      if (w.tagName === "BUTTON") w.type = "button";
+      if (word) { w.id = "gt-" + k; w.dataset.t = k; if (model.stress.has(norm(split(model.toks[k])[1]))) w.classList.add("st"); }
+      else w.textContent = model.toks[k];
+      text.append(w);
+    }
+    const ends = /[.!?]["“”»«’)]*$/.test(model.toks[g.b]);
+    if (i < model.groups.length - 1) text.append(el("span", "brk", ends ? "//" : "/"));
+    const body = el("div", "gbody"); body.append(text);
+    if (audio && T[g.a] && T[g.b]) {   // how long each word really takes in the recording, on one scale for all rows
+      const bar = el("span", "rhythm"); bar.setAttribute("aria-hidden", "true");
+      bar.style.width = (groupLen(g) / longest * 100) + "%";
+      for (let k = g.a; k <= g.b; k++) {
+        if (!T[k]) continue;
+        const seg = el("i", "rs" + (model.stress.has(norm(split(model.toks[k])[1])) ? " st" : ""));
+        seg.id = "rs-" + k; seg.style.flexGrow = Math.max(0.02, T[k][1] - T[k][0]); seg.style.flexBasis = "0";
+        seg.title = split(model.toks[k])[1] + " · " + (T[k][1] - T[k][0]).toFixed(2) + " 秒";
+        bar.append(seg);
+        const gap = k < g.b && T[k + 1] ? T[k + 1][0] - T[k][1] : 0;
+        if (gap > 0.04) { const z = el("i", "rs gap"); z.style.flexGrow = gap; z.style.flexBasis = "0"; bar.append(z); }
+      }
+      body.append(bar);
+    }
+    row.append(el("span", "gn", String(i + 1)), body, el("span", "tp", "该你跟读了"), el("span", "tbar"));
+    const li = el("li"); li.append(row); box.append(li);
+    if (i > 0 && /[.!?]["“”»«’)]*$/.test(model.toks[model.groups[i - 1].b])) li.classList.add("after-end");
+  });
+  $("groups-block").hidden = !model.groups.length;
+}
+const RSTEP = {
+  1: "<b>划分意群。</b>每一行是一个意群：行内不停顿，读到行末的 / 才停一下、换口气；// 是一句话说完，停得稍长一点。先听原声，听说话人在哪里停。",
+  2: "<b>找重读。</b>加粗、带紫色下划线的是重读词，这一段的意思落在它上面。可以先切回第 1 步自己猜，再回到这里对答案。",
+  3: "<b>重的慢，轻的快。</b>大字放慢、读饱满；小字快读、一带而过。",
+  4: "<b>把一行读成一个词。</b>⌣ 处不停、直接连过去，整行一口气读完，只在 / 处换气。",
+};
+const RSTEP_BAR = "每行下面的节奏条是原声里每个词实际占的时间，紫色是重读词：说话人在重读词上花的时间明显更长。";
+function renderScore() {
+  const r = ui.rstep, box = $("groups");
+  box.classList.toggle("r-stress", r >= 2);
+  box.classList.toggle("r-tempo", r >= 3);
+  box.classList.toggle("r-tie", r >= 4);
+  for (const b of document.querySelectorAll("#rsteps button")) {
+    const n = Number(b.dataset.r);
+    b.setAttribute("aria-pressed", String(n === r));
+    b.classList.toggle("lit", n < r);
+  }
+  $("rstep-how").innerHTML = RSTEP[r] + (r === 3 && hasAudio(curSent()) ? RSTEP_BAR : "");
+}
+for (const b of document.querySelectorAll("#rsteps button")) b.addEventListener("click", () => { ui.rstep = Number(b.dataset.r); saveUi(); renderScore(); });
+$("drill-btn").addEventListener("click", () => {
+  if (drill) { cancelDrill(); stopAudio(); return; }
+  if (markMode) { markMode = false; render(); }
+  drillPlay(0);
+});
+$("pen-btn").addEventListener("click", () => { ui.pen = !ui.pen; saveUi(); paintMarks(); });
+$("zh-btn").addEventListener("click", () => { ui.zh = !ui.zh; saveUi(); render(); });
+
+// ---- the editor for one word's marks ----
+const ed = { node: $("mark-ed"), home: $("ed-home"), word: $("ed-word"), letters: $("ed-letters"), note: $("ed-note") };
+function openEditor(i) {
+  const s = curSent();
+  if (!s || !model || !split(model.toks[i])[1]) return;
+  if (editing === i) { closeEditor(); return; }
+  editing = i;
+  const g = model.groups.findIndex((x) => i >= x.a && i <= x.b);
+  const row = $("grp-" + g);
+  if (!row) { editing = null; return; }
+  row.parentElement.after(ed.node);
+  fillEditor();
+  paintMarks();
+  ed.node.scrollIntoView({ block: "nearest", behavior: calm() ? "auto" : "smooth" });
+}
+function fillEditor() {
+  const s = curSent(), core = split(model.toks[editing])[1], m = markOf(s, editing);
+  const mask = maskFor(core, m && m.c);
+  ed.letters.replaceChildren(...chars(core).map((ch, k) => {
+    const b = el("button", "lt", ch); b.type = "button"; b.lang = "de"; b.dataset.k = k;
+    b.setAttribute("aria-pressed", String(mask[k] === "1"));
+    return b;
+  }));
+  ed.note.value = m ? m.n : "";
+}
+function closeEditor() {
+  if (editing == null && ed.node.parentElement === ed.home) return;
+  editing = null;
+  ed.home.append(ed.node);
+  paintMarks();
+}
+ed.letters.addEventListener("click", (e) => {
+  const b = e.target.closest(".lt");
+  if (!b || editing == null) return;
+  const s = curSent(), core = split(model.toks[editing])[1], m = markOf(s, editing);
+  const mask = maskFor(core, m && m.c).split(""), k = Number(b.dataset.k);
+  mask[k] = mask[k] === "1" ? "0" : "1";
+  setMark(editing, { c: mask.join("") });
+  b.setAttribute("aria-pressed", String(mask[k] === "1"));
+  paintMarks();
+});
+ed.note.addEventListener("input", () => { if (editing == null) return; setMark(editing, { n: ed.note.value.slice(0, 40) }); paintMarks(); });
+ed.note.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); closeEditor(); } });
+$("ed-clear").addEventListener("click", () => { if (editing == null) return; setMark(editing, { c: "", n: "" }); fillEditor(); paintMarks(); });
+$("ed-done").addEventListener("click", closeEditor);
+$("ed-play").addEventListener("click", () => { if (editing != null && hasAudio(curSent())) playTokens(editing, editing, $("ed-play")); });
+$("ed-play3").addEventListener("click", () => {
+  if (editing == null || !hasAudio(curSent())) return;
+  const at = model.idx.indexOf(editing);   // the neighbours that are words, not punctuation
+  const a = model.idx[Math.max(0, at - 1)], b = model.idx[Math.min(model.idx.length - 1, at + 1)];
+  playTokens(a, b, $("ed-play3"));
+});
+$("mark-btn").addEventListener("click", () => { markMode = !markMode; if (markMode && ui.fold[3]) { ui.fold[3] = false; saveUi(); } render(); });
 
 function renderProgress() {
   const box = $("prog"); box.replaceChildren();
   const d = curDay();
   if (d) {
     const n = d.sentences.filter((s) => prog.done[sid(d, s)]).length;
-    const dots = el("span", "dots");
-    d.sentences.forEach((s) => dots.append(el("i", prog.done[sid(d, s)] ? "on" : "")));
-    const t = el("span"); t.append(d.date === today() ? "今天 " : "这天 ", el("b", null, n + "/" + d.sentences.length), " 句练完");
-    box.append(t, dots);
+    const t = el("span", n >= d.sentences.length ? "all" : null);
+    t.append(d.date === today() ? "今天练完 " : "这天练完 ", el("b", null, n + "/" + d.sentences.length), " " + U());
+    box.append(t);
   }
   const marked = new Set(Object.values(prog.done));
   const c = new Date(); if (!marked.has(fmt(c))) c.setDate(c.getDate() - 1);
@@ -757,12 +1492,59 @@ function renderProgress() {
   box.append(s);
 }
 
+// ---- the docked player ----
+let stageSeen = true;
+function updateDock() {
+  const show = !stageSeen && !!curDay() && hasAudio(curSent());
+  $("dock").hidden = !show;
+  $("wrap").classList.toggle("docked", show);
+  if (show) renderDockText();
+}
+function renderDockText() {
+  const s = curSent(), box = $("dock-text");
+  if (!s || !model) return;
+  box.replaceChildren();
+  if (playing && !veil && nowIdx >= 0) {   // the stretch being spoken, with the current word marked
+    const g = model.groups.find((x) => nowIdx >= x.a && nowIdx <= x.b) || { a: Math.max(0, nowIdx - 2), b: Math.min(model.toks.length - 1, nowIdx + 3) };
+    box.className = "dock-text de"; box.lang = "de";
+    for (let i = g.a; i <= g.b; i++) { if (i > g.a) box.append(" "); box.append(i === nowIdx ? el("span", "now", model.toks[i]) : model.toks[i]); }
+  } else {
+    box.className = "dock-text"; box.removeAttribute("lang");
+    if (drill && !playing) box.append(el("b", null, "第 " + (drill.i + 1) + " 行"), "该你跟读了");
+    else box.append(el("b", null, "第 " + s.n + " " + U()), veil ? "脱稿中" : range ? "选段" : S(s.topic));
+  }
+}
+if ("IntersectionObserver" in window) {
+  new IntersectionObserver((es) => { stageSeen = es[es.length - 1].isIntersecting; updateDock(); }).observe($("stage"));
+}
+const calm = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const toStage = () => $("stage").scrollIntoView({ behavior: calm() ? "auto" : "smooth", block: "start" });
+
+// ---- pointing at a piece of the breakdown marks it in the sentence; each word shows its form ----
+function preview(node) {
+  document.querySelectorAll("#sentence .w.hl").forEach((w) => w.classList.remove("hl"));
+  if (!node || veil) return;
+  for (let i = Number(node.dataset.a); i <= Number(node.dataset.b); i++) { const w = $("sw-" + i); if (w) w.classList.add("hl"); }
+}
+function hidePop() { $("pop").hidden = true; }
+function showPop(node) {
+  const s = curSent(), g = A(s && s.gloss)[Number(node.dataset.g)];
+  if (!g || !S(g.f) || ui.forms) { hidePop(); return; }
+  const pop = $("pop");
+  const b = el("b", null, split(g.w)[1] || S(g.w)); b.lang = "de";
+  pop.replaceChildren(b, S(g.f));
+  pop.hidden = false;
+  const wrap = pop.parentElement;
+  pop.style.left = Math.max(0, Math.min(node.offsetLeft, wrap.clientWidth - pop.offsetWidth)) + "px";
+  pop.style.top = (node.offsetTop + node.offsetHeight + 2) + "px";
+}
+
 // ---------- actions ----------
 function go(i) {
   const d = curDay(); if (!d) return;
   const n = Math.max(0, Math.min(d.sentences.length - 1, i));
   if (n === sIdx) return;
-  sIdx = n; range = null; stopAudio(); render();
+  sIdx = n; range = null; cancelDrill(); closeEditor(); stopAudio(); render();
 }
 async function loadDay(date) {
   if (dayCache[date] || !db) return dayCache[date] || null;
@@ -774,9 +1556,11 @@ async function loadDay(date) {
 async function selectDay(date) {
   if (!isDate(date)) return;
   selDate = date; sIdx = 0; veil = false; calOpen = false; calMonth = null; range = null;
+  cancelDrill(); closeEditor();
   stopAudio();
+  syncMarks(date);
   if (!dayCache[date]) {
-    setState("正在读取" + dayLabel(date) + "的 5 句…", "");
+    setState("正在读取" + dayLabel(date) + "的练习…", "");
     render();
     try { await loadDay(date); } catch {}
     if (selDate !== date) return;
@@ -790,22 +1574,41 @@ function stepDay(delta) {
 }
 function setDates(list) {
   dates = [...new Set(A(list).filter(isDate))].sort().reverse();
-  if (!dates.length) { setState("今天的 5 句还在准备", "每天柏林时间早上 5 点前会自动放好 5 句带原声的德语原句和完整讲解，到时刷新页面就能看到。"); render(); return; }
+  if (!dates.length) { setState("今天的练习还在准备", "每天柏林时间早上 5 点前会自动放好 2 段带原声的德语原文和完整讲解，到时刷新页面就能看到。"); render(); return; }
   if (!selDate || !dates.includes(selDate)) selectDay(dates[0]); else render();
 }
+function toggleDone() {
+  const d = curDay(), s = curSent(); if (!d || !s) return;
+  const id = sid(d, s);
+  if (prog.done[id]) delete prog.done[id]; else prog.done[id] = today();
+  saveProg(); render();
+}
+function toggleVeil() {
+  veil = !veil;
+  preview(null); hidePop(); closeEditor(); cancelDrill();
+  if (veil) range = null;
+  render();
+  if (veil && !stageSeen) toStage();
+}
+function toggleLoop() { loop = !loop; if (!loop) clearTimeout(loopTimer); renderTools(); }
+function setRate(r) { rate = r; player.playbackRate = rate; renderTools(); }
 // In the sentence: a click plays from that word to the end; Shift+click sets where to stop.
-// In the gloss: a click plays just that word.
 function wordAct(node, shift) {
   if (!node) return;
-  const inSentence = !!node.closest("#sentence");
-  if (veil && inSentence) { node.classList.add("peek"); setTimeout(() => node.classList.remove("peek"), 2000); return; }
+  if (veil) { node.classList.add("peek"); setTimeout(() => node.classList.remove("peek"), 2000); return; }
   const i = Number(node.dataset.i);
   const s = curSent();
   if (!Number.isInteger(i) || !hasAudio(s)) return;
   const n = A(s.t).length;
-  if (!inSentence) { playTokens(i, i, node); return; }
   if (shift) { const anchor = range ? range.a : 0; playTokens(Math.min(anchor, i), Math.max(anchor, i), null); return; }
   playTokens(i, n - 1, null);
+}
+// In the breakdown: a click plays just that stretch; a second click while it plays stops it.
+function pieceAct(node) {
+  if (node.classList.contains("gw")) showPop(node);
+  if (!node.dataset.a || !hasAudio(curSent())) return;
+  if (playing && playing.node === node) { stopAudio(); return; }
+  playTokens(Number(node.dataset.a), Number(node.dataset.b), node);
 }
 function seekAt(e) {
   const s = curSent();
@@ -813,6 +1616,7 @@ function seekAt(e) {
   const box = $("seek").getBoundingClientRect();
   const rel = Math.max(0, Math.min(1, (e.clientX - box.left) / box.width)) * clipLen(s);
   const n = A(s.t).length;
+  if (veil) { setRange(null); playRange(rel, null, null); return; }
   const k = Math.max(0, wordAt(rel));
   const b = range && range.b >= k ? range.b : n - 1;
   setRange(k, b);
@@ -826,33 +1630,73 @@ $("cal-btn").addEventListener("click", () => { calOpen = !calOpen; calMonth = nu
 $("cal-prev").addEventListener("click", () => { const [y, m] = calMonth.split("-").map(Number); const d = new Date(y, m - 2, 1); calMonth = d.getFullYear() + "-" + pad(d.getMonth() + 1); render(); });
 $("cal-next").addEventListener("click", () => { const [y, m] = calMonth.split("-").map(Number); const d = new Date(y, m, 1); calMonth = d.getFullYear() + "-" + pad(d.getMonth() + 1); render(); });
 $("cal-latest").addEventListener("click", () => { if (dates[0]) selectDay(dates[0]); });
-document.addEventListener("click", (e) => { if (calOpen && !e.target.closest(".daynav")) { calOpen = false; render(); } });
-$("play-btn").addEventListener("click", togglePlay);
-for (const b of document.querySelectorAll("#speed button")) b.addEventListener("click", () => { rate = Number(b.dataset.rate); player.playbackRate = rate; renderTools(); });
-$("loop-btn").addEventListener("click", () => { loop = !loop; if (!loop) clearTimeout(loopTimer); renderTools(); });
-$("range-clear").addEventListener("click", () => { setRange(null); if (playing) stopAudio(); renderTools(); });
-$("seek").addEventListener("pointerdown", (e) => { e.preventDefault(); seekAt(e); });
-$("veil-btn").addEventListener("click", () => { veil = !veil; render(); });
-$("done-btn").addEventListener("click", () => {
-  const d = curDay(), s = curSent(); if (!d || !s) return;
-  const id = sid(d, s);
-  if (prog.done[id]) delete prog.done[id]; else prog.done[id] = today();
-  saveProg(); render();
+document.addEventListener("click", (e) => {
+  if (calOpen && !e.target.closest(".daynav")) { calOpen = false; render(); }
+  if (!e.target.closest(".gw")) hidePop();
 });
+$("play-btn").addEventListener("click", togglePlay);
+$("dock-play").addEventListener("click", togglePlay);
+$("listen-btn").addEventListener("click", () => {
+  const b = $("listen-btn");
+  if (playing && playing.node === b) { stopAudio(); return; }
+  setRange(null); playSelection(b);
+});
+for (const b of document.querySelectorAll("#speed button")) b.addEventListener("click", () => setRate(Number(b.dataset.rate)));
+$("dock-rate").addEventListener("click", () => setRate(rate === 1 ? 0.75 : rate === 0.75 ? 0.5 : 1));
+$("loop-btn").addEventListener("click", toggleLoop);
+$("dock-loop").addEventListener("click", toggleLoop);
+$("dock-top").addEventListener("click", toStage);
+$("range-clear").addEventListener("click", clearRange);
+$("seek").addEventListener("pointerdown", (e) => { e.preventDefault(); seekAt(e); });
+$("veil-btn").addEventListener("click", toggleVeil);
+$("veil-btn-2").addEventListener("click", toggleVeil);
+$("done-btn").addEventListener("click", toggleDone);
+$("done-btn-2").addEventListener("click", toggleDone);
+$("next-btn").addEventListener("click", () => { go(sIdx + 1); toStage(); });
+for (const n of [2, 3]) $("fold-" + n).addEventListener("click", () => { ui.fold[n] = !ui.fold[n]; saveUi(); render(); });
+for (const b of document.querySelectorAll(".layer-nav button")) b.addEventListener("click", () => $(b.dataset.go).scrollIntoView({ behavior: calm() ? "auto" : "smooth", block: "start" }));
+$("forms-btn").addEventListener("click", () => { ui.forms = !ui.forms; saveUi(); hidePop(); render(); });
 $("sentence").addEventListener("click", (e) => wordAct(e.target.closest(".w"), e.shiftKey));
 $("sentence").addEventListener("mousedown", (e) => { if (e.shiftKey) e.preventDefault(); });  // no text selection on Shift+click
 $("sentence").addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { const w = e.target.closest(".w"); if (w) { e.preventDefault(); e.stopPropagation(); wordAct(w, e.shiftKey); } } });
-$("gloss").addEventListener("click", (e) => wordAct(e.target.closest(".gw"), false));
+
+const piece = (t) => (t && t.closest ? t.closest("#steps [data-a], #steps .gw") : null);
+const steps = $("steps");
+steps.addEventListener("pointerover", (e) => { const n = piece(e.target); if (!n || e.pointerType === "touch") return; if (n.dataset.a) preview(n); if (n.classList.contains("gw")) showPop(n); });   // hovering is for a mouse; a tap goes through click
+steps.addEventListener("pointerout", (e) => { const n = piece(e.target); if (!n || e.pointerType === "touch" || n.contains(e.relatedTarget)) return; preview(null); if (n.classList.contains("gw")) hidePop(); });
+steps.addEventListener("focusin", (e) => { const n = piece(e.target); if (!n) return; if (n.dataset.a) preview(n); if (n.classList.contains("gw")) showPop(n); });
+steps.addEventListener("focusout", (e) => { const n = piece(e.target); if (!n) return; preview(null); hidePop(); });
+steps.addEventListener("click", (e) => {
+  if (e.target.closest("#mark-ed")) return;                 // the editor has its own buttons
+  const word = markMode ? e.target.closest("button.gt") : null;
+  if (word) { openEditor(Number(word.dataset.t)); return; }
+  const n = piece(e.target); if (n) pieceAct(n);
+});
+steps.addEventListener("keydown", (e) => {
+  if ((e.key !== "Enter" && e.key !== " ") || e.target.closest("button.gt, #mark-ed")) return;
+  const n = piece(e.target);
+  if (n && n.tagName !== "BUTTON") { e.preventDefault(); pieceAct(n); }
+});
+
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && calOpen) { calOpen = false; render(); $("cal-btn").focus(); return; }
+  if (e.key === "Escape") {
+    if (calOpen) { calOpen = false; render(); $("cal-btn").focus(); return; }
+    hidePop();
+    if (editing != null) { closeEditor(); return; }
+    if (range || playing) clearRange();
+    return;
+  }
   if (e.metaKey || e.ctrlKey || e.altKey || /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
   if (e.key === " " && !/^(BUTTON|A)$/.test(e.target.tagName) && e.target.getAttribute("role") !== "button") {
     if (hasAudio(curSent())) { e.preventDefault(); togglePlay(); }
     return;
   }
-  if (e.key === "ArrowLeft") { go(sIdx - 1); e.preventDefault(); }
-  else if (e.key === "ArrowRight") { go(sIdx + 1); e.preventDefault(); }
-  else if (/^[1-5]$/.test(e.key)) go(Number(e.key) - 1);
+  if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+    const delta = e.key === "ArrowLeft" ? -1 : 1;
+    if (e.shiftKey) stepGroup(delta); else go(sIdx + delta);
+    e.preventDefault();
+  }
+  else if (/^[1-9]$/.test(e.key)) go(Number(e.key) - 1);
 });
 
 render();
@@ -870,6 +1714,7 @@ render();
     db.collection("meta").doc("index").onSnapshot(async (snap) => {
       clearTimeout(timer); answered = true;
       const list = snap.exists ? A(snap.data().dates) : null;
+      if (snap.exists && snap.data().counts && typeof snap.data().counts === "object") counts = snap.data().counts;
       if (list) { setDates(list); return; }
       // no index yet: fall back to the newest days themselves
       const q = await db.collection("days").orderBy("date", "desc").limit(30).get();
@@ -877,8 +1722,9 @@ render();
       setDates(Object.keys(dayCache));
     }, () => { clearTimeout(timer); fail("没读到句子", "页面的数据库暂时不可用，刷新页面再试。"); });
 
-    const uid = user ? await user.id() : null;
+    uid = user ? await user.id() : null;
     if (uid) {
+      if (selDate) syncMarks(selDate);
       progRef = db.doc("data/users/" + uid + "/progress");
       const snap = await progRef.get();
       const remote = snap.exists ? snap.data() : null;

@@ -8,9 +8,12 @@ about 30 words. Each kept sentence gets a short MP3 clip of the real audio and
 the start/end time of every word inside that clip, so the page can play the
 whole sentence, one sense group or one word in the speaker's own voice.
 
+With --unit passage it keeps paragraphs instead: runs of consecutive sentences, spoken
+without a long pause between them, of --min-words to --max-words words (100-170 by default).
+
 Usage:
     python3 jingdu_audio_candidates.py --out cands.json --clips clips/ [--feeds news,pro,fun]
-                                       [--window 300] [--exclude used.json] [--date YYYY-MM-DD]
+                                       [--unit sentence|passage] [--window 300] [--exclude used.json] [--date YYYY-MM-DD]
 
 Needs: ffmpeg, `pip install faster-whisper`, and the environment variable
 HF_HUB_DISABLE_XET=1 where the Xet download host is not reachable. The model
@@ -45,6 +48,7 @@ FEEDS = {
 }
 UA = "Mozilla/5.0 (personal language-learning podcast reader)"
 MIN_WORDS, MAX_WORDS = 25, 35
+TURN_GAP = 1.2  # seconds of silence between two sentences that usually means the other speaker takes over
 AD_WORDS = re.compile(r"(Werbung|Anzeige|Sponsor|gesponsert|Rabatt|Gutschein|Code\b|präsentiert von|unterstützt von|"
                       r"Partner dieser Folge|Link in den Shownotes|Shownotes|abonnier|Abo\b|Steady|Patreon)", re.I)
 
@@ -112,7 +116,9 @@ def transcribe(model, wav_path):
                 continue
             # Whisper marks a new word with a leading space; a piece without one (e.g. "-Präsidentschaft")
             # belongs to the word before it.
-            if words and not w.word.startswith(" ") and (tok[0] in "-–'’" or tok[0].islower()):
+            # The same goes for the decimal part of a number ("32" + ",8").
+            if words and not w.word.startswith(" ") and (tok[0] in "-–'’" or tok[0].islower()
+                                                         or (re.match(r"[.,]\d", tok) and words[-1][0][-1:].isdigit())):
                 prev = words[-1]
                 words[-1] = [prev[0] + tok, prev[1], float(w.end), min(prev[3], float(w.probability))]
                 continue
@@ -151,15 +157,64 @@ def good(sent):
     return True
 
 
+def nwords(sent):
+    return len([w for w in sent if re.search(r"[\wÄÖÜäöüß]", w[0])])
+
+
+def passage_good(sents):
+    words = [w for s in sents for w in s]
+    text = " ".join(w[0] for w in words)
+    if not re.match(r"[\"„»(]?[A-ZÄÖÜ]", text) or text.endswith("?"):
+        return False
+    if AD_WORDS.search(text):
+        return False
+    if any(nwords(s) <= 2 for s in sents):  # "Ja." "Genau." "Mhm.": usually the other speaker
+        return False
+    probs = [w[3] for w in words]
+    if sum(probs) / len(probs) < 0.8 or min(probs) < 0.2 or sum(1 for p in probs if p < 0.5) > 4:
+        return False
+    if sum(1 for w in words if re.search(r"\d", w[0])) > 4:
+        return False
+    if words[-1][2] - words[0][1] > 80:
+        return False
+    return True
+
+
+def passages(sents, lo, hi):
+    """Non-overlapping runs of consecutive sentences with lo..hi words and no long pause inside."""
+    out, i = [], 0
+    while i < len(sents):
+        cur, n, j = [], 0, i
+        while j < len(sents):
+            if cur and sents[j][0][1] - cur[-1][-1][2] > TURN_GAP:
+                break
+            cur.append(sents[j])
+            n += nwords(sents[j])
+            j += 1
+            if n >= lo:
+                break
+        if lo <= n <= hi and passage_good(cur):
+            out.append(cur)
+            i = j
+        else:
+            i += 1
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", required=True)
     ap.add_argument("--clips", required=True)
     ap.add_argument("--feeds", default="news,pro,fun")
-    ap.add_argument("--window", type=int, default=300, help="seconds of audio to transcribe per podcast")
+    ap.add_argument("--window", type=int, default=0, help="seconds of audio to transcribe per podcast (default 300, or 420 for passages)")
+    ap.add_argument("--unit", choices=["sentence", "passage"], default="sentence")
+    ap.add_argument("--min-words", type=int, default=100, help="passages only")
+    ap.add_argument("--max-words", type=int, default=170, help="passages only")
     ap.add_argument("--exclude")
     ap.add_argument("--date", default=dt.date.today().isoformat(), help="varies the window position from day to day")
     args = ap.parse_args()
+    if not args.window:
+        args.window = 420 if args.unit == "passage" else 300
 
     os.makedirs(args.clips, exist_ok=True)
     work = os.path.join(args.clips, "_work")
@@ -201,9 +256,13 @@ def main():
              "-i", mp3, "-ac", "1", "-ar", "16000", wav])
         words = transcribe(model, wav)
         n = 0
-        for sent in sentences(words):
+        if args.unit == "passage":
+            units = [[w for s in p for w in s] for p in passages(sentences(words), args.min_words, args.max_words)]
+        else:
+            units = [s for s in sentences(words) if good(s)]
+        for sent in units:
             text = " ".join(w[0] for w in sent)
-            if text in used or not good(sent):
+            if text in used or any(u in text or text in u for u in used if len(u) > 40):
                 continue
             t0 = max(0.0, sent[0][1] - 0.25)
             t1 = sent[-1][2] + 0.35

@@ -45,9 +45,14 @@ def day_label(date):
     return f"{d.month}月{d.day}日 周{'一二三四五六日'[d.weekday()]}"
 
 
+def unit(day):
+    """句 for a day of single sentences, 段 for a day of passages."""
+    return "段" if day.get("unit") == "passage" else "句"
+
+
 def subject(day):
     topics = "、".join(str(s.get("topic", "")) for s in day["sentences"][:2] if s.get("topic"))
-    return f"精读训练 · {day_label(day['date'])} · 5 句德语原声" + (f"（{topics}…）" if topics else "")
+    return f"精读训练 · {day_label(day['date'])} · {len(day['sentences'])} {unit(day)}德语原声" + (f"（{topics}…）" if topics else "")
 
 
 def mmss(sec):
@@ -87,12 +92,13 @@ def render_html(day, lean=False, attached=False):
                  f'font-family:{SANS};color:#1b1b26;font-size:15px;line-height:1.65;">')
     h.append(f'<h2{S("margin:0 0 4px;font-size:21px;")}>精读训练 · {e(day_label(day["date"]))}</h2>')
     listen = "打开页面听原声、点词跟读" if has_audio else "打开页面"
-    h.append(f'<p{S(f"margin:0 0 6px;color:{MUTED};font-size:13.5px;")}>德语 · B2–C1 · 今天 5 句'
+    u, n = unit(day), len(day["sentences"])
+    h.append(f'<p{S(f"margin:0 0 6px;color:{MUTED};font-size:13.5px;")}>德语 · B2–C1 · 今天 {n} {u}'
              + ("真人原声" if has_audio else "原句")
              + f' · <a href="{PAGE}"{S(f"color:{ACCENT};font-weight:600;")}>{listen} →</a></p>')
     if has_audio and attached:
-        marks = " · ".join(f"第 {s['n']} 句 {mmss(s['clip'][0])}" for s in day["sentences"] if s.get("clip"))
-        h.append(f'<p{S(f"margin:0 0 4px;color:{MUTED};font-size:12.5px;")}>附件里的录音是 5 句连播：{marks}</p>')
+        marks = " · ".join(f"第 {s['n']} {u} {mmss(s['clip'][0])}" for s in day["sentences"] if s.get("clip"))
+        h.append(f'<p{S(f"margin:0 0 4px;color:{MUTED};font-size:12.5px;")}>附件里的录音是 {n} {u}连播：{marks}</p>')
 
     for s in day["sentences"]:
         flags = small_flags(s)
@@ -115,7 +121,7 @@ def render_html(day, lean=False, attached=False):
             h.append(f'<p><font face="Georgia" size="4">{sent}</font></p>')
         else:
             h.append(f'<p style="margin:0 0 8px;font-family:{SERIF};font-size:20px;line-height:1.6;">{sent}</p>')
-        h.append(f'<p{S("margin:0 0 6px;")}><b>整句</b>　{e(str(s.get("translation", "")))}</p>')
+        h.append(f'<p{S("margin:0 0 6px;")}><b>整{u}</b>　{e(str(s.get("translation", "")))}</p>')
         if s.get("phrasing"):
             sep = " | " if lean else f' <span style="color:{ACCENT};">|</span> '
             parts = [e(p.strip()) for p in str(s["phrasing"]).split("|") if p.strip()]
@@ -152,7 +158,7 @@ def render_html(day, lean=False, attached=False):
         listing("词组合后在这个语境里的意思", s.get("context", []),
                 lambda x: f'{de(x.get("text", ""))}　这里：{e(str(x.get("here", "")))}；换个搭配：{e(str(x.get("elsewhere", "")))}')
         if s.get("meanings"):
-            title("这句话的所有含义")
+            title(f"这{u}话的所有含义")
             h.append(f'<p{S("margin:0;")}>{e(str(s["meanings"]))}</p>')
         listing("发音难点", s.get("pron", []), lambda x: f'{de(x.get("word", ""))}　{e(str(x.get("tip", "")))}')
 
@@ -168,7 +174,7 @@ def render_text(day):
     t = [f"精读训练 · {day_label(day['date'])}", f"打开页面听原声：{PAGE}", ""]
     for s in day["sentences"]:
         t += [f"【{s['n']}】{s.get('source', '')} · {s.get('outlet', '')} · {s.get('topic', '')}", s["text"],
-              "整句：" + str(s.get("translation", "")), ""]
+              f"整{unit(day)}：" + str(s.get("translation", "")), ""]
         t += [f"  {g.get('w', '')}  {g.get('g', '')}  ({g.get('f', '')})" for g in s.get("gloss", [])]
         t += ["", "词组：" + "；".join(f"{c.get('text')} = {c.get('meaning')}" for c in s.get("chunks", [])),
               "小词：" + "；".join(f"{c.get('word')}：{c.get('role')}" for c in s.get("small", [])),

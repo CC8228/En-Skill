@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Assemble one day's set from the chosen audio candidates and their breakdowns.
 
-The breakdown file is a JSON list of five objects, in page order. Each names
+The breakdown file is a JSON list of the day's items (five sentences, or two passages with --unit passage),
+in page order. Each names
 the candidate it explains ("cid") and carries the teaching fields (topic,
 level, translation, gloss, chunks, structure, relations, context, small,
 meanings, phrasing, stress, pron). Everything that must match the recording
 exactly (text, word timings, source, link, the audio itself) is copied from the
 candidate here, never retyped.
 
-The five clips are joined into one audio file for the day (AAC in an .mp4
+The clips are joined into one audio file for the day (AAC in an .mp4
 container: the page's file store takes .mp4 but not .mp3) (a short pause between
 sentences); each sentence records where it sits in that file ("clip": [start,
 end] in seconds) and its word timings relative to that start ("t").
@@ -27,7 +28,7 @@ import subprocess
 import sys
 
 TEACH = ["topic", "level", "translation", "gloss", "chunks", "structure", "relations", "context", "small",
-         "meanings", "phrasing", "stress", "pron"]
+         "meanings", "phrasing", "stress", "pron", "build", "grammar", "why", "rewrite", "pitfalls"]
 FROM_CAND = ["text", "source", "outlet", "title", "url", "published", "at", "words", "t"]
 GAP = 0.6  # seconds of silence between sentences in the day's file
 
@@ -47,6 +48,7 @@ def main():
     ap.add_argument("--date", required=True)
     ap.add_argument("--out", required=True)
     ap.add_argument("--audio-id", default="", help="asset id of the uploaded day audio file")
+    ap.add_argument("--unit", choices=["sentence", "passage"], default="sentence", help="what one item of the day is")
     args = ap.parse_args()
 
     cands = {c["cid"]: c for c in json.load(open(args.cands, encoding="utf-8"))}
@@ -62,7 +64,7 @@ def main():
         d = duration(c["clip"])
         s = {"n": n, "cid": c["cid"]}
         s.update({k: c[k] for k in FROM_CAND})
-        s.update({k: b.get(k) for k in TEACH})
+        s.update({k: b.get(k) for k in TEACH if k in b})
         s["clip"] = [round(pos, 2), round(pos + d, 2)]
         sentences.append(s)
         clips.append(c["clip"])
@@ -84,7 +86,7 @@ def main():
                         "-map", "[out]", "-ac", "1", "-ar", "24000", "-c:a", "aac", "-b:a", "48k", "-movflags", "+faststart", mp4],
                        check=True)
 
-    day = {"date": args.date, "lang": "de", "level": "B2–C1", "audio": True, "audioId": args.audio_id,
+    day = {"date": args.date, "lang": "de", "level": "B2–C1", "unit": args.unit, "audio": True, "audioId": args.audio_id,
            "createdAt": dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "sentences": sentences}
     json.dump(day, open(os.path.join(args.out, "day.json"), "w", encoding="utf-8"), ensure_ascii=False)
     print(f"wrote {mp4} ({os.path.getsize(mp4) // 1024} KB, {pos:.1f}s) and {args.out}/day.json"

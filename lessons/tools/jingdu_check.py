@@ -4,8 +4,10 @@
 Usage:
     python3 jingdu_check.py day.json [--cands cands.json]
 
-Works for both kinds of day: text sentences, and spoken sentences with audio
-(then the day needs "audioId", and every sentence word timings "t" and its "clip" span).
+Works for text sentences and for spoken items with audio (then the day needs "audioId",
+and every item word timings "t" and its "clip" span). A day is five sentences of 25-35
+words, or, when it says "unit": "passage", two passages of 100-170 words, each explained
+in full depth (build, grammar, why, rewrite, pitfalls, and one structure entry per sentence).
 Exits 0 and prints "OK" when the file is fit to publish; otherwise lists every
 problem and exits 1. With --cands, each sentence must match a collected
 candidate exactly, so a sentence can never drift from its source.
@@ -18,6 +20,14 @@ SOURCES = {"新闻", "专业", "娱乐"}
 STR_FIELDS = ["text", "source", "outlet", "title", "url", "published", "topic", "level",
               "translation", "relations", "meanings", "phrasing"]
 LIST_MIN = {"gloss": 1, "chunks": 4, "structure": 2, "context": 2, "small": 3, "stress": 3, "pron": 1}
+UNITS = {
+    "sentence": {"count": 5, "words": (25, 35), "min": LIST_MIN, "deep": {}},
+    "passage": {"count": 2, "words": (100, 170),
+                "min": {"gloss": 1, "chunks": 8, "structure": 2, "context": 3, "small": 4, "stress": 6, "pron": 3},
+                "deep": {"build": (3, ("text", "note")), "grammar": (4, ("point", "rule", "here", "example")),
+                         "why": (5, ("q", "a")), "rewrite": (2, ("text", "note")), "pitfalls": (4, ("wrong", "right", "why"))}},
+}
+SENT_END = re.compile(r"[.!?][\"“”»«’)]*$")
 
 
 def norm(w):
@@ -32,9 +42,13 @@ def check(day, cands=None):
         errs.append('lang must be "de"')
     if day.get("audio") and not str(day.get("audioId", "")).strip():
         errs.append("audioId is empty: upload the day's .mp4 and rebuild with --audio-id")
+    unit = day.get("unit", "sentence")
+    if unit not in UNITS:
+        return errs + ['unit must be "sentence" or "passage"']
+    U = UNITS[unit]
     sents = day.get("sentences")
-    if not isinstance(sents, list) or len(sents) != 5:
-        return errs + ["sentences must be a list of exactly 5"]
+    if not isinstance(sents, list) or len(sents) != U["count"]:
+        return errs + [f"sentences must be a list of exactly {U['count']} ({unit})"]
     texts = set()
     for i, s in enumerate(sents, 1):
         p = f"sentence {i}: "
@@ -43,7 +57,7 @@ def check(day, cands=None):
         for f in STR_FIELDS:
             if not isinstance(s.get(f), str) or not s.get(f).strip():
                 errs.append(p + f"missing text field '{f}'")
-        for f, k in LIST_MIN.items():
+        for f, k in U["min"].items():
             if not isinstance(s.get(f), list) or len(s.get(f)) < k:
                 errs.append(p + f"'{f}' needs at least {k} entries")
         text = s.get("text", "")
@@ -56,8 +70,9 @@ def check(day, cands=None):
             errs.append(p + 'level must be "B2" or "C1"')
         tokens = text.split()
         words = [t for t in tokens if re.search(r"[\wÄÖÜäöüß]", t)]
-        if not 25 <= len(words) <= 35:
-            errs.append(p + f"{len(words)} words; needs 25-35")
+        lo, hi = U["words"]
+        if not lo <= len(words) <= hi:
+            errs.append(p + f"{len(words)} words; needs {lo}-{hi}")
         if s.get("words") != len(words):
             errs.append(p + f"words must be {len(words)}")
         if cands is not None and text not in cands:
@@ -88,6 +103,39 @@ def check(day, cands=None):
         for w in s.get("stress") or []:
             if not all(norm(x) in have for x in str(w).split()):
                 errs.append(p + f"stress word {w!r} is not in the sentence")
+        # the deeper layer: required for passages, checked whenever it is there
+        deep = dict(U["deep"])
+        for k, need in UNITS["passage"]["deep"].items():
+            if k not in deep and s.get(k):
+                deep[k] = (1, need[1])
+        for k, (n, keys) in deep.items():
+            v = s.get(k)
+            if not isinstance(v, list) or len(v) < n or any(not isinstance(x, dict) or any(not str(x.get(f, "")).strip() for f in keys) for x in v):
+                errs.append(p + f"'{k}' needs at least {n} entries, each with {', '.join(keys)}")
+        build = s.get("build") or []
+        if build and isinstance(build[-1], dict):
+            last = str(build[-1].get("text", ""))
+            if unit == "passage":
+                at = text.find(last)
+                if not last or at < 0 or (at > 0 and not SENT_END.search(text[:at].rstrip())) or not SENT_END.search(last):
+                    errs.append(p + "the last build step must be one whole sentence of the passage, character for character")
+            elif last != text:
+                errs.append(p + "the last build step must be the sentence itself, character for character")
+        if unit == "passage":
+            at = 0
+            for j, seg in enumerate(s.get("structure") or []):
+                seg_text = str(seg.get("text", "")) if isinstance(seg, dict) else ""
+                k = text.find(seg_text, at) if seg_text else -1
+                if k < 0:
+                    errs.append(p + f"structure[{j}] is not the next stretch of the passage word for word")
+                    break
+                at = k + len(seg_text)
+                if not str(seg.get("zh", "")).strip():
+                    errs.append(p + f"structure[{j}] needs its Chinese translation 'zh'")
+            if at and text[at:].strip():
+                errs.append(p + "structure must cover the passage to its end")
+            if len(s.get("rewrite") or []) != 2:
+                errs.append(p + "rewrite needs exactly 2 entries (书面版, 简单版)")
         if not str(s.get("url", "")).startswith("https://"):
             errs.append(p + "url must start with https://")
         if "t" in s or day.get("audio"):
